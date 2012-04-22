@@ -1,11 +1,19 @@
 package com.playnomics.analytics;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -16,18 +24,39 @@ import android.view.View;
 import android.view.Window.Callback;
 import android.view.accessibility.AccessibilityEvent;
 
+import com.playnomics.analytics.PlaynomicsEvent.EventTypes;
+
 public class PlaynomicsSession {
 	
 	private static final String TAG = PlaynomicsSession.class.getSimpleName();
 	
-	private static final int UPDATE_INTERVAL = 10000;
+	private static final int UPDATE_INTERVAL = 60000;
 	private static Timer eventTimer;
 	private static List<PlaynomicsEvent> eventList = new CopyOnWriteArrayList<PlaynomicsEvent>();
 	private static PlaynomicsTimerTask timerTask = new PlaynomicsTimerTask();
-	private static String apiKey;
 	private static Activity activity;
-	private static String userId;
 	private static Callback activityCallback;
+	private static SharedPreferences settings;
+	private static Editor editor;
+	
+	// Tracking values
+	private static int collectMode = 7;
+	
+	private static int sequence = 0;
+	
+	private static String applicationId;
+	private static String cookieId;
+	private static String sessionId;
+	private static String instanceId;
+	private static Date sessionStartTime;
+	private static String userId;
+	private static int timeZoneOffset;
+	private static int clicks;
+	private static int totalClicks;
+	private static int keys;
+	private static int totalKeys;
+	
+	private static Date pauseTime;
 	
 	private static enum SessionStates {
 		UNKNOWN, STARTED, PAUSED, STOPPED
@@ -46,20 +75,20 @@ public class PlaynomicsSession {
 		start(activity, apiKey);
 	}
 	
-	public static void start(Activity activity, String apiKey) {
+	public static void start(Activity activity, String applicationId) {
 	
 		if (sessionState.equals(SessionStates.STARTED))
 			return;
 		
 		sessionState = SessionStates.STARTED;
-		PlaynomicsSession.apiKey = apiKey;
+		PlaynomicsSession.applicationId = applicationId;
+		
 		PlaynomicsSession.activity = activity;
 		activityCallback = activity.getWindow().getCallback();
-
+		
 		// Startup the event timer to send events back to the server
 		eventTimer = new Timer(true);
-		eventTimer.scheduleAtFixedRate(timerTask, 1000, UPDATE_INTERVAL);
-		
+		eventTimer.scheduleAtFixedRate(timerTask, 0, UPDATE_INTERVAL);
 		
 		activity.getWindow().setCallback(new Callback() {
 			
@@ -164,9 +193,8 @@ public class PlaynomicsSession {
 			public boolean dispatchTouchEvent(MotionEvent event) {
 			
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					// TODO: add to queue
-					PlaynomicsEvent pe = new PlaynomicsEvent(PlaynomicsEvent.EventTypes.EVENT_CLICK, "blah");
-					eventList.add(pe);
+					clicks += 1;
+					totalClicks += 1;
 				}
 				return activityCallback.dispatchTouchEvent(event);
 			}
@@ -186,11 +214,11 @@ public class PlaynomicsSession {
 			@Override
 			public boolean dispatchKeyEvent(KeyEvent event) {
 			
-				if (event.getAction()  == KeyEvent.ACTION_DOWN) {
-					PlaynomicsEvent pe = new PlaynomicsEvent(PlaynomicsEvent.EventTypes.EVENT_KEY, "blah");
-					eventList.add(pe);					
+				if (event.getAction() == KeyEvent.ACTION_DOWN) {
+					keys += 1;
+					totalKeys += 1;
 				}
-		
+				
 				return activityCallback.dispatchKeyEvent(event);
 			}
 			
@@ -201,7 +229,44 @@ public class PlaynomicsSession {
 			}
 		});
 		
-		PlaynomicsEvent pe = new PlaynomicsEvent(PlaynomicsEvent.EventTypes.EVENT_START, "blah");
+		sequence = 1;
+		clicks = 0;
+		totalClicks = 0;
+		keys = 0;
+		totalKeys = 0;
+		
+		sessionStartTime = new Date();
+		timeZoneOffset = TimeZone.getDefault().getRawOffset() / -60000;
+		collectMode = 7;
+		
+		settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
+		editor = settings.edit();
+		
+		EventTypes eventType;
+		
+		// Send an appStart if it has been > 3 min since the last session; otherwise send an appPAge
+		if (settings.getLong("lastSessionStartTime", 0) - sessionStartTime.getTime() > 180000) {
+			sessionId = RandomGenerator.createRandomHex();
+			editor.putString("lastSessionId", sessionId);
+			instanceId = sessionId;
+			eventType = EventTypes.appStart;
+		}
+		else {
+			sessionId = settings.getString("lastSessionId", "");
+			instanceId = RandomGenerator.createRandomHex();
+			eventType = EventTypes.appPage;
+		}
+		
+		editor.putLong("lastSessionStartTime", sessionStartTime.getTime());
+		editor.commit();
+		
+		// Get unique ID for device; may be null on emulator
+		String cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
+		if (cookieId == null) cookieId = "TEST_DEVICE";
+		
+		PlaynomicsEvent pe = new PlaynomicsEvent(eventType, applicationId, userId, cookieId, sessionId,
+			instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks, keys, totalKeys, collectMode);
+		
 		eventList.add(pe);
 	}
 	
@@ -209,9 +274,16 @@ public class PlaynomicsSession {
 	
 		if (sessionState.equals(SessionStates.PAUSED))
 			return;
+		pauseTime = new Date();
 		sessionState = SessionStates.PAUSED;
-		PlaynomicsEvent pe = new PlaynomicsEvent(PlaynomicsEvent.EventTypes.EVENT_PAUSE, "blah");
-		eventList.add(pe);
+	}
+	
+	public static void resume() {
+	
+		if (sessionState.equals(SessionStates.STARTED))
+			return;
+		
+		sessionState = SessionStates.STARTED;
 	}
 	
 	public static void stop() {
@@ -220,9 +292,11 @@ public class PlaynomicsSession {
 			return;
 		
 		sessionState = SessionStates.STOPPED;
-		PlaynomicsEvent pe = new PlaynomicsEvent(PlaynomicsEvent.EventTypes.EVENT_STOP , "blah");
+		PlaynomicsEvent pe = new PlaynomicsEvent(EventTypes.appStop, applicationId, userId, cookieId, sessionId,
+			instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks, keys, totalKeys, collectMode);
 		eventList.add(pe);
-		// TODO: Revisit stopping the timer logic; we might want to keep trying if offline
+		// TODO: Revisit stopping the timer logic; we might want to keep trying
+		// if offline
 		timerTask.run();
 		eventTimer.cancel();
 		
@@ -231,7 +305,7 @@ public class PlaynomicsSession {
 	}
 	
 	public static void logEvent(PlaynomicsEvent pe) {
-
+	
 		eventList.add(pe);
 	}
 	
@@ -244,12 +318,22 @@ public class PlaynomicsSession {
 	
 		PlaynomicsSession.userId = userId;
 	}
-
+	
 	private static class PlaynomicsTimerTask extends TimerTask {
 		
 		@Override
 		public void run() {
 		
+			sequence += 1;
+			PlaynomicsEvent runningPE = new PlaynomicsEvent(EventTypes.appRunning, applicationId, userId, cookieId,
+				sessionId, instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks,
+				keys, totalKeys, collectMode);
+			eventList.add(runningPE);
+			
+			// Reset keys/clicks
+			keys = 0;
+			clicks = 0;
+			
 			for (PlaynomicsEvent pe : eventList) {
 				
 				// Send the event and remove if successful
@@ -260,10 +344,50 @@ public class PlaynomicsSession {
 		
 		private boolean sendToServer(PlaynomicsEvent pe) {
 		
-			// TODO: implement
-			// TODO: add server availability check
-			Log.i(TAG, "Sending event to server for session" + apiKey + ": " + pe.toString());
-			return true;
+			try {
+				// Set common params
+				String eventUrl = "https://test.b.playnomics.net/v1/"
+					+ pe.getEventType()
+					+ "?t=" + pe.getEventTime().getTime()
+					+ "&a=" + pe.getApplicationId()
+					+ "&b=" + pe.getCookieId()
+					+ "&s=" + pe.getSessionId()
+					+ "&i=" + pe.getInstanceId();
+				
+				switch (pe.getEventType()) {
+				
+					case appStart:
+					case appPage:
+						eventUrl += "&z=" + pe.getTimeZoneOffset();
+						break;
+						
+					case appRunning:
+						eventUrl += "&r=" + pe.getSessionStartTime()
+						+ "&q=" + pe.getSequence()
+						+ "&d=" + UPDATE_INTERVAL
+						+ "&c=" + pe.getClicks()
+						+ "&e=" + pe.getTotalClicks()
+						+ "&k=" + pe.getKeys()
+						+ "&l=" + pe.getTotalKeys()
+						+ "&m=" + pe.getCollectMode();
+						break;
+						
+					case appPause:
+						eventUrl += "&r=" + pe.getSessionStartTime()
+						+ "&q=" + pe.getSequence();
+					case appResume:
+						eventUrl += "&p=" + pauseTime;
+				}
+				
+				Log.i(TAG, "Sending event to server: " + eventUrl);
+				HttpURLConnection.setFollowRedirects(false);
+				HttpURLConnection con =	(HttpURLConnection) new URL(eventUrl).openConnection();
+				con.setRequestMethod("HEAD");
+				return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
 		}
 	}
 }
