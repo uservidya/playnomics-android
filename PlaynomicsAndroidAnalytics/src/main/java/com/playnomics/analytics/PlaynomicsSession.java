@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.Window.Callback;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.playnomics.analytics.PlaynomicsEvent.EventTypes;
+import com.playnomics.analytics.PlaynomicsEvent.EventType;
 
 public class PlaynomicsSession {
 	
@@ -79,8 +79,14 @@ public class PlaynomicsSession {
 	
 	public static void start(Activity activity, String applicationId) {
 	
-		if (sessionState.equals(SessionStates.STARTED))
+		if (sessionState == SessionStates.STARTED)
 			return;
+		
+		// If paused, resume and get out of here
+		if (sessionState == SessionStates.PAUSED) {
+			resume();
+			return;
+		}
 		
 		sessionState = SessionStates.STARTED;
 		PlaynomicsSession.applicationId = applicationId;
@@ -89,12 +95,10 @@ public class PlaynomicsSession {
 		activityCallback = activity.getWindow().getCallback();
 		
 		// Startup the event timer to send events back to the server
-		if (eventTimer == null)
+		if (eventTimer == null) {
 			eventTimer = new Timer(true);
-		else
-			eventTimer.cancel();
-		
-		eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+		}
 		
 		activity.getWindow().setCallback(new Callback() {
 			
@@ -108,24 +112,13 @@ public class PlaynomicsSession {
 			@Override
 			public void onWindowFocusChanged(boolean hasFocus) {
 			
-				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
-				PlaynomicsEvent pe;
-				// Are we pausing or resuming?
-				if (hasFocus) {
-					pe = new PlaynomicsEvent(EventTypes.appResume, PlaynomicsSession.applicationId, userId,
-						cookieId, sessionId, instanceId, timeZoneOffset);
-					pe.setPauseTime(pauseTime);
-					sequence += 1;
-					pe.setSequence(sequence);
-				}
-				else {
-					pe = new PlaynomicsEvent(EventTypes.appPause, PlaynomicsSession.applicationId, userId,
-						cookieId, sessionId, instanceId, timeZoneOffset);					
-				}
-				
-				pe.setSessionStartTime(sessionStartTime);
-				eventList.add(pe);
 				activityCallback.onWindowFocusChanged(hasFocus);
+				
+				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
+				// Are we pausing?
+				if (!hasFocus) {
+					pause();
+				}
 			}
 			
 			@Override
@@ -265,7 +258,7 @@ public class PlaynomicsSession {
 		settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
 		editor = settings.edit();
 		
-		EventTypes eventType;
+		EventType eventType;
 		
 		// Send an appStart if it has been > 3 min since the last session;
 		// otherwise send an appPAge
@@ -273,25 +266,24 @@ public class PlaynomicsSession {
 			sessionId = RandomGenerator.createRandomHex();
 			editor.putString("lastSessionId", sessionId);
 			instanceId = sessionId;
-			eventType = EventTypes.appStart;
+			eventType = EventType.appStart;
 		}
 		else {
 			sessionId = settings.getString("lastSessionId", "");
 			instanceId = RandomGenerator.createRandomHex();
-			eventType = EventTypes.appPage;
+			eventType = EventType.appPage;
 		}
 		
 		editor.putLong("lastSessionStartTime", sessionStartTime.getTime());
 		editor.commit();
 		
 		// Get unique ID for device; may be null on emulator
-		String cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
+		cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
 		if (cookieId == null)
-			cookieId = "TEST_DEVICE";
+			cookieId = "UNKNOWN_DEVICE_ID";
 		
 		PlaynomicsEvent pe = new PlaynomicsEvent(eventType, applicationId, userId, cookieId, sessionId,
 			instanceId, timeZoneOffset);
-		
 		eventList.add(pe);
 	}
 	
@@ -299,8 +291,13 @@ public class PlaynomicsSession {
 	
 		if (sessionState.equals(SessionStates.PAUSED))
 			return;
-		pauseTime = new Date();
+		
+		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
+			cookieId, sessionId, instanceId, timeZoneOffset);
 		sessionState = SessionStates.PAUSED;
+		pauseTime = new Date();
+		pe.setSessionStartTime(sessionStartTime);
+		eventList.add(pe);
 	}
 	
 	public static void resume() {
@@ -309,6 +306,13 @@ public class PlaynomicsSession {
 			return;
 		
 		sessionState = SessionStates.STARTED;
+		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appResume, applicationId, userId,
+			cookieId, sessionId, instanceId, timeZoneOffset);
+		pe.setPauseTime(pauseTime);
+		pe.setSessionStartTime(sessionStartTime);
+		sequence += 1;
+		pe.setSequence(sequence);
+		eventList.add(pe);
 	}
 	
 	public static void stop() {
@@ -317,7 +321,7 @@ public class PlaynomicsSession {
 			return;
 		
 		sessionState = SessionStates.STOPPED;
-		PlaynomicsEvent pe = new PlaynomicsEvent(EventTypes.appStop, applicationId, userId, cookieId, sessionId,
+		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appStop, applicationId, userId, cookieId, sessionId,
 			instanceId, timeZoneOffset);
 		eventList.add(pe);
 		// TODO: Revisit stopping the timer logic; we might want to keep trying
@@ -350,7 +354,7 @@ public class PlaynomicsSession {
 		public void run() {
 		
 			sequence += 1;
-			PlaynomicsEvent runningPE = new PlaynomicsEvent(EventTypes.appRunning, applicationId, userId, cookieId,
+			PlaynomicsEvent runningPE = new PlaynomicsEvent(EventType.appRunning, applicationId, userId, cookieId,
 				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
 			eventList.add(runningPE);
 			

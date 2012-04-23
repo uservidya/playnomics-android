@@ -4,11 +4,11 @@ import java.util.Date;
 
 public class PlaynomicsEvent {
 	
-	public enum EventTypes {
+	public enum EventType {
 		appStart, appPage, appRunning, appPause, appResume, appStop
 	};
 	
-	private EventTypes eventType;
+	private EventType eventType;
 	private Date eventTime;
 	private String applicationId;
 	private String userId;
@@ -25,7 +25,7 @@ public class PlaynomicsEvent {
 	private int totalKeys;
 	private int collectMode;
 	
-	public PlaynomicsEvent(EventTypes eventType, String applicationId, String userId, String cookieId,
+	public PlaynomicsEvent(EventType eventType, String applicationId, String userId, String cookieId,
 		String sessionId, String instanceId, Date sessionStartTime, int sequence, int clicks,
 		int totalClicks, int keys, int totalKeys, int collectMode) {
 	
@@ -45,7 +45,7 @@ public class PlaynomicsEvent {
 		this.collectMode = collectMode;
 	}
 	
-	public PlaynomicsEvent(EventTypes eventType, String applicationId, String userId, String cookieId,
+	public PlaynomicsEvent(EventType eventType, String applicationId, String userId, String cookieId,
 		String sessionId, String instanceId, int timeZoneOffset) {
 	
 		eventTime = new Date();
@@ -58,12 +58,12 @@ public class PlaynomicsEvent {
 		this.timeZoneOffset = timeZoneOffset;
 	}
 	
-	public EventTypes getEventType() {
+	public EventType getEventType() {
 	
 		return eventType;
 	}
 	
-	public void setEventType(EventTypes eventType) {
+	public void setEventType(EventType eventType) {
 	
 		this.eventType = eventType;
 	}
