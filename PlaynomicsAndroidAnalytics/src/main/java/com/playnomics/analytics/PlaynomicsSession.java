@@ -29,6 +29,8 @@ import com.playnomics.analytics.PlaynomicsEvent.EventTypes;
 public class PlaynomicsSession {
 	
 	private static final String TAG = PlaynomicsSession.class.getSimpleName();
+	// TODO: Externalize this string
+	private static final String PLAYNOMICS_BASE_URL = "https://test.b.playnomics.net/v1/";
 	
 	private static final int UPDATE_INTERVAL = 60000;
 	private static Timer eventTimer;
@@ -87,8 +89,12 @@ public class PlaynomicsSession {
 		activityCallback = activity.getWindow().getCallback();
 		
 		// Startup the event timer to send events back to the server
-		eventTimer = new Timer(true);
-		eventTimer.scheduleAtFixedRate(timerTask, 0, UPDATE_INTERVAL);
+		if (eventTimer == null)
+			eventTimer = new Timer(true);
+		else
+			eventTimer.cancel();
+		
+		eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
 		
 		activity.getWindow().setCallback(new Callback() {
 			
@@ -102,6 +108,23 @@ public class PlaynomicsSession {
 			@Override
 			public void onWindowFocusChanged(boolean hasFocus) {
 			
+				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
+				PlaynomicsEvent pe;
+				// Are we pausing or resuming?
+				if (hasFocus) {
+					pe = new PlaynomicsEvent(EventTypes.appResume, PlaynomicsSession.applicationId, userId,
+						cookieId, sessionId, instanceId, timeZoneOffset);
+					pe.setPauseTime(pauseTime);
+					sequence += 1;
+					pe.setSequence(sequence);
+				}
+				else {
+					pe = new PlaynomicsEvent(EventTypes.appPause, PlaynomicsSession.applicationId, userId,
+						cookieId, sessionId, instanceId, timeZoneOffset);					
+				}
+				
+				pe.setSessionStartTime(sessionStartTime);
+				eventList.add(pe);
 				activityCallback.onWindowFocusChanged(hasFocus);
 			}
 			
@@ -244,7 +267,8 @@ public class PlaynomicsSession {
 		
 		EventTypes eventType;
 		
-		// Send an appStart if it has been > 3 min since the last session; otherwise send an appPAge
+		// Send an appStart if it has been > 3 min since the last session;
+		// otherwise send an appPAge
 		if (settings.getLong("lastSessionStartTime", 0) - sessionStartTime.getTime() > 180000) {
 			sessionId = RandomGenerator.createRandomHex();
 			editor.putString("lastSessionId", sessionId);
@@ -262,10 +286,11 @@ public class PlaynomicsSession {
 		
 		// Get unique ID for device; may be null on emulator
 		String cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
-		if (cookieId == null) cookieId = "TEST_DEVICE";
+		if (cookieId == null)
+			cookieId = "TEST_DEVICE";
 		
 		PlaynomicsEvent pe = new PlaynomicsEvent(eventType, applicationId, userId, cookieId, sessionId,
-			instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks, keys, totalKeys, collectMode);
+			instanceId, timeZoneOffset);
 		
 		eventList.add(pe);
 	}
@@ -293,7 +318,7 @@ public class PlaynomicsSession {
 		
 		sessionState = SessionStates.STOPPED;
 		PlaynomicsEvent pe = new PlaynomicsEvent(EventTypes.appStop, applicationId, userId, cookieId, sessionId,
-			instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks, keys, totalKeys, collectMode);
+			instanceId, timeZoneOffset);
 		eventList.add(pe);
 		// TODO: Revisit stopping the timer logic; we might want to keep trying
 		// if offline
@@ -326,8 +351,7 @@ public class PlaynomicsSession {
 		
 			sequence += 1;
 			PlaynomicsEvent runningPE = new PlaynomicsEvent(EventTypes.appRunning, applicationId, userId, cookieId,
-				sessionId, instanceId, sessionStartTime, sequence, timeZoneOffset, clicks, totalClicks,
-				keys, totalKeys, collectMode);
+				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
 			eventList.add(runningPE);
 			
 			// Reset keys/clicks
@@ -346,7 +370,7 @@ public class PlaynomicsSession {
 		
 			try {
 				// Set common params
-				String eventUrl = "https://test.b.playnomics.net/v1/"
+				String eventUrl = PLAYNOMICS_BASE_URL
 					+ pe.getEventType()
 					+ "?t=" + pe.getEventTime().getTime()
 					+ "&a=" + pe.getApplicationId()
@@ -360,31 +384,31 @@ public class PlaynomicsSession {
 					case appPage:
 						eventUrl += "&z=" + pe.getTimeZoneOffset();
 						break;
-						
+					
 					case appRunning:
 						eventUrl += "&r=" + pe.getSessionStartTime()
-						+ "&q=" + pe.getSequence()
-						+ "&d=" + UPDATE_INTERVAL
-						+ "&c=" + pe.getClicks()
-						+ "&e=" + pe.getTotalClicks()
-						+ "&k=" + pe.getKeys()
-						+ "&l=" + pe.getTotalKeys()
-						+ "&m=" + pe.getCollectMode();
+							+ "&q=" + pe.getSequence()
+							+ "&d=" + UPDATE_INTERVAL
+							+ "&c=" + pe.getClicks()
+							+ "&e=" + pe.getTotalClicks()
+							+ "&k=" + pe.getKeys()
+							+ "&l=" + pe.getTotalKeys()
+							+ "&m=" + pe.getCollectMode();
 						break;
-						
+					
 					case appPause:
 						eventUrl += "&r=" + pe.getSessionStartTime()
-						+ "&q=" + pe.getSequence();
+							+ "&q=" + pe.getSequence();
 					case appResume:
-						eventUrl += "&p=" + pauseTime;
+						eventUrl += "&p=" + pe.getPauseTime();
 				}
 				
 				Log.i(TAG, "Sending event to server: " + eventUrl);
-				HttpURLConnection.setFollowRedirects(false);
-				HttpURLConnection con =	(HttpURLConnection) new URL(eventUrl).openConnection();
-				con.setRequestMethod("HEAD");
+				HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
+				// con.setRequestMethod("HEAD");
 				return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 			} catch (Exception e) {
+				Log.e(TAG, e.getMessage());
 				e.printStackTrace();
 				return false;
 			}
