@@ -31,6 +31,8 @@ import com.playnomics.analytics.PlaynomicsEvent.EventType;
 
 public class PlaynomicsSession {
 	
+	private static final String SETTING_LAST_SESSION_START_TIME = "lastSessionStartTime";
+	private static final String SETTING_LAST_USER_ID = "lastUserId";
 	private static final String TAG = PlaynomicsSession.class.getSimpleName();
 	// TODO: Externalize this string
 	private static final String PLAYNOMICS_BASE_URL = "https://test.b.playnomics.net/v1/";
@@ -56,7 +58,7 @@ public class PlaynomicsSession {
 	private static String sessionId;
 	private static String instanceId;
 	private static Date sessionStartTime;
-	private static String userId;
+	private static String userId = "";
 	private static int timeZoneOffset;
 	private static int clicks;
 	private static int totalClicks;
@@ -82,8 +84,10 @@ public class PlaynomicsSession {
 		start(activity, apiKey);
 	}
 	
-	public static void start(Activity activity, String applicationId) {
-	
+	public static void start(Activity activity, String applicationId) {	
+		
+		Log.i(TAG, "start() called");
+		
 		if (sessionState == SessionStates.STARTED)
 			return;
 		
@@ -267,9 +271,10 @@ public class PlaynomicsSession {
 		
 		EventType eventType;
 		
-		// Send an appStart if it has been > 3 min since the last session;
+		// Send an appStart if it has been > 3 min since the last session or a different user
 		// otherwise send an appPage
-		if (settings.getLong("lastSessionStartTime", 0) - sessionStartTime.getTime() > 180000) {
+		if (sessionStartTime.getTime() - settings.getLong(SETTING_LAST_SESSION_START_TIME, 0) > 180000
+			|| !settings.getString(SETTING_LAST_USER_ID, "").equals(userId)) {
 			sessionId = RandomGenerator.createRandomHex();
 			editor.putString(SETTING_LAST_SESSION_ID, sessionId);
 			instanceId = sessionId;
@@ -281,7 +286,8 @@ public class PlaynomicsSession {
 			eventType = EventType.appPage;
 		}
 		
-		editor.putLong("lastSessionStartTime", sessionStartTime.getTime());
+		editor.putString(SETTING_LAST_USER_ID, userId);
+		editor.putLong(SETTING_LAST_SESSION_START_TIME, sessionStartTime.getTime());
 		editor.commit();
 		
 		// Get unique ID for device; may be null on emulator
@@ -306,8 +312,9 @@ public class PlaynomicsSession {
 		eventList.add(pe);
 	}
 	
-	public static void pause() {
+	private static void pause() {
 	
+		Log.i(TAG, "pause() called");
 		if (sessionState.equals(SessionStates.PAUSED))
 			return;
 		
@@ -320,8 +327,9 @@ public class PlaynomicsSession {
 		eventList.add(pe);
 	}
 	
-	public static void resume() {
+	private static void resume() {
 	
+		Log.i(TAG, "resume() called");
 		if (sessionState.equals(SessionStates.STARTED))
 			return;
 		
@@ -337,16 +345,11 @@ public class PlaynomicsSession {
 	
 	public static void stop() {
 	
+		Log.i(TAG, "stop() called");
 		if (sessionState.equals(SessionStates.STOPPED))
 			return;
 		
 		sessionState = SessionStates.STOPPED;
-		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appStop, applicationId, userId, cookieId, sessionId,
-			instanceId, timeZoneOffset);
-		eventList.add(pe);
-		// TODO: Revisit stopping the timer logic; we might want to keep trying
-		// if offline
-		timerTask.run();
 		eventTimer.cancel();
 		
 		// Save eventList to disk for later sending

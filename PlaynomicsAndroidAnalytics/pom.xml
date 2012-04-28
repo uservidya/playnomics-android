@@ -2,23 +2,39 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>PlaynomicsAndroidAnalytics</groupId>
   <artifactId>PlaynomicsAndroidAnalytics</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
+<!--  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> this is used for inheritance merges
+            <phase>package</phase> bind to the packaging phase
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins> 
+ </build> -->
   <dependencies>
   	<dependency>
   		<groupId>com.google.android</groupId>
   		<artifactId>android</artifactId>
   		<version>4.0.1.2</version>
   	</dependency>
-  	<dependency>
-  		<groupId>com.google.android</groupId>
-  		<artifactId>support-v4</artifactId>
-  		<version>r6</version>
-  	</dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.1</version>
-      <scope>compile</scope>
     </dependency>
-  </dependencies>
+  </dependencies> 
 </project>
