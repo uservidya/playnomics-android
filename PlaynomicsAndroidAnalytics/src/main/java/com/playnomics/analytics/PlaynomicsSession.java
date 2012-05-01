@@ -1,8 +1,6 @@
 package com.playnomics.analytics;
 
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -28,20 +26,30 @@ import android.view.accessibility.AccessibilityEvent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.playnomics.analytics.PlaynomicsEvent.EventType;
+import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
+import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
+import com.playnomics.analytics.UserInfoEvent.UserInfoType;
 
 public class PlaynomicsSession {
 	
+	private static final String TAG = PlaynomicsSession.class.getSimpleName();
 	private static final String SETTING_LAST_SESSION_START_TIME = "lastSessionStartTime";
 	private static final String SETTING_LAST_USER_ID = "lastUserId";
-	private static final String TAG = PlaynomicsSession.class.getSimpleName();
-	// TODO: Externalize this string
-	private static final String PLAYNOMICS_BASE_URL = "https://test.b.playnomics.net/v1/";
 	private static final String SETTING_LAST_SESSION_ID = "lastSessionId";
-	private static final String SETTING_EVENT_LIST = "eventList";
+	private static final String SETTING_BASIC_EVENT_LIST = "basicEventList";
+	private static final String SETTING_USER_INFO_EVENT_LIST = "userInfoEventList";
+	private static final String SETTING_GAME_EVENT_LIST = "gameEventList";
+	private static final String SETTING_TRANSACTION_EVENT_LIST = "transactionEventList";
 	
 	private static final int UPDATE_INTERVAL = 60000;
+	private static final int COLLECTION_MODE = 7;
 	private static Timer eventTimer;
-	private static List<PlaynomicsEvent> eventList = new CopyOnWriteArrayList<PlaynomicsEvent>();
+	// Event lists for various types of events
+	private static List<BasicEvent> basicEventList = new CopyOnWriteArrayList<BasicEvent>();
+	private static List<UserInfoEvent> userInfoEventList = new CopyOnWriteArrayList<UserInfoEvent>();
+	private static List<GameEvent> gameEventList = new CopyOnWriteArrayList<GameEvent>();
+	private static List<TransactionEvent> transactionEventList = new CopyOnWriteArrayList<TransactionEvent>();
+	
 	private static PlaynomicsTimerTask timerTask = new PlaynomicsTimerTask();
 	private static Activity activity;
 	private static Callback activityCallback;
@@ -50,7 +58,6 @@ public class PlaynomicsSession {
 	
 	// Tracking values
 	private static int collectMode = 7;
-	
 	private static int sequence = 0;
 	
 	private static String applicationId;
@@ -67,11 +74,11 @@ public class PlaynomicsSession {
 	
 	private static Date pauseTime;
 	
-	private static enum SessionStates {
+	private static enum SessionState {
 		UNKNOWN, STARTED, PAUSED, STOPPED
 	}
 	
-	private static SessionStates sessionState = SessionStates.UNKNOWN;
+	private static SessionState sessionState = SessionState.UNKNOWN;
 	
 	// Prevent instantiation
 	private PlaynomicsSession() {
@@ -84,20 +91,20 @@ public class PlaynomicsSession {
 		start(activity, apiKey);
 	}
 	
-	public static void start(Activity activity, String applicationId) {	
-		
+	public static void start(Activity activity, String applicationId) {
+	
 		Log.i(TAG, "start() called");
 		
-		if (sessionState == SessionStates.STARTED)
+		if (sessionState == SessionState.STARTED)
 			return;
 		
 		// If paused, resume and get out of here
-		if (sessionState == SessionStates.PAUSED) {
+		if (sessionState == SessionState.PAUSED) {
 			resume();
 			return;
 		}
 		
-		sessionState = SessionStates.STARTED;
+		sessionState = SessionState.STARTED;
 		PlaynomicsSession.applicationId = applicationId;
 		
 		PlaynomicsSession.activity = activity;
@@ -262,16 +269,52 @@ public class PlaynomicsSession {
 		
 		sessionStartTime = new Date();
 		
-		// Calc to conform to wacky javascript format
+		// Calc to conform to minute offset format
 		timeZoneOffset = TimeZone.getDefault().getRawOffset() / -60000;
-		collectMode = 7;
+		// Collection mode for Android
+		collectMode = COLLECTION_MODE;
 		
 		settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
 		editor = settings.edit();
 		
+		// Restore event lists from persistent storage
+		Gson gson = new Gson();
+		String json = settings.getString(SETTING_BASIC_EVENT_LIST, null);
+		if (json != null) {
+			Type collectionType = new TypeToken<List<BasicEvent>>() {
+			}.getType();
+			List<BasicEvent> savedEventList = gson.fromJson(json, collectionType);
+			basicEventList.addAll(savedEventList);
+		}
+		
+		json = settings.getString(SETTING_USER_INFO_EVENT_LIST, null);
+		if (json != null) {
+			Type collectionType = new TypeToken<List<UserInfoEvent>>() {
+			}.getType();
+			List<UserInfoEvent> savedEventList = gson.fromJson(json, collectionType);
+			userInfoEventList.addAll(savedEventList);
+		}
+		
+		json = settings.getString(SETTING_GAME_EVENT_LIST, null);
+		if (json != null) {
+			Type collectionType = new TypeToken<List<GameEvent>>() {
+			}.getType();
+			List<GameEvent> savedEventList = gson.fromJson(json, collectionType);
+			gameEventList.addAll(savedEventList);
+		}
+		
+		json = settings.getString(SETTING_TRANSACTION_EVENT_LIST, null);
+		if (json != null) {
+			Type collectionType = new TypeToken<List<TransactionEvent>>() {
+			}.getType();
+			List<TransactionEvent> savedEventList = gson.fromJson(json, collectionType);
+			transactionEventList.addAll(savedEventList);
+		}
+		
 		EventType eventType;
 		
-		// Send an appStart if it has been > 3 min since the last session or a different user
+		// Send an appStart if it has been > 3 min since the last session or a
+		// different user
 		// otherwise send an appPage
 		if (sessionStartTime.getTime() - settings.getLong(SETTING_LAST_SESSION_START_TIME, 0) > 180000
 			|| !settings.getString(SETTING_LAST_USER_ID, "").equals(userId)) {
@@ -295,143 +338,166 @@ public class PlaynomicsSession {
 		if (cookieId == null)
 			cookieId = "UNKNOWN_DEVICE_ID";
 		
-		
-		// Restore event list from persistent storage
-		Gson gson = new Gson();
-		String json = settings.getString(SETTING_EVENT_LIST, null);
-		
-		if (json != null) {
-			Type collectionType = new TypeToken<List<PlaynomicsEvent>>() {
-			}.getType();
-			List<PlaynomicsEvent> savedEventList = gson.fromJson(json, collectionType);
-			eventList.addAll(savedEventList);
-		}
-		
-		PlaynomicsEvent pe = new PlaynomicsEvent(eventType, applicationId, userId, cookieId, sessionId,
+		BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
 			instanceId, timeZoneOffset);
-		eventList.add(pe);
+		basicEventList.add(be);
 	}
 	
 	private static void pause() {
 	
 		Log.i(TAG, "pause() called");
-		if (sessionState.equals(SessionStates.PAUSED))
+		if (sessionState.equals(SessionState.PAUSED))
 			return;
 		
-		sessionState = SessionStates.PAUSED;
+		sessionState = SessionState.PAUSED;
 		
-		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
+		BasicEvent be = new BasicEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
 			cookieId, sessionId, instanceId, timeZoneOffset);
 		pauseTime = new Date();
-		pe.setSessionStartTime(sessionStartTime);
-		eventList.add(pe);
+		be.setSessionStartTime(sessionStartTime);
+		basicEventList.add(be);
 	}
 	
 	private static void resume() {
 	
 		Log.i(TAG, "resume() called");
-		if (sessionState.equals(SessionStates.STARTED))
+		if (sessionState.equals(SessionState.STARTED))
 			return;
 		
-		sessionState = SessionStates.STARTED;
-		PlaynomicsEvent pe = new PlaynomicsEvent(EventType.appResume, applicationId, userId,
+		sessionState = SessionState.STARTED;
+		BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId,
 			cookieId, sessionId, instanceId, timeZoneOffset);
-		pe.setPauseTime(pauseTime);
-		pe.setSessionStartTime(sessionStartTime);
+		be.setPauseTime(pauseTime);
+		be.setSessionStartTime(sessionStartTime);
 		sequence += 1;
-		pe.setSequence(sequence);
-		eventList.add(pe);
+		be.setSequence(sequence);
+		basicEventList.add(be);
 	}
 	
 	public static void stop() {
 	
 		Log.i(TAG, "stop() called");
-		if (sessionState.equals(SessionStates.STOPPED))
+		if (sessionState.equals(SessionState.STOPPED))
 			return;
 		
-		sessionState = SessionStates.STOPPED;
+		sessionState = SessionState.STOPPED;
 		eventTimer.cancel();
 		
-		// Save eventList to disk for later sending
-		if (eventList.size() > 0) {
-			Gson gson = new Gson();
-			String json = gson.toJson(eventList);
-			editor.putString(SETTING_EVENT_LIST, json);
-			editor.commit();
+		// Save eventLists to disk for later sending
+		Gson gson = new Gson();
+		
+		if (basicEventList.size() > 0) {
+			String json = gson.toJson(basicEventList);
+			editor.putString(SETTING_BASIC_EVENT_LIST, json);
 		}
+		
+		if (userInfoEventList.size() > 0) {
+			String json = gson.toJson(userInfoEventList);
+			editor.putString(SETTING_USER_INFO_EVENT_LIST, json);
+		}
+		
+		if (gameEventList.size() > 0) {
+			String json = gson.toJson(gameEventList);
+			editor.putString(SETTING_GAME_EVENT_LIST, json);
+		}
+
+		if (transactionEventList.size() > 0) {
+			String json = gson.toJson(transactionEventList);
+			editor.putString(SETTING_TRANSACTION_EVENT_LIST, json);
+		}
+		
+		editor.commit();
 		
 		// Restore original callback
 		activity.getWindow().setCallback(activityCallback);
 	}
 	
-	private static class PlaynomicsTimerTask extends TimerTask {
+	public static void sendUserInfo() throws StartNotCalledException {
+	
+		sendUserInfo(UserInfoType.update, null, null, null, null, null, null, null);
+	}
+	
+	public static void sendUserInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
+		Date birthday, UserInfoSource source, String sourceCampaign, Date installTime) throws StartNotCalledException {
+	
+		if (sessionState == SessionState.STARTED) {
+			UserInfoEvent uie = new UserInfoEvent(applicationId, userId, type, country, subdivision, sex, birthday,
+				source,
+				sourceCampaign, installTime);
+			userInfoEventList.add(uie);
+		}
+		else {
+			throw new StartNotCalledException();
+		}
+	}
+	
+	public static void sessionStart(String sessionId, String site) {
+	
+		GameEvent ge = new GameEvent(EventType.sessionStart, applicationId, userId, sessionId, site,
+			null, null, null, null);
+		gameEventList.add(ge);
+	}
+	
+	public static void sessionEnd(String sessionId, String reason) {
+		
+		GameEvent ge = new GameEvent(EventType.sessionEnd, applicationId, userId, sessionId, null,
+			null, null, null, reason);
+		gameEventList.add(ge);
+	}
+	
+	public static void gameStart(String instanceId, String sessionId, String site, String type, String gameId) {
+		
+		GameEvent ge = new GameEvent(EventType.gameStart, applicationId, userId, sessionId, site,
+			instanceId, type, gameId, null);
+		gameEventList.add(ge);
+	}
+	
+	public static void gameEnd(String instanceId, String sessionId, String reason) {
+		
+		GameEvent ge = new GameEvent(EventType.gameEnd, applicationId, userId, sessionId, null,
+			instanceId, null, null, reason);
+		gameEventList.add(ge);
+	}
+	
+	protected static class PlaynomicsTimerTask extends TimerTask {
 		
 		@Override
 		public void run() {
 		
 			sequence += 1;
-			PlaynomicsEvent runningPE = new PlaynomicsEvent(EventType.appRunning, applicationId, userId, cookieId,
+			BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
 				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
-			eventList.add(runningPE);
+			basicEventList.add(runningBE);
 			
 			// Reset keys/clicks
 			keys = 0;
 			clicks = 0;
+			EventSender es = new EventSender();
 			
-			for (PlaynomicsEvent pe : eventList) {
+			for (BasicEvent be : basicEventList) {
 				
-				// Send the event and remove if successful
-				if (sendToServer(pe))
-					eventList.remove(pe);
+				if (es.sendToServer(be))
+					basicEventList.remove(be);
+			}
+			
+			for (UserInfoEvent uie : userInfoEventList) {
+				
+				if (es.sendToServer(uie))
+					userInfoEventList.remove(uie);
+			}
+			
+			for (GameEvent ge : gameEventList) {
+				
+				if (es.sendToServer(ge))
+					gameEventList.remove(ge);
+			}
+			
+			for (TransactionEvent te : transactionEventList) {
+				
+				if (es.sendToServer(te))
+					gameEventList.remove(te);
 			}
 		}
 		
-		private boolean sendToServer(PlaynomicsEvent pe) {
-		
-			try {
-				// Set common params
-				String eventUrl = PLAYNOMICS_BASE_URL
-					+ pe.getEventType()
-					+ "?t=" + pe.getEventTime().getTime()
-					+ "&a=" + pe.getApplicationId()
-					+ "&b=" + pe.getCookieId()
-					+ "&s=" + pe.getSessionId()
-					+ "&i=" + pe.getInstanceId();
-				
-				switch (pe.getEventType()) {
-				
-					case appStart:
-					case appPage:
-						eventUrl += "&z=" + pe.getTimeZoneOffset();
-						break;
-					
-					case appRunning:
-						eventUrl += "&r=" + pe.getSessionStartTime().getTime()
-							+ "&q=" + pe.getSequence()
-							+ "&d=" + UPDATE_INTERVAL
-							+ "&c=" + pe.getClicks()
-							+ "&e=" + pe.getTotalClicks()
-							+ "&k=" + pe.getKeys()
-							+ "&l=" + pe.getTotalKeys()
-							+ "&m=" + pe.getCollectMode();
-						break;
-					
-					case appResume:
-						eventUrl += "&p=" + pe.getPauseTime().getTime();
-					case appPause:
-						eventUrl += "&r=" + pe.getSessionStartTime().getTime()
-							+ "&q=" + pe.getSequence();
-				}
-				
-				Log.i(TAG, "Sending event to server: " + eventUrl);
-				HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
-				// con.setRequestMethod("HEAD");
-				return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-			} catch (Exception e) {
-//				Log.e(TAG, e.getMessage());
-				e.printStackTrace();
-				return false;
-			}
-		}
 	}
 }
