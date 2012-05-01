@@ -35,15 +35,15 @@ public class EventSender {
 		return url;
 	}
 	
-	protected boolean sendToServer(String url) {
+	protected boolean sendToServer(String eventUrl) {
 	
 		try {
 			// Hack to use JUnit testing w/o emulator
 			if (testMode)
-				System.out.println("Sending event to server: " + url);
+				System.out.println("Sending event to server: " + eventUrl);
 			else
-				Log.i(TAG, "Sending event to server: " + url);
-			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+				Log.i(TAG, "Sending event to server: " + eventUrl);
+			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
 			// con.setRequestMethod("HEAD");
 			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
@@ -51,6 +51,30 @@ public class EventSender {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	protected boolean sendToServer(SocialEvent se) {
+		
+		// Set common params
+		String eventUrl = PLAYNOMICS_BASE_URL
+			+ se.getEventType()
+			+ "?t=" + se.getEventTime().getTime()
+			+ "&a=" + se.getApplicationId()
+			+ "&u=" + se.getUserId()
+			+ "&ii=" + se.getInvitationId();
+		
+		if (se.getEventType() == EventType.invitationResponse) {
+			eventUrl += "&ie=" + se.getResponse()
+				+ "&ir=" + se.getRecipientUserId();	
+		}
+		else {
+			// Optional params
+			eventUrl = addOptionalParam(eventUrl, "ir", se.getRecipientUserId());
+			eventUrl = addOptionalParam(eventUrl, "ia", se.getRecipientAddress());
+			eventUrl = addOptionalParam(eventUrl, "im", se.getMethod());			
+		}
+		
+		return sendToServer(eventUrl);
 	}
 	
 	protected boolean sendToServer(TransactionEvent te) {
@@ -65,9 +89,9 @@ public class EventSender {
 
 		for (int i = 0; i < te.getCurrencyTypes().length; i++ ) {
 			
-			eventUrl += "&tc" + i + te.getCurrencyTypes()[i]
-				+ "&tv" + i + te.getCurrencyValues()[i]
-				+ "&ta" + i + te.getCurrencyCategories()[i];
+			eventUrl += "&tc" + i + "=" + te.getCurrencyTypes()[i]
+				+ "&tv" + i + "=" + te.getCurrencyValues()[i]
+				+ "&ta" + i + "=" + te.getCurrencyCategories()[i];
 		}
 		
 		// Optional params

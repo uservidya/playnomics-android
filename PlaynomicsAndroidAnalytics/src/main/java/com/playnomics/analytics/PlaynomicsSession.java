@@ -26,6 +26,8 @@ import android.view.accessibility.AccessibilityEvent;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.playnomics.analytics.PlaynomicsEvent.EventType;
+import com.playnomics.analytics.TransactionEvent.CurrencyCategory;
+import com.playnomics.analytics.TransactionEvent.TransactionType;
 import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
 import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
 import com.playnomics.analytics.UserInfoEvent.UserInfoType;
@@ -40,6 +42,7 @@ public class PlaynomicsSession {
 	private static final String SETTING_USER_INFO_EVENT_LIST = "userInfoEventList";
 	private static final String SETTING_GAME_EVENT_LIST = "gameEventList";
 	private static final String SETTING_TRANSACTION_EVENT_LIST = "transactionEventList";
+	private static final String SETTING_SOCIAL_EVENT_LIST = "socialEventList";
 	
 	private static final int UPDATE_INTERVAL = 60000;
 	private static final int COLLECTION_MODE = 7;
@@ -49,6 +52,7 @@ public class PlaynomicsSession {
 	private static List<UserInfoEvent> userInfoEventList = new CopyOnWriteArrayList<UserInfoEvent>();
 	private static List<GameEvent> gameEventList = new CopyOnWriteArrayList<GameEvent>();
 	private static List<TransactionEvent> transactionEventList = new CopyOnWriteArrayList<TransactionEvent>();
+	private static List<SocialEvent> socialEventList = new CopyOnWriteArrayList<SocialEvent>();
 	
 	private static PlaynomicsTimerTask timerTask = new PlaynomicsTimerTask();
 	private static Activity activity;
@@ -277,6 +281,7 @@ public class PlaynomicsSession {
 		settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
 		editor = settings.edit();
 		
+		// TODO: Make a generic method using reflection
 		// Restore event lists from persistent storage
 		Gson gson = new Gson();
 		String json = settings.getString(SETTING_BASIC_EVENT_LIST, null);
@@ -309,6 +314,14 @@ public class PlaynomicsSession {
 			}.getType();
 			List<TransactionEvent> savedEventList = gson.fromJson(json, collectionType);
 			transactionEventList.addAll(savedEventList);
+		}
+		
+		json = settings.getString(SETTING_SOCIAL_EVENT_LIST, null);
+		if (json != null) {
+			Type collectionType = new TypeToken<List<SocialEvent>>() {
+			}.getType();
+			List<SocialEvent> savedEventList = gson.fromJson(json, collectionType);
+			socialEventList.addAll(savedEventList);
 		}
 		
 		EventType eventType;
@@ -384,33 +397,28 @@ public class PlaynomicsSession {
 		eventTimer.cancel();
 		
 		// Save eventLists to disk for later sending
-		Gson gson = new Gson();
-		
-		if (basicEventList.size() > 0) {
-			String json = gson.toJson(basicEventList);
-			editor.putString(SETTING_BASIC_EVENT_LIST, json);
-		}
-		
-		if (userInfoEventList.size() > 0) {
-			String json = gson.toJson(userInfoEventList);
-			editor.putString(SETTING_USER_INFO_EVENT_LIST, json);
-		}
-		
-		if (gameEventList.size() > 0) {
-			String json = gson.toJson(gameEventList);
-			editor.putString(SETTING_GAME_EVENT_LIST, json);
-		}
-
-		if (transactionEventList.size() > 0) {
-			String json = gson.toJson(transactionEventList);
-			editor.putString(SETTING_TRANSACTION_EVENT_LIST, json);
-		}
-		
-		editor.commit();
+		saveEventList(SETTING_BASIC_EVENT_LIST, basicEventList);
+		saveEventList(SETTING_USER_INFO_EVENT_LIST, userInfoEventList);
+		saveEventList(SETTING_GAME_EVENT_LIST, gameEventList);
+		saveEventList(SETTING_TRANSACTION_EVENT_LIST, transactionEventList);
+		saveEventList(SETTING_SOCIAL_EVENT_LIST, socialEventList);
 		
 		// Restore original callback
 		activity.getWindow().setCallback(activityCallback);
 	}
+	
+	private static void saveEventList(String setting, List<?> eventList) {
+		
+		Gson gson = new Gson();
+		
+		if (eventList.size() > 0) {
+			String json = gson.toJson(eventList);
+			editor.putString(setting, json);
+		}
+		
+		editor.commit();		
+	}
+	
 	
 	public static void sendUserInfo() throws StartNotCalledException {
 	
@@ -439,24 +447,32 @@ public class PlaynomicsSession {
 	}
 	
 	public static void sessionEnd(String sessionId, String reason) {
-		
+	
 		GameEvent ge = new GameEvent(EventType.sessionEnd, applicationId, userId, sessionId, null,
 			null, null, null, reason);
 		gameEventList.add(ge);
 	}
 	
 	public static void gameStart(String instanceId, String sessionId, String site, String type, String gameId) {
-		
+	
 		GameEvent ge = new GameEvent(EventType.gameStart, applicationId, userId, sessionId, site,
 			instanceId, type, gameId, null);
 		gameEventList.add(ge);
 	}
 	
 	public static void gameEnd(String instanceId, String sessionId, String reason) {
-		
+	
 		GameEvent ge = new GameEvent(EventType.gameEnd, applicationId, userId, sessionId, null,
 			instanceId, null, null, reason);
 		gameEventList.add(ge);
+	}
+	
+	public static void transaction(long transactionId, String itemId, double quantity, TransactionType type,
+		String otherUserId, String[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
+	
+		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
+		transactionEventList.add(te);
 	}
 	
 	protected static class PlaynomicsTimerTask extends TimerTask {
@@ -497,7 +513,6 @@ public class PlaynomicsSession {
 				if (es.sendToServer(te))
 					gameEventList.remove(te);
 			}
-		}
-		
+		}	
 	}
 }

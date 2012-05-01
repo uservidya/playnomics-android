@@ -3,7 +3,7 @@ package com.playnomics.analytics;
 class TransactionEvent extends PlaynomicsEvent {
 	
 	public enum TransactionType {
-		BuyItem, SellItemn, ReturnItem, BuyService, SellService, ReturnService,
+		BuyItem, SellItem, ReturnItem, BuyService, SellService, ReturnService,
 		CurrencyConvert, Initial, Free, Reward, GiftSend, GiftReceive
 	};
 	
