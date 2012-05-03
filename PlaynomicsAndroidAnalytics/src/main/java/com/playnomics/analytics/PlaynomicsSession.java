@@ -409,14 +409,12 @@ public class PlaynomicsSession {
 	
 	private static void saveEventList(String setting, List<?> eventList) {
 		
-		Gson gson = new Gson();
-		
 		if (eventList.size() > 0) {
+			Gson gson = new Gson();
 			String json = gson.toJson(eventList);
 			editor.putString(setting, json);
-		}
-		
-		editor.commit();		
+			editor.commit();		
+		}		
 	}
 	
 	
