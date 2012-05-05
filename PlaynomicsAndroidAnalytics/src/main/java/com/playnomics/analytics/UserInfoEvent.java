@@ -2,7 +2,7 @@ package com.playnomics.analytics;
 
 import java.util.Date;
 
-class UserInfoEvent extends PlaynomicsEvent {
+public class UserInfoEvent extends PlaynomicsEvent {
 	
 	// Enums for UserInfo Events
 	public static enum UserInfoType {

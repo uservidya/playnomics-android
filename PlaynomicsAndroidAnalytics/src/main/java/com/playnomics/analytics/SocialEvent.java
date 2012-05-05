@@ -1,6 +1,6 @@
 package com.playnomics.analytics;
 
-class SocialEvent extends PlaynomicsEvent {
+public class SocialEvent extends PlaynomicsEvent {
 	
 	public enum ResponseType {
 		accepted
@@ -11,6 +11,17 @@ class SocialEvent extends PlaynomicsEvent {
 	private String recipientAddress;
 	private String method;
 	private ResponseType response;
+	
+	public SocialEvent(EventType eventType, String applicationId, String userId, String invitationId,
+		String recipientUserId, String recipientAddress, String method, ResponseType response) {
+	
+		super(eventType, applicationId, userId);
+		this.invitationId = invitationId;
+		this.recipientUserId = recipientUserId;
+		this.recipientAddress = recipientAddress;
+		this.method = method;
+		this.response = response;
+	}
 	
 	public String getInvitationId() {
 	
@@ -59,17 +70,6 @@ class SocialEvent extends PlaynomicsEvent {
 	
 	public void setResponse(ResponseType response) {
 	
-		this.response = response;
-	}
-	
-	public SocialEvent(EventType eventType, String applicationId, String userId, String invitationId,
-		String recipientUserId, String recipientAddress, String method, ResponseType response) {
-	
-		super(eventType, applicationId, userId);
-		this.invitationId = invitationId;
-		this.recipientUserId = recipientUserId;
-		this.recipientAddress = recipientAddress;
-		this.method = method;
 		this.response = response;
 	}
 }

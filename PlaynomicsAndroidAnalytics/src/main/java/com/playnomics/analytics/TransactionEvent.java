@@ -1,6 +1,6 @@
 package com.playnomics.analytics;
 
-class TransactionEvent extends PlaynomicsEvent {
+public class TransactionEvent extends PlaynomicsEvent {
 	
 	public enum TransactionType {
 		BuyItem, SellItem, ReturnItem, BuyService, SellService, ReturnService,

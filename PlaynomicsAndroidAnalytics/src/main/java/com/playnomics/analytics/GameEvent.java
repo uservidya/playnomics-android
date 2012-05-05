@@ -2,7 +2,7 @@ package com.playnomics.analytics;
 
 import com.playnomics.analytics.PlaynomicsEvent;
 
-class GameEvent extends PlaynomicsEvent {
+public class GameEvent extends PlaynomicsEvent {
 	
 	private String sessionId;
 	private String site;
