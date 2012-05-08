@@ -629,8 +629,8 @@ public class PlaynomicsSession {
 		@Override
 		public void run() {
 		
-			// Don't send appRunning event if we are paused
-			if (sessionState != SessionState.PAUSED) {
+			// Only send appRunning event if we are started
+			if (sessionState == SessionState.STARTED) {
 				sequence += 1;
 				BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
 					sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
