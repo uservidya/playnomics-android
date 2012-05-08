@@ -153,8 +153,11 @@ public class PlaynomicsSession {
 				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
 				// Are we pausing?
 				// CR: could this be another activity in the same app?
-				if (!hasFocus) {
-					pause();
+				if (hasFocus) {
+					resume();
+				}
+				else {
+					pause();					
 				}
 			}
 			
