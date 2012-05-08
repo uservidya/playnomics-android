@@ -132,7 +132,7 @@ public class EventSender {
 		String eventUrl = PLAYNOMICS_BASE_URL
 			+ uie.getEventType()
 			+ "?t=" + uie.getEventTime().getTime()
-			+ "com.playnomics.analytics.a=" + uie.getApplicationId()
+			+ "&a=" + uie.getApplicationId()
 			+ "&u=" + uie.getUserId()
 			+ "&pt=" + uie.getType();
 		// Optional params

@@ -629,14 +629,17 @@ public class PlaynomicsSession {
 		@Override
 		public void run() {
 		
-			sequence += 1;
-			BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
-				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
-			basicEventList.add(runningBE);
-			
-			// Reset keys/clicks
-			keys = 0;
-			clicks = 0;
+			// Don't send appRunning event if we are paused
+			if (sessionState != SessionState.PAUSED) {
+				sequence += 1;
+				BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
+					sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys, collectMode);
+				basicEventList.add(runningBE);
+				
+				// Reset keys/clicks
+				keys = 0;
+				clicks = 0;				
+			}
 			
 			for (BasicEvent be : basicEventList) {
 				
