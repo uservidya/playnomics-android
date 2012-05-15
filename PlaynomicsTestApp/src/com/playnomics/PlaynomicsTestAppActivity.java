@@ -1,0 +1,122 @@
+package com.playnomics;
+
+import java.util.Date;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
+
+import com.playnomics.analytics.PlaynomicsSession;
+import com.playnomics.analytics.SocialEvent.ResponseType;
+import com.playnomics.analytics.TransactionEvent.CurrencyCategory;
+import com.playnomics.analytics.TransactionEvent.CurrencyType;
+import com.playnomics.analytics.TransactionEvent.TransactionType;
+import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
+import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
+import com.playnomics.analytics.UserInfoEvent.UserInfoType;
+
+public class PlaynomicsTestAppActivity extends Activity {
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, "TEST_APP_ID", "testUserId").toString(), Toast.LENGTH_LONG)
+			.show();
+	}
+	
+	@Override
+	protected void onStart() {
+		
+		super.onStart();
+		PlaynomicsSession.switchActivity(this);
+	};
+	
+	@Override
+	protected void onDestroy() {
+	
+		PlaynomicsSession.stop();
+		super.onDestroy();
+	}
+	
+	public void onUserInfoClick(View view) {
+	
+		Toast.makeText(this, "USER INFO: " +
+			PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.M, new Date("1/1/1999"),
+				UserInfoSource.Other, "test", new Date()).toString(), Toast.LENGTH_LONG).show();
+	}
+	
+	public void onSessionStartClick(View view) {
+	
+		Toast.makeText(this,
+			"SESSION START: " + PlaynomicsSession.sessionStart("TEST_SESSION_ID", "TEST_SITE").toString(),
+			Toast.LENGTH_LONG).show();
+	}
+	
+	public void onSessionEndClick(View view) {
+	
+		Toast.makeText(this, "SESSION END: " + PlaynomicsSession.sessionEnd("TEST_SESSION_ID", "QUIT").toString(),
+			Toast.LENGTH_LONG)
+			.show();
+	}
+	
+	public void onGameStartClick(View view) {
+	
+		Toast.makeText(
+			this,
+			"GAME START: "
+				+
+				PlaynomicsSession.gameStart("TEST_INSTANCE_ID", "TEST_SESSION_ID", "TEST_SITE", "TEST_TYPE",
+					"TEST_GAME")
+					.toString(), Toast.LENGTH_LONG).show();
+	}
+	
+	public void onGameEndClick(View view) {
+	
+		Toast.makeText(this,
+			"GAME END: " + PlaynomicsSession.gameEnd("TEST_INSTANCE_ID", "TEST_SESSION_ID", "LOSE").toString(),
+			Toast.LENGTH_LONG).show();
+	}
+	
+	public void onTransactionClick(View view) {
+	
+		String[] currencyTypes = { CurrencyType.USD.toString(), CurrencyType.OFF.toString() };
+		double[] currencyValues = { 1, 2 };
+		CurrencyCategory[] currencyCategories = { CurrencyCategory.r, CurrencyCategory.v };
+		
+		Toast.makeText(this, "TRANSACTION: " +
+			PlaynomicsSession.transaction(1234567890, "TEST_ITEM_ID", 1, TransactionType.BuyItem, "TEST_USER_ID",
+				currencyTypes, currencyValues, currencyCategories).toString(),
+			Toast.LENGTH_LONG).show();
+	}
+	
+	public void onInvitationSentClick(View view) {
+	
+		Toast.makeText(
+			this,
+			"INVITATION SENT: "
+				+ PlaynomicsSession.invitationSent("TEST_INVITATION_ID", "TEST_USER_ID", "TEST_ADDRESS", "TEST_METHOD")
+					.toString(),
+			Toast.LENGTH_LONG).show();
+	}
+	
+	public void onInvitationResponseClick(View view) {
+	
+		Toast.makeText(
+			this,
+			"INVITATION RESPONSE: "
+				+ PlaynomicsSession.invitationResponse("TEST_INVITATION_ID", ResponseType.accepted).toString(),
+			Toast.LENGTH_LONG).show();
+	}
+	
+	public void onSwitchActivityClick(View view) {
+        Intent myIntent = new Intent(view.getContext(), PlaynomicsTestAppActivity2.class);
+        startActivityForResult(myIntent, 0);
+		
+		
+	}
+
+}

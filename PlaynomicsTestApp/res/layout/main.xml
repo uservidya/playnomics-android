@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Activity 1" />
+    <Button
+        android:id="@+id/userInfoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="userInfo"
+        android:onClick="onUserInfoClick" />
+    
+    <Button
+        android:id="@+id/sessionStartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sessionStart"
+        android:onClick="onSessionStartClick" />
+    
+    <Button
+        android:id="@+id/sessionEndButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sessionEnd"
+        android:onClick="onSessionEndClick" />
+
+    <Button
+        android:id="@+id/gameStartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="gameStart"
+        android:onClick="onGameStartClick" />
+
+    <Button
+        android:id="@+id/gameEndButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="gameEnd" 
+        android:onClick="onGameEndClick"/>
+
+    <Button
+        android:id="@+id/transactionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="transaction"
+        android:onClick="onTransactionClick" />
+
+    <Button
+        android:id="@+id/invitationSentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="invitationSent"
+        android:onClick="onInvitationSentClick" />
+
+    <Button
+        android:id="@+id/invitationResponseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="invitationResponse" 
+        android:onClick="onInvitationResponseClick"/>
+    
+	<Button android:id="@+id/switchActivityButton"
+	    android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch Activity" 
+        android:onClick="onSwitchActivityClick"/>
+</LinearLayout>
