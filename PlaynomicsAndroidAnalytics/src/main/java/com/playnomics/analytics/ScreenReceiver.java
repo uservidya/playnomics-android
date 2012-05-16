@@ -16,11 +16,10 @@ public class ScreenReceiver extends BroadcastReceiver {
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
 			screenOff = true;
 			PlaynomicsSession.pause();
-			Log.i(TAG, "SCREEN TURNED OFF on BroadcastReceiver");
+			Log.i(TAG, "SCREEN TURNED OFF");
 		} else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
 			screenOff = false;
-			PlaynomicsSession.resume();
-			Log.i(TAG, "SCREEN TURNED ON on BroadcastReceiver");
+			Log.i(TAG, "SCREEN TURNED ON");
 		}
 	}
 }
