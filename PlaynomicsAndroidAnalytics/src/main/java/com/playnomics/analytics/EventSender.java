@@ -1,10 +1,9 @@
 package com.playnomics.analytics;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Properties;
+import java.util.ResourceBundle;
 
 import android.util.Log;
 
@@ -28,12 +27,10 @@ public class EventSender {
 	
 		try {
 			this.testMode = testMode;
-			Properties p = new Properties();
-			
-			p.load(getClass().getResourceAsStream("/PlaynomicsAndroidAnalytics.properties"));
-			version = p.getProperty("version");
-			baseUrl = p.getProperty("baseUrl");
-		} catch (IOException e) {
+			ResourceBundle b = ResourceBundle.getBundle("playnomicsAndroidAnalytics");
+			version = b.getString("version");
+			baseUrl = b.getString("baseUrl");
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
