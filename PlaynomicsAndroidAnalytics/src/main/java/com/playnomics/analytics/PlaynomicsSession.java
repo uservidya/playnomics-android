@@ -11,6 +11,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import android.Manifest.permission;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
@@ -68,6 +70,8 @@ public class PlaynomicsSession {
 	private static SharedPreferences settings;
 	private static Editor editor;
 	private static EventSender eventSender = new EventSender();
+	private static ScreenReceiver screenReceiver= new ScreenReceiver();
+	private static IntentFilter screenIntentFilter = new IntentFilter();
 	
 	// Tracking values
 	private static int collectMode = 7;
@@ -128,6 +132,11 @@ public class PlaynomicsSession {
 		
 		// Setup the activity callback function(s)
 		setActivityCallback(activity);
+		if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
+			screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+		if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
+		screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
+		activity.registerReceiver(screenReceiver, screenIntentFilter);
 		sequence = 1;
 		clicks = 0;
 		totalClicks = 0;
@@ -247,11 +256,13 @@ public class PlaynomicsSession {
 			
 				activityCallback.onWindowFocusChanged(hasFocus);
 				
-				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
+				// Get out of here is we are finishing the activity
+				if (PlaynomicsSession.activity.isFinishing()) 
+					return;
+				
 				// Are we pausing?
-				// CR: could this be another activity in the same app?
 				if (hasFocus) {
-					resume();
+					resume();			
 				}
 				else {
 					pause();					
@@ -359,7 +370,7 @@ public class PlaynomicsSession {
 		});		
 	}
 	
-	private static void pause() {
+	protected static void pause() {
 	
 		Log.i(TAG, "pause() called");
 		if (sessionState.equals(SessionState.PAUSED))
@@ -377,7 +388,7 @@ public class PlaynomicsSession {
 			basicEventList.add(be);
 	}
 	
-	private static void resume() {
+	protected static void resume() {
 	
 		Log.i(TAG, "resume() called");
 		if (sessionState.equals(SessionState.STARTED))
@@ -423,7 +434,7 @@ public class PlaynomicsSession {
 		if (activity.isFinishing()) {
 			sessionState = SessionState.STOPPED;
 			eventTimer.cancel();
-			
+			activity.unregisterReceiver(screenReceiver);
 			// Save eventLists to disk for later sending
 			saveEventList(SETTING_BASIC_EVENT_LIST, basicEventList);
 			saveEventList(SETTING_USER_INFO_EVENT_LIST, userInfoEventList);

@@ -24,13 +24,14 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, "TEST_APP_ID", "testUserId").toString(), Toast.LENGTH_LONG)
+		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, "TEST_APP_ID", "testUserId").toString(),
+			Toast.LENGTH_LONG)
 			.show();
 	}
 	
 	@Override
 	protected void onStart() {
-		
+	
 		super.onStart();
 		PlaynomicsSession.switchActivity(this);
 	};
@@ -113,10 +114,14 @@ public class PlaynomicsTestAppActivity extends Activity {
 	}
 	
 	public void onSwitchActivityClick(View view) {
-        Intent myIntent = new Intent(view.getContext(), PlaynomicsTestAppActivity2.class);
-        startActivityForResult(myIntent, 0);
-		
+	
+		Intent myIntent = new Intent(view.getContext(), PlaynomicsTestAppActivity2.class);
+		startActivityForResult(myIntent, 0);
 		
 	}
 
+	public void onCloseClick(View view) {
+		
+		this.finish();
+	}
 }
