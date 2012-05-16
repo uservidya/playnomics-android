@@ -37,7 +37,7 @@ import com.playnomics.analytics.UserInfoEvent.UserInfoType;
 public class PlaynomicsSession {
 	
 	public enum APIResult {
-		SENT, QUEUED, STOPPED, ALREADY_STARTED, ALREADY_STOPPED, SESSION_RESUMED, START_NOT_CALLED, NO_INTERNET_PERMISSION, FAIL_UNKNOWN
+		SENT, QUEUED, SWITCHED, STOPPED, ALREADY_STARTED, ALREADY_SWITCHED,ALREADY_STOPPED, SESSION_RESUMED, START_NOT_CALLED, NO_INTERNET_PERMISSION, FAIL_UNKNOWN
 	};
 	
 	private static final String TAG = PlaynomicsSession.class.getSimpleName();
@@ -126,165 +126,8 @@ public class PlaynomicsSession {
 		sessionState = SessionState.STARTED;
 		PlaynomicsSession.applicationId = applicationId;
 		
-		PlaynomicsSession.activity = activity;
-		activityCallback = activity.getWindow().getCallback();
-		
-		// Startup the event timer to send events back to the server
-		if (eventTimer == null) {
-			eventTimer = new Timer(true);
-			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
-		}
-		
-		activity.getWindow().setCallback(new Callback() {
-			
-			// @Override
-			// public ActionMode
-			// onWindowStartingActionMode(android.view.ActionMode.Callback
-			// callback) {
-			//
-			// return activityCallback.onWindowStartingActionMode(callback);
-			// }
-			
-			@Override
-			public void onWindowFocusChanged(boolean hasFocus) {
-			
-				activityCallback.onWindowFocusChanged(hasFocus);
-				
-				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
-				// Are we pausing?
-				// CR: could this be another activity in the same app?
-				if (hasFocus) {
-					resume();
-				}
-				else {
-					pause();					
-				}
-			}
-			
-			@Override
-			public void onWindowAttributesChanged(android.view.WindowManager.LayoutParams attrs) {
-			
-				activityCallback.onWindowAttributesChanged(attrs);
-			}
-			
-			@Override
-			public boolean onSearchRequested() {
-			
-				return activityCallback.onSearchRequested();
-			}
-			
-			@Override
-			public boolean onPreparePanel(int featureId, View view, Menu menu) {
-			
-				return activityCallback.onPreparePanel(featureId, view, menu);
-			}
-			
-			@Override
-			public void onPanelClosed(int featureId, Menu menu) {
-			
-				activityCallback.onPanelClosed(featureId, menu);
-			}
-			
-			@Override
-			public boolean onMenuOpened(int featureId, Menu menu) {
-			
-				return activityCallback.onMenuOpened(featureId, menu);
-			}
-			
-			@Override
-			public boolean onMenuItemSelected(int featureId, MenuItem item) {
-			
-				return activityCallback.onMenuItemSelected(featureId, item);
-			}
-			
-			@Override
-			public void onDetachedFromWindow() {
-			
-				activityCallback.onDetachedFromWindow();
-			}
-			
-			@Override
-			public View onCreatePanelView(int featureId) {
-			
-				return activityCallback.onCreatePanelView(featureId);
-			}
-			
-			@Override
-			public boolean onCreatePanelMenu(int featureId, Menu menu) {
-			
-				return activityCallback.onCreatePanelMenu(featureId, menu);
-			}
-			
-			@Override
-			public void onContentChanged() {
-			
-				activityCallback.onContentChanged();
-			}
-			
-			@Override
-			public void onAttachedToWindow() {
-			
-				activityCallback.onAttachedToWindow();
-			}
-			
-			// @Override
-			// public void onActionModeStarted(ActionMode mode) {
-			//
-			// activityCallback.onActionModeStarted(mode);
-			// }
-			//
-			// @Override
-			// public void onActionModeFinished(ActionMode mode) {
-			//
-			// activityCallback.onActionModeFinished(mode);
-			// }
-			
-			@Override
-			public boolean dispatchTrackballEvent(MotionEvent event) {
-			
-				return activityCallback.dispatchTrackballEvent(event);
-			}
-			
-			@Override
-			public boolean dispatchTouchEvent(MotionEvent event) {
-			
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					clicks += 1;
-					totalClicks += 1;
-				}
-				return activityCallback.dispatchTouchEvent(event);
-			}
-			
-			@Override
-			public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
-			
-				return activityCallback.dispatchPopulateAccessibilityEvent(event);
-			}
-			
-			// @Override
-			// public boolean dispatchKeyShortcutEvent(KeyEvent event) {
-			//
-			// return activityCallback.dispatchKeyShortcutEvent(event);
-			// }
-			
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent event) {
-			
-				if (event.getAction() == KeyEvent.ACTION_DOWN) {
-					keys += 1;
-					totalKeys += 1;
-				}
-				
-				return activityCallback.dispatchKeyEvent(event);
-			}
-			
-			// @Override
-			// public boolean dispatchGenericMotionEvent(MotionEvent event) {
-			//
-			// return activityCallback.dispatchGenericMotionEvent(event);
-			// }
-		});
-		
+		// Setup the activity callback function(s)
+		setActivityCallback(activity);
 		sequence = 1;
 		clicks = 0;
 		totalClicks = 0;
@@ -373,14 +216,147 @@ public class PlaynomicsSession {
 		
 		BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
 			instanceId, timeZoneOffset);
+		
+		
 		// Try to send and queue if unsuccessful
+		APIResult result;
 		if (eventSender.sendToServer(be)) {
-			return APIResult.SENT;
+			result = APIResult.SENT;
 		}
 		else {
 			basicEventList.add(be);
-			return APIResult.QUEUED;
+			result = APIResult.QUEUED;
 		}
+		// Startup the event timer to send events back to the server
+		if (eventTimer == null) {
+			eventTimer = new Timer(true);
+			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+		}
+		
+		return result;
+	}
+	
+	private static void setActivityCallback(Activity activity) {
+		
+		PlaynomicsSession.activity = activity;
+		activityCallback = activity.getWindow().getCallback();
+		activity.getWindow().setCallback(new Callback() {
+			
+			@Override
+			public void onWindowFocusChanged(boolean hasFocus) {
+			
+				activityCallback.onWindowFocusChanged(hasFocus);
+				
+				Log.i(TAG, "onWindowFocusChanged: " + hasFocus);
+				// Are we pausing?
+				// CR: could this be another activity in the same app?
+				if (hasFocus) {
+					resume();
+				}
+				else {
+					pause();					
+				}
+			}
+			
+			@Override
+			public void onWindowAttributesChanged(android.view.WindowManager.LayoutParams attrs) {
+			
+				activityCallback.onWindowAttributesChanged(attrs);
+			}
+			
+			@Override
+			public boolean onSearchRequested() {
+			
+				return activityCallback.onSearchRequested();
+			}
+			
+			@Override
+			public boolean onPreparePanel(int featureId, View view, Menu menu) {
+			
+				return activityCallback.onPreparePanel(featureId, view, menu);
+			}
+			
+			@Override
+			public void onPanelClosed(int featureId, Menu menu) {
+			
+				activityCallback.onPanelClosed(featureId, menu);
+			}
+			
+			@Override
+			public boolean onMenuOpened(int featureId, Menu menu) {
+			
+				return activityCallback.onMenuOpened(featureId, menu);
+			}
+			
+			@Override
+			public boolean onMenuItemSelected(int featureId, MenuItem item) {
+			
+				return activityCallback.onMenuItemSelected(featureId, item);
+			}
+			
+			@Override
+			public void onDetachedFromWindow() {
+			
+				activityCallback.onDetachedFromWindow();
+			}
+			
+			@Override
+			public View onCreatePanelView(int featureId) {
+			
+				return activityCallback.onCreatePanelView(featureId);
+			}
+			
+			@Override
+			public boolean onCreatePanelMenu(int featureId, Menu menu) {
+			
+				return activityCallback.onCreatePanelMenu(featureId, menu);
+			}
+			
+			@Override
+			public void onContentChanged() {
+			
+				activityCallback.onContentChanged();
+			}
+			
+			@Override
+			public void onAttachedToWindow() {
+			
+				activityCallback.onAttachedToWindow();
+			}
+			
+			@Override
+			public boolean dispatchTrackballEvent(MotionEvent event) {
+			
+				return activityCallback.dispatchTrackballEvent(event);
+			}
+			
+			@Override
+			public boolean dispatchTouchEvent(MotionEvent event) {
+			
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					clicks += 1;
+					totalClicks += 1;
+				}
+				return activityCallback.dispatchTouchEvent(event);
+			}
+			
+			@Override
+			public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
+			
+				return activityCallback.dispatchPopulateAccessibilityEvent(event);
+			}
+
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent event) {
+			
+				if (event.getAction() == KeyEvent.ACTION_DOWN) {
+					keys += 1;
+					totalKeys += 1;
+				}
+				
+				return activityCallback.dispatchKeyEvent(event);
+			}
+		});		
 	}
 	
 	private static void pause() {
@@ -394,6 +370,7 @@ public class PlaynomicsSession {
 		BasicEvent be = new BasicEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
 			cookieId, sessionId, instanceId, timeZoneOffset);
 		pauseTime = new Date();
+		be.setSequence(sequence);
 		be.setSessionStartTime(sessionStartTime);
 		// Try to send and queue if unsuccessful
 		if (!eventSender.sendToServer(be))
@@ -418,24 +395,47 @@ public class PlaynomicsSession {
 			basicEventList.add(be);
 	}
 	
+	public static APIResult switchActivity(Activity activity) {
+		
+		Log.i(TAG, "switchActivity() called");
+		
+		if (sessionState != SessionState.STARTED) {
+			return APIResult.START_NOT_CALLED;
+		}
+
+		if (PlaynomicsSession.activity != activity) {
+			// Restore original callback
+			PlaynomicsSession.activity.getWindow().setCallback(activityCallback);
+			setActivityCallback(activity);
+			return APIResult.SWITCHED;			
+		}
+		else {
+			return APIResult.ALREADY_SWITCHED;
+		}
+	}
+	
 	public static APIResult stop() {
 	
 		Log.i(TAG, "stop() called");
 		if (sessionState.equals(SessionState.STOPPED))
 			return APIResult.ALREADY_STOPPED;
 		
-		sessionState = SessionState.STOPPED;
-		eventTimer.cancel();
+		if (activity.isFinishing()) {
+			sessionState = SessionState.STOPPED;
+			eventTimer.cancel();
+			
+			// Save eventLists to disk for later sending
+			saveEventList(SETTING_BASIC_EVENT_LIST, basicEventList);
+			saveEventList(SETTING_USER_INFO_EVENT_LIST, userInfoEventList);
+			saveEventList(SETTING_GAME_EVENT_LIST, gameEventList);
+			saveEventList(SETTING_TRANSACTION_EVENT_LIST, transactionEventList);
+			saveEventList(SETTING_SOCIAL_EVENT_LIST, socialEventList);
+			
+			// Restore original callback
+			activity.getWindow().setCallback(activityCallback);
+			PlaynomicsSession.activity = null;			
+		}
 		
-		// Save eventLists to disk for later sending
-		saveEventList(SETTING_BASIC_EVENT_LIST, basicEventList);
-		saveEventList(SETTING_USER_INFO_EVENT_LIST, userInfoEventList);
-		saveEventList(SETTING_GAME_EVENT_LIST, gameEventList);
-		saveEventList(SETTING_TRANSACTION_EVENT_LIST, transactionEventList);
-		saveEventList(SETTING_SOCIAL_EVENT_LIST, socialEventList);
-		
-		// Restore original callback
-		activity.getWindow().setCallback(activityCallback);
 		return APIResult.STOPPED;
 		
 	}
@@ -644,34 +644,45 @@ public class PlaynomicsSession {
 				clicks = 0;				
 			}
 			
+			// Exit method if any sendToServer call fails (we'll try again next time)
 			for (BasicEvent be : basicEventList) {
 				
 				if (eventSender.sendToServer(be))
 					basicEventList.remove(be);
+				else
+					return;
 			}
 			
 			for (UserInfoEvent uie : userInfoEventList) {
 				
 				if (eventSender.sendToServer(uie))
 					userInfoEventList.remove(uie);
+				else
+					return;
 			}
 			
 			for (GameEvent ge : gameEventList) {
 				
 				if (eventSender.sendToServer(ge))
 					gameEventList.remove(ge);
+				else
+					return;
 			}
 			
 			for (TransactionEvent te : transactionEventList) {
 				
 				if (eventSender.sendToServer(te))
 					gameEventList.remove(te);
+				else
+					return;
 			}
 			
 			for (SocialEvent se : socialEventList) {
 				
 				if (eventSender.sendToServer(se))
 					gameEventList.remove(se);
+				else
+					return;
 			}
 		}
 	}

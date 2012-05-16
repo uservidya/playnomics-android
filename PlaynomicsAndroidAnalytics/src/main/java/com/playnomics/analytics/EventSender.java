@@ -1,8 +1,10 @@
 package com.playnomics.analytics;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Properties;
 
 import android.util.Log;
 
@@ -11,19 +13,30 @@ import com.playnomics.analytics.PlaynomicsEvent.EventType;
 public class EventSender {
 	
 	// TODO: Externalize this string or add test/prod modes
-	private static final String PLAYNOMICS_BASE_URL = "https://test.b.playnomics.net/v1/";
 	private static final String TAG = EventSender.class.getSimpleName();
 	private static final int UPDATE_INTERVAL = 60000;
+	private String version;
+	private String baseUrl;
 	
 	private boolean testMode = false;
 	
 	public EventSender() {
-	
+		this(false);
 	}
 	
 	public EventSender(boolean testMode) {
 	
-		this.testMode = testMode;
+		try {
+			this.testMode = testMode;
+			Properties p = new Properties();
+			
+			p.load(getClass().getResourceAsStream("/PlaynomicsAndroidAnalytics.properties"));
+			version = p.getProperty("version");
+			baseUrl = p.getProperty("baseUrl");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private String addOptionalParam(String url, String param, Object value) {
@@ -37,18 +50,20 @@ public class EventSender {
 	
 	protected boolean sendToServer(String eventUrl) {
 	
-		try {
+		try {			
+			// Add version info
+			eventUrl += "&esrc=aj&ever=" + version;
 			// Hack to use JUnit testing w/o emulator
 			if (testMode)
 				System.out.println("Sending event to server: " + eventUrl);
 			else
 				Log.i(TAG, "Sending event to server: " + eventUrl);
+
 			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
 			// con.setRequestMethod("HEAD");
 			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
-			// Log.e(TAG, e.getMessage());
-			e.printStackTrace();
+//			e.printStackTrace();
 			return false;
 		}
 	}
@@ -56,7 +71,7 @@ public class EventSender {
 	protected boolean sendToServer(SocialEvent se) {
 		
 		// Set common params
-		String eventUrl = PLAYNOMICS_BASE_URL
+		String eventUrl = baseUrl
 			+ se.getEventType()
 			+ "?t=" + se.getEventTime().getTime()
 			+ "&a=" + se.getApplicationId()
@@ -80,7 +95,7 @@ public class EventSender {
 	protected boolean sendToServer(TransactionEvent te) {
 		
 		// Set common params
-		String eventUrl = PLAYNOMICS_BASE_URL
+		String eventUrl = baseUrl
 			+ te.getEventType()
 			+ "?t=" + te.getEventTime().getTime()
 			+ "&a=" + te.getApplicationId()
@@ -105,7 +120,7 @@ public class EventSender {
 	protected boolean sendToServer(GameEvent ge) {
 		
 		// Set common params
-		String eventUrl = PLAYNOMICS_BASE_URL
+		String eventUrl = baseUrl
 			+ ge.getEventType()
 			+ "?t=" + ge.getEventTime().getTime()
 			+ "&a=" + ge.getApplicationId()
@@ -129,7 +144,7 @@ public class EventSender {
 	protected boolean sendToServer(UserInfoEvent uie) {
 	
 		// Set common params
-		String eventUrl = PLAYNOMICS_BASE_URL
+		String eventUrl = baseUrl
 			+ uie.getEventType()
 			+ "?t=" + uie.getEventTime().getTime()
 			+ "&a=" + uie.getApplicationId()
@@ -150,7 +165,7 @@ public class EventSender {
 	protected boolean sendToServer(BasicEvent be) {
 	
 		// Set common params
-		String eventUrl = PLAYNOMICS_BASE_URL
+		String eventUrl = baseUrl
 			+ be.getEventType()
 			+ "?t=" + be.getEventTime().getTime()
 			+ "&a=" + be.getApplicationId()
