@@ -1,4 +1,4 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 /**
  * Copyright (c) 2009 Mark S. Kolich

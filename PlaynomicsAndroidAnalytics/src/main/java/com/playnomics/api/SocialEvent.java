@@ -1,4 +1,4 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 public class SocialEvent extends PlaynomicsEvent {
 	

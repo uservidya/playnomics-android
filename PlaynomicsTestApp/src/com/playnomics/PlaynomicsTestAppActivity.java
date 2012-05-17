@@ -8,14 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.playnomics.analytics.PlaynomicsSession;
-import com.playnomics.analytics.SocialEvent.ResponseType;
-import com.playnomics.analytics.TransactionEvent.CurrencyCategory;
-import com.playnomics.analytics.TransactionEvent.CurrencyType;
-import com.playnomics.analytics.TransactionEvent.TransactionType;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
-import com.playnomics.analytics.UserInfoEvent.UserInfoType;
+import com.playnomics.api.PlaynomicsSession;
+import com.playnomics.api.SocialEvent.ResponseType;
+import com.playnomics.api.TransactionEvent.CurrencyCategory;
+import com.playnomics.api.TransactionEvent.CurrencyType;
+import com.playnomics.api.TransactionEvent.TransactionType;
+import com.playnomics.api.UserInfoEvent.UserInfoSex;
+import com.playnomics.api.UserInfoEvent.UserInfoSource;
+import com.playnomics.api.UserInfoEvent.UserInfoType;
 
 public class PlaynomicsTestAppActivity extends Activity {
 	

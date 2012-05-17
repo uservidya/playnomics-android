@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.playnomics.analytics.PlaynomicsSession;
+import com.playnomics.api.PlaynomicsSession;
 
 
 public class PlaynomicsTestAppActivity2 extends Activity {

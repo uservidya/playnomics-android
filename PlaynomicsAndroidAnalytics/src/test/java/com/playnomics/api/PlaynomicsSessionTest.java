@@ -1,4 +1,4 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,13 +8,20 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.playnomics.analytics.PlaynomicsEvent.EventType;
-import com.playnomics.analytics.TransactionEvent.CurrencyCategory;
-import com.playnomics.analytics.TransactionEvent.CurrencyType;
-import com.playnomics.analytics.TransactionEvent.TransactionType;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
-import com.playnomics.analytics.UserInfoEvent.UserInfoType;
+import com.playnomics.api.BasicEvent;
+import com.playnomics.api.EventSender;
+import com.playnomics.api.GameEvent;
+import com.playnomics.api.RandomGenerator;
+import com.playnomics.api.SocialEvent;
+import com.playnomics.api.TransactionEvent;
+import com.playnomics.api.UserInfoEvent;
+import com.playnomics.api.PlaynomicsEvent.EventType;
+import com.playnomics.api.TransactionEvent.CurrencyCategory;
+import com.playnomics.api.TransactionEvent.CurrencyType;
+import com.playnomics.api.TransactionEvent.TransactionType;
+import com.playnomics.api.UserInfoEvent.UserInfoSex;
+import com.playnomics.api.UserInfoEvent.UserInfoSource;
+import com.playnomics.api.UserInfoEvent.UserInfoType;
 
 public class PlaynomicsSessionTest {
 	

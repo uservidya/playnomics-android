@@ -1,6 +1,6 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
-import com.playnomics.analytics.PlaynomicsEvent;
+import com.playnomics.api.PlaynomicsEvent;
 
 public class GameEvent extends PlaynomicsEvent {
 	

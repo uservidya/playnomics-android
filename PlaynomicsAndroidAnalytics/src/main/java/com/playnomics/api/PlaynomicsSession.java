@@ -1,4 +1,4 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 import java.lang.reflect.Type;
 import java.util.Date;
@@ -28,13 +28,13 @@ import android.view.accessibility.AccessibilityEvent;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.playnomics.analytics.PlaynomicsEvent.EventType;
-import com.playnomics.analytics.SocialEvent.ResponseType;
-import com.playnomics.analytics.TransactionEvent.CurrencyCategory;
-import com.playnomics.analytics.TransactionEvent.TransactionType;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSex;
-import com.playnomics.analytics.UserInfoEvent.UserInfoSource;
-import com.playnomics.analytics.UserInfoEvent.UserInfoType;
+import com.playnomics.api.PlaynomicsEvent.EventType;
+import com.playnomics.api.SocialEvent.ResponseType;
+import com.playnomics.api.TransactionEvent.CurrencyCategory;
+import com.playnomics.api.TransactionEvent.TransactionType;
+import com.playnomics.api.UserInfoEvent.UserInfoSex;
+import com.playnomics.api.UserInfoEvent.UserInfoSource;
+import com.playnomics.api.UserInfoEvent.UserInfoType;
 
 public class PlaynomicsSession {
 	
@@ -102,10 +102,10 @@ public class PlaynomicsSession {
 	
 	}
 	
-	public static APIResult start(Activity activity, String apiKey, String userId) {
+	public static APIResult start(Activity activity, String applicationId, String userId) {
 	
 		PlaynomicsSession.userId = userId;
-		return start(activity, apiKey);
+		return start(activity, applicationId);
 	}
 	
 	public static APIResult start(Activity activity, String applicationId) {

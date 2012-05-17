@@ -1,8 +1,8 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 import java.util.Date;
 
-import com.playnomics.analytics.PlaynomicsEvent;
+import com.playnomics.api.PlaynomicsEvent;
 
 public class BasicEvent extends PlaynomicsEvent {
 	

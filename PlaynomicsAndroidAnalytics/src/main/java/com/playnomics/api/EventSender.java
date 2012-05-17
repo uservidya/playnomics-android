@@ -1,4 +1,4 @@
-package com.playnomics.analytics;
+package com.playnomics.api;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 
 import android.util.Log;
 
-import com.playnomics.analytics.PlaynomicsEvent.EventType;
+import com.playnomics.api.PlaynomicsEvent.EventType;
 
 public class EventSender {
 	
