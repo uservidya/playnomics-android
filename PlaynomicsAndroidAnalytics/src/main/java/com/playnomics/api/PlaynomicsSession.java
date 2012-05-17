@@ -129,7 +129,7 @@ public class PlaynomicsSession {
 		
 		sessionState = SessionState.STARTED;
 		PlaynomicsSession.applicationId = applicationId;
-		
+			
 		// Setup the activity callback function(s)
 		setActivityCallback(activity);
 		if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
@@ -222,6 +222,10 @@ public class PlaynomicsSession {
 		cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
 		if (cookieId == null)
 			cookieId = "UNKNOWN_DEVICE_ID";
+
+		// Set userId to cookieId if it isn't present
+		if (userId == null)
+			userId = cookieId;
 		
 		BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
 			instanceId, timeZoneOffset);
