@@ -12,7 +12,7 @@ public class SocialEvent extends PlaynomicsEvent {
 	private String method;
 	private ResponseType response;
 	
-	public SocialEvent(EventType eventType, String applicationId, String userId, String invitationId,
+	public SocialEvent(EventType eventType, Long applicationId, String userId, String invitationId,
 		String recipientUserId, String recipientAddress, String method, ResponseType response) {
 	
 		super(eventType, applicationId, userId);

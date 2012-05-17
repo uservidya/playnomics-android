@@ -24,7 +24,7 @@ public class TransactionEvent extends PlaynomicsEvent {
 	private double[] currencyValues;
 	private CurrencyCategory[] currencyCategories;
 	
-	public TransactionEvent(EventType eventType, String applicationId, String userId, long transactionId,
+	public TransactionEvent(EventType eventType, Long applicationId, String userId, long transactionId,
 		String itemId, double quantity, TransactionType type, String otherUserId, String[] currencyTypes,
 		double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	

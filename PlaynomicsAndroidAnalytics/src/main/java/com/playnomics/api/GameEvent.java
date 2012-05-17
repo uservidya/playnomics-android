@@ -11,7 +11,7 @@ public class GameEvent extends PlaynomicsEvent {
 	private String gameId;
 	private String reason;
 	
-	public GameEvent(EventType eventType, String applicationId, String userId, String sessionId, String site,
+	public GameEvent(EventType eventType, Long applicationId, String userId, String sessionId, String site,
 		String instanceId, String type, String gameId, String reason) {
 	
 		super(eventType, applicationId, userId);

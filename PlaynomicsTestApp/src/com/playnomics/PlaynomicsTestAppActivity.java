@@ -24,7 +24,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, "TEST_APP_ID", "testUserId").toString(),
+		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, 3L, "testUserId").toString(),
 			Toast.LENGTH_LONG)
 			.show();
 	}

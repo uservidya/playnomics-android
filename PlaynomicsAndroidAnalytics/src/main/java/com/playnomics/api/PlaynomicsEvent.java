@@ -11,11 +11,11 @@ class PlaynomicsEvent {
 	
 	private EventType eventType;
 	private Date eventTime;
-	private String applicationId;
+	private Long applicationId;
 	private String userId;
 	
 	
-	protected PlaynomicsEvent(EventType eventType, String applicationId, String userId) {
+	protected PlaynomicsEvent(EventType eventType, Long applicationId, String userId) {
 	
 		super();
 		eventTime = new Date();
@@ -45,12 +45,12 @@ class PlaynomicsEvent {
 		this.eventTime = eventTime;
 	}
 	
-	protected String getApplicationId() {
+	protected Long getApplicationId() {
 	
 		return applicationId;
 	}
 	
-	protected void setApplicationId(String applicationId) {
+	protected void setApplicationId(Long applicationId) {
 	
 		this.applicationId = applicationId;
 	}

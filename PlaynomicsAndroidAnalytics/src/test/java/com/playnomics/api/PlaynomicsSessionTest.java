@@ -30,7 +30,7 @@ public class PlaynomicsSessionTest {
 	
 		List<BasicEvent> basicEventList = new ArrayList<BasicEvent>();
 		EventType eventType = EventType.appStart;
-		String applicationId = "testAppId";
+		Long applicationId = 3L;
 		String userId = "testUserId";
 		BasicEvent startEvent = new BasicEvent(eventType, applicationId, userId, "testCookieId",
 			RandomGenerator.createRandomHex(), RandomGenerator.createRandomHex(), 480);

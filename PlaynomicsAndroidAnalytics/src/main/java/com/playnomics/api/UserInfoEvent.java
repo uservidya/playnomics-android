@@ -28,13 +28,13 @@ public class UserInfoEvent extends PlaynomicsEvent {
 	private String sourceCampaign;
 	private Date installTime;
 	
-	public UserInfoEvent(String applicationId, String userId, UserInfoType type) {
+	public UserInfoEvent(Long applicationId, String userId, UserInfoType type) {
 		
 		super(EventType.userInfo, applicationId, userId);
 		this.type = type;
 	}
 	
-	public UserInfoEvent(String applicationId, String userId, UserInfoType type, String country,
+	public UserInfoEvent(Long applicationId, String userId, UserInfoType type, String country,
 		String subdivision, UserInfoSex sex, Date birthday, UserInfoSource source, String sourceCampaign,
 		Date installTime) {
 	

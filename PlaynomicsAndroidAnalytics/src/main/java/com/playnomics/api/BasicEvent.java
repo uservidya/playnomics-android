@@ -19,7 +19,7 @@ public class BasicEvent extends PlaynomicsEvent {
 	private int totalKeys;
 	private int collectMode;
 	
-	protected BasicEvent(EventType eventType, String applicationId, String userId, String cookieId,
+	protected BasicEvent(EventType eventType, Long applicationId, String userId, String cookieId,
 		String sessionId, String instanceId, Date sessionStartTime, int sequence, int clicks,
 		int totalClicks, int keys, int totalKeys, int collectMode) {
 	
@@ -36,7 +36,7 @@ public class BasicEvent extends PlaynomicsEvent {
 		this.collectMode = collectMode;
 	}
 	
-	protected BasicEvent(EventType eventType, String applicationId, String userId, String cookieId,
+	protected BasicEvent(EventType eventType, Long applicationId, String userId, String cookieId,
 		String sessionId, String instanceId, int timeZoneOffset) {
 	
 		super(eventType, applicationId, userId);

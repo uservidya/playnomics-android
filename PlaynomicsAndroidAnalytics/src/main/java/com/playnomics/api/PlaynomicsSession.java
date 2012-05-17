@@ -77,7 +77,7 @@ public class PlaynomicsSession {
 	private static int collectMode = 7;
 	private static int sequence = 0;
 	
-	private static String applicationId;
+	private static Long applicationId;
 	private static String cookieId;
 	private static String sessionId;
 	private static String instanceId;
@@ -102,13 +102,13 @@ public class PlaynomicsSession {
 	
 	}
 	
-	public static APIResult start(Activity activity, String applicationId, String userId) {
+	public static APIResult start(Activity activity, Long applicationId, String userId) {
 	
 		PlaynomicsSession.userId = userId;
 		return start(activity, applicationId);
 	}
 	
-	public static APIResult start(Activity activity, String applicationId) {
+	public static APIResult start(Activity activity, Long applicationId) {
 	
 		Log.i(TAG, "start() called");
 		
