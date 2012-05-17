@@ -166,6 +166,7 @@ public class EventSender {
 			+ be.getEventType()
 			+ "?t=" + be.getEventTime().getTime()
 			+ "&a=" + be.getApplicationId()
+			+ "&u=" + be.getUserId()
 			+ "&b=" + be.getCookieId()
 			+ "&s=" + be.getSessionId()
 			+ "&i=" + be.getInstanceId();
