@@ -32,7 +32,7 @@ public class PlaynomicsSessionTest {
 		
 		@SuppressWarnings("deprecation")
 		UserInfoEvent userInfoEvent = new UserInfoEvent(applicationId, userId, UserInfoType.update, "US", "CA",
-			UserInfoSex.M, new Date("01/01/1999"), UserInfoSource.Other, "testCampaign", new Date());
+			UserInfoSex.Male, new Date("01/01/1999"), UserInfoSource.Other, "testCampaign", new Date());
 		eventList.add(userInfoEvent);
 		
 		GameEvent gameEvent = new GameEvent(EventType.gameStart, applicationId, userId,
@@ -42,7 +42,7 @@ public class PlaynomicsSessionTest {
 	
 		String[] currencyTypes = {CurrencyType.USD.toString(), CurrencyType.OFF.toString()};
 		double[] currencyValues = {1,2};
-		CurrencyCategory[] currencyCategories = {CurrencyCategory.r, CurrencyCategory.v};
+		CurrencyCategory[] currencyCategories = {CurrencyCategory.Real, CurrencyCategory.Virtual};
 		TransactionEvent transactionEvent = new TransactionEvent(EventType.transaction, applicationId, userId, 123456,
 			"testItemId", 1, TransactionType.SellItem, null, currencyTypes, currencyValues, currencyCategories);
 
