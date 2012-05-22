@@ -250,9 +250,12 @@ public class PlaynomicsSession {
 			}
 			
 		} catch (Exception e) {
-			
-			// TODO: Send error to server
 			result = APIResult.FAIL_UNKNOWN;
+			
+			ErrorEvent ee = new ErrorEvent(e);
+			// Not sure if we should try to send immediately, but whatever
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
 		}
 		
 		return result;
@@ -394,20 +397,26 @@ public class PlaynomicsSession {
 	 */
 	protected static void pause() {
 	
-		Log.i(TAG, "pause() called");
-		if (sessionState.equals(SessionState.PAUSED))
-			return;
-		
-		sessionState = SessionState.PAUSED;
-		
-		BasicEvent be = new BasicEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
-			cookieId, sessionId, instanceId, timeZoneOffset);
-		pauseTime = new Date();
-		be.setSequence(sequence);
-		be.setSessionStartTime(sessionStartTime);
-		// Try to send and queue if unsuccessful
-		if (!eventSender.sendToServer(be))
-			playnomicsEventList.add(be);
+		try {
+			Log.i(TAG, "pause() called");
+			if (sessionState.equals(SessionState.PAUSED))
+				return;
+			
+			sessionState = SessionState.PAUSED;
+			
+			BasicEvent be = new BasicEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
+				cookieId, sessionId, instanceId, timeZoneOffset);
+			pauseTime = new Date();
+			be.setSequence(sequence);
+			be.setSessionStartTime(sessionStartTime);
+			// Try to send and queue if unsuccessful
+			if (!eventSender.sendToServer(be))
+				playnomicsEventList.add(be);
+		} catch (Exception e) {
+			ErrorEvent ee = new ErrorEvent(e);
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
+		}
 	}
 	
 	/**
@@ -415,20 +424,26 @@ public class PlaynomicsSession {
 	 */
 	protected static void resume() {
 	
-		Log.i(TAG, "resume() called");
-		if (sessionState.equals(SessionState.STARTED))
-			return;
-		
-		sessionState = SessionState.STARTED;
-		BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId,
-			cookieId, sessionId, instanceId, timeZoneOffset);
-		be.setPauseTime(pauseTime);
-		be.setSessionStartTime(sessionStartTime);
-		sequence += 1;
-		be.setSequence(sequence);
-		// Try to send and queue if unsuccessful
-		if (!eventSender.sendToServer(be))
-			playnomicsEventList.add(be);
+		try {
+			Log.i(TAG, "resume() called");
+			if (sessionState.equals(SessionState.STARTED))
+				return;
+			
+			sessionState = SessionState.STARTED;
+			BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId,
+				cookieId, sessionId, instanceId, timeZoneOffset);
+			be.setPauseTime(pauseTime);
+			be.setSessionStartTime(sessionStartTime);
+			sequence += 1;
+			be.setSequence(sequence);
+			// Try to send and queue if unsuccessful
+			if (!eventSender.sendToServer(be))
+				playnomicsEventList.add(be);
+		} catch (Exception e) {
+			ErrorEvent ee = new ErrorEvent(e);
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
+		}
 	}
 	
 	/**
@@ -459,6 +474,11 @@ public class PlaynomicsSession {
 			}
 		} catch (Exception e) {
 			result = APIResult.FAIL_UNKNOWN;
+			
+			ErrorEvent ee = new ErrorEvent(e);
+			// Not sure if we should try to send immediately, but whatever
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
 		}
 		
 		return result;
@@ -493,8 +513,11 @@ public class PlaynomicsSession {
 			
 			result = APIResult.STOPPED;
 		} catch (Exception e) {
-			// TODO: send error to server
 			result = APIResult.FAIL_UNKNOWN;
+			
+			ErrorEvent ee = new ErrorEvent(e);
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
 		}
 		
 		return result;
@@ -728,8 +751,11 @@ public class PlaynomicsSession {
 				result = APIResult.QUEUED;
 			}
 		} catch (Exception e) {
-			// TODO: send error to server
 			result = APIResult.FAIL_UNKNOWN;
+			
+			ErrorEvent ee = new ErrorEvent(e);
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
 		}
 		
 		return result;
@@ -762,7 +788,8 @@ public class PlaynomicsSession {
 					clicks = 0;
 				}
 				
-				// Exit method if any sendToServer call fails (we'll try again time)
+				// Exit method if any sendToServer call fails (we'll try again
+				// time)
 				for (PlaynomicsEvent pe : playnomicsEventList) {
 					
 					if (eventSender.sendToServer(pe))
@@ -771,7 +798,10 @@ public class PlaynomicsSession {
 						return;
 				}
 			} catch (Exception e) {
-				// TODO: send error to server
+				ErrorEvent ee = new ErrorEvent(e);
+				// Not sure if we should try to send immediately, but whatever
+				if (!eventSender.sendToServer(ee))
+					playnomicsEventList.add(ee);
 			}
 		}
 	}
