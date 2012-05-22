@@ -1,24 +1,16 @@
 package com.playnomics.api;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UserInfoEvent extends PlaynomicsEvent {
+import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
+import com.playnomics.api.PlaynomicsConstants.UserInfoSource;
+import com.playnomics.api.PlaynomicsConstants.UserInfoType;
+
+class UserInfoEvent extends PlaynomicsEvent {
 	
-	// Enums for UserInfo Events
-	public static enum UserInfoType {
-		update
-	};
-	
-	public static enum UserInfoSex {
-		M, F, U
-	};
-	
-	public static enum UserInfoSource {
-		Adwords, DoubleClick, YahooAds, MSNAds, AOLAds, Adbrite, FacebookAds,
-		GoogleSearch, YahooSearch, BingSearch, FacebookSearch,
-		Applifier, AppStrip, VIPGamesNetwork, UserReferral, InterGame, Other
-	}
-	
+	private static final long serialVersionUID = 1L;
+
 	private UserInfoType type;
 	private String country;
 	private String subdivision;
@@ -126,5 +118,27 @@ public class UserInfoEvent extends PlaynomicsEvent {
 	public void setInstallTime(Date installTime) {
 	
 		this.installTime = installTime;
+	}
+
+	@Override
+	public String toQueryString() {
+	
+		// Set common params
+		String queryString = getEventType()
+			+ "?t=" + getEventTime().getTime()
+			+ "&a=" + getApplicationId()
+			+ "&u=" + getUserId()
+			+ "&pt=" + getType();
+		// Optional params
+		queryString = addOptionalParam(queryString, "pc", getCountry());
+		queryString = addOptionalParam(queryString, "ps", getSubdivision());
+		queryString = addOptionalParam(queryString, "px", getSex());
+	    SimpleDateFormat format = new SimpleDateFormat("MM-DD-yyyy");
+		queryString = addOptionalParam(queryString, "pb", format.format(getBirthday()));
+		queryString = addOptionalParam(queryString, "po", getSource());
+		queryString = addOptionalParam(queryString, "pm", getSourceCampaign());
+		queryString = addOptionalParam(queryString, "pi", getInstallTime().getTime());
+		
+		return queryString;
 	}
 }

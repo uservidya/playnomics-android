@@ -1,8 +1,10 @@
 package com.playnomics.api;
 
-import com.playnomics.api.PlaynomicsEvent;
+import java.io.Serializable;
 
-public class GameEvent extends PlaynomicsEvent {
+class GameEvent extends PlaynomicsEvent  implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	private String sessionId;
 	private String site;
@@ -83,5 +85,29 @@ public class GameEvent extends PlaynomicsEvent {
 	public void setSite(String site) {
 	
 		this.site = site;
+	}
+
+
+	@Override
+	public String toQueryString() {
+		// Set common params
+		String queryString =  getEventType()
+			+ "?t=" + getEventTime().getTime()
+			+ "&a=" + getApplicationId()
+			+ "&u=" + getUserId();
+		// sessionId is optional for game events
+		if (getEventType() == EventType.gameStart || getEventType() == EventType.gameEnd)
+			queryString = addOptionalParam(queryString, "s", getSessionId());
+		else
+			queryString += "&s=" + getSessionId();
+		// Optional params
+		queryString = addOptionalParam(queryString, "ss", getSite());
+		queryString = addOptionalParam(queryString, "r", getReason());
+		queryString = addOptionalParam(queryString, "g", getInstanceId());
+		queryString = addOptionalParam(queryString, "ss", getSite());
+		queryString = addOptionalParam(queryString, "gt", getType());
+		queryString = addOptionalParam(queryString, "gi", getGameId());
+		
+		return queryString;
 	}
 }

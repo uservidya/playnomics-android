@@ -2,9 +2,10 @@ package com.playnomics.api;
 
 import java.util.Date;
 
-import com.playnomics.api.PlaynomicsEvent;
-
-public class BasicEvent extends PlaynomicsEvent {
+class BasicEvent extends PlaynomicsEvent {
+	
+	private static final long serialVersionUID = 1L;
+	private static final int UPDATE_INTERVAL = 60000;
 	
 	private String cookieId;
 	private String sessionId;
@@ -164,5 +165,45 @@ public class BasicEvent extends PlaynomicsEvent {
 	protected void setCollectMode(int collectMode) {
 	
 		this.collectMode = collectMode;
+	}
+	
+	@Override
+	public String toQueryString() {
+	
+		String queryString = getEventType()
+			+ "?t=" + getEventTime().getTime()
+			+ "&a=" + getApplicationId()
+			+ "&u=" + getUserId()
+			+ "&b=" + getCookieId()
+			+ "&s=" + getSessionId()
+			+ "&i=" + getInstanceId();
+		
+		switch (getEventType()) {
+		
+			case appStart:
+			case appPage:
+				queryString += "&z=" + getTimeZoneOffset();
+				break;
+			
+			case appRunning:
+				queryString += "&r=" + getSessionStartTime().getTime()
+					+ "&q=" + getSequence()
+					+ "&d=" + UPDATE_INTERVAL
+					+ "&c=" + getClicks()
+					+ "&e=" + getTotalClicks()
+					+ "&k=" + getKeys()
+					+ "&l=" + getTotalKeys()
+					+ "&m=" + getCollectMode();
+				break;
+			
+			case appResume:
+				queryString += "&p=" + getPauseTime().getTime();
+			case appPause:
+				queryString += "&r=" + getSessionStartTime().getTime()
+					+ "&q=" + getSequence();
+				break;
+		}
+		
+		return queryString;
 	}
 }

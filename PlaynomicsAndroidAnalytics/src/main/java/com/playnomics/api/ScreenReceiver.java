@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-public class ScreenReceiver extends BroadcastReceiver {
+class ScreenReceiver extends BroadcastReceiver {
 	
 	private static String TAG = ScreenReceiver.class.getSimpleName();
 	public boolean screenOff;

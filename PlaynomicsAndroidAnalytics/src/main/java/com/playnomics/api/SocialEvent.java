@@ -1,10 +1,10 @@
 package com.playnomics.api;
 
-public class SocialEvent extends PlaynomicsEvent {
+import com.playnomics.api.PlaynomicsConstants.ResponseType;
+
+class SocialEvent extends PlaynomicsEvent {
 	
-	public enum ResponseType {
-		accepted
-	};
+	private static final long serialVersionUID = 1L;
 	
 	private String invitationId;
 	private String recipientUserId;
@@ -71,5 +71,29 @@ public class SocialEvent extends PlaynomicsEvent {
 	public void setResponse(ResponseType response) {
 	
 		this.response = response;
+	}
+
+	@Override
+	public String toQueryString() {
+	
+		// Set common params
+		String queryString = getEventType()
+			+ "?t=" + getEventTime().getTime()
+			+ "&a=" + getApplicationId()
+			+ "&u=" + getUserId()
+			+ "&ii=" + getInvitationId();
+		
+		if (getEventType() == EventType.invitationResponse) {
+			queryString += "&ie=" + getResponse()
+				+ "&ir=" + getRecipientUserId();	
+		}
+		else {
+			// Optional params
+			queryString = addOptionalParam(queryString, "ir", getRecipientUserId());
+			queryString = addOptionalParam(queryString, "ia", getRecipientAddress());
+			queryString = addOptionalParam(queryString, "im", getMethod());			
+		}
+		
+		return queryString;
 	}
 }

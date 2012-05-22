@@ -1,19 +1,11 @@
 package com.playnomics.api;
 
+import com.playnomics.api.PlaynomicsConstants.CurrencyCategory;
+import com.playnomics.api.PlaynomicsConstants.TransactionType;
+
 public class TransactionEvent extends PlaynomicsEvent {
 	
-	public enum TransactionType {
-		BuyItem, SellItem, ReturnItem, BuyService, SellService, ReturnService,
-		CurrencyConvert, Initial, Free, Reward, GiftSend, GiftReceive
-	};
-	
-	public enum CurrencyCategory {
-		r, v
-	};
-	
-	public enum CurrencyType {
-		USD, FBC, OFD, OFF
-	}
+	private static final long serialVersionUID = 1L;
 	
 	private long transactionId;
 	private String itemId;
@@ -117,6 +109,31 @@ public class TransactionEvent extends PlaynomicsEvent {
 	public void setCurrencyCategories(CurrencyCategory[] currencyCategories) {
 	
 		this.currencyCategories = currencyCategories;
+	}
+	
+	@Override
+	public String toQueryString() {
+	
+		// Set common params
+		String queryString = getEventType()
+			+ "?t=" + getEventTime().getTime()
+			+ "&a=" + getApplicationId()
+			+ "&u=" + getUserId()
+			+ "&tt=" + getType();
+		
+		for (int i = 0; i < getCurrencyTypes().length; i++) {
+			
+			queryString += "&tc" + i + "=" + getCurrencyTypes()[i]
+				+ "&tv" + i + "=" + getCurrencyValues()[i]
+				+ "&ta" + i + "=" + getCurrencyCategories()[i];
+		}
+		
+		// Optional params
+		queryString = addOptionalParam(queryString, "i", getItemId());
+		queryString = addOptionalParam(queryString, "tq", getQuantity());
+		queryString = addOptionalParam(queryString, "to", getOtherUserId());
+		
+		return queryString;
 	}
 	
 }

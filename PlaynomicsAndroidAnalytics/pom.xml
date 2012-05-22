@@ -5,38 +5,6 @@
 	<artifactId>PlaynomicsAndroidApi</artifactId>
 	<version>0.0.1</version>
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<excludes>
-									<exclude>com.google.android:android</exclude>
-									<exclude>commons-logging:commons-logging</exclude>
-									<exclude>org.apache.httpcomponents:httpclient</exclude>
-									<exclude>org.apache.httpcomponents:httpcore</exclude>
-									<exclude>commons-codec:commons-codec</exclude>
-									<exclude>org.json:json</exclude>
-									<exclude>xpp3:xpp3</exclude>
-									<exclude>xerces:xmlParserAPIs</exclude>
-									<exclude>org.khronos:opengl-api</exclude>
-									<exclude>junit:junit</exclude>
-									<exclude>org.hamcrest:hamcrest-core</exclude>
-								</excludes>
-							</artifactSet>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -49,11 +17,6 @@
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
 			<version>2.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

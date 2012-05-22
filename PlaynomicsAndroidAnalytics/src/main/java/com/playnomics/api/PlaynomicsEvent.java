@@ -1,9 +1,12 @@
 package com.playnomics.api;
 
+import java.io.Serializable;
 import java.util.Date;
 
-class PlaynomicsEvent {
-	
+abstract class PlaynomicsEvent implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	protected enum EventType {
 		appStart, appPage, appRunning, appPause, appResume, appStop, userInfo, sessionStart, sessionEnd,
 		gameStart, gameEnd, transaction, invitationSent, invitationResponse
@@ -25,6 +28,10 @@ class PlaynomicsEvent {
 	}
 	
 	
+	public PlaynomicsEvent() {
+		
+	}
+
 	protected EventType getEventType() {
 	
 		return eventType;
@@ -69,4 +76,15 @@ class PlaynomicsEvent {
 	
 		return eventTime.toString() + ": " + eventType.toString();
 	}
+	
+	protected String addOptionalParam(String url, String param, Object value) {
+		
+		if (value != null) {
+			url += "&" + param + "=" + value.toString();
+		}
+		
+		return url;
+	}
+	
+	public abstract String toQueryString();
 }
