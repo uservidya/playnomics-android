@@ -46,7 +46,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	public void onUserInfoClick(View view) {
 	
 		Toast.makeText(this, "USER INFO: " +
-			PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.M, new Date("1/1/1999"),
+			PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.Male, new Date("1/1/1999"),
 				UserInfoSource.Other, "test", new Date()).toString(), Toast.LENGTH_LONG).show();
 	}
 	
@@ -86,7 +86,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		String[] currencyTypes = { CurrencyType.USD.toString(), CurrencyType.OFF.toString() };
 		double[] currencyValues = { 1, 2 };
-		CurrencyCategory[] currencyCategories = { CurrencyCategory.r, CurrencyCategory.v };
+		CurrencyCategory[] currencyCategories = { CurrencyCategory.Real, CurrencyCategory.Virtual };
 		
 		Toast.makeText(this, "TRANSACTION: " +
 			PlaynomicsSession.transaction(1234567890, "TEST_ITEM_ID", 1, TransactionType.BuyItem, "TEST_USER_ID",

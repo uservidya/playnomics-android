@@ -144,106 +144,115 @@ public class PlaynomicsSession {
 	@SuppressWarnings("unchecked")
 	public static APIResult start(Activity activity, Long applicationId) {
 	
-		Log.i(TAG, "start() called");
-		
-		if (activity.getApplication().getPackageManager()
-			.checkPermission(permission.INTERNET, activity.getApplication().getPackageName()) != PackageManager.PERMISSION_GRANTED) {
-			hasInternetPermission = false;
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
-		if (sessionState == SessionState.STARTED)
-			return APIResult.ALREADY_STARTED;
-		
-		// If paused, resume and get out of here
-		if (sessionState == SessionState.PAUSED) {
-			resume();
-			return APIResult.SESSION_RESUMED;
-		}
-		
-		sessionState = SessionState.STARTED;
-		PlaynomicsSession.applicationId = applicationId;
-		
-		// Setup the activity callback function(s)
-		setActivityCallback(activity);
-		if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
-			screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-		if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
-			screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
-		
-		if (screenReceiver == null) {
-			screenReceiver = new ScreenReceiver();
-			activity.registerReceiver(screenReceiver, screenIntentFilter);
-		}
-		
-		sequence = 1;
-		clicks = 0;
-		totalClicks = 0;
-		keys = 0;
-		totalKeys = 0;
-		
-		sessionStartTime = new Date();
-		
-		// Calc to conform to minute offset format
-		timeZoneOffset = TimeZone.getDefault().getRawOffset() / -60000;
-		// Collection mode for Android
-		collectMode = COLLECTION_MODE;
-		
-		settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
-		editor = settings.edit();
-		
-		playnomicsEventList.clear();
-		List<?> eventList = (List<BasicEvent>) ObjectCacheUtil.getObject(activity, FILE_PLAYNOMICS_EVENT_LIST);
-		if (eventList != null)
-			playnomicsEventList.addAll((List<PlaynomicsEvent>) eventList);
-	
-		EventType eventType;
-		
-		// Send an appStart if it has been > 3 min since the last session or a
-		// different user
-		// otherwise send an appPage
-		if (sessionStartTime.getTime() - settings.getLong(SETTING_LAST_SESSION_START_TIME, 0) > 180000
-			|| !settings.getString(SETTING_LAST_USER_ID, "").equals(userId)) {
-			sessionId = RandomGenerator.createRandomHex();
-			editor.putString(SETTING_LAST_SESSION_ID, sessionId);
-			instanceId = sessionId;
-			eventType = EventType.appStart;
-		}
-		else {
-			sessionId = settings.getString(SETTING_LAST_SESSION_ID, "");
-			instanceId = RandomGenerator.createRandomHex();
-			eventType = EventType.appPage;
-		}
-		
-		editor.putString(SETTING_LAST_USER_ID, userId);
-		editor.putLong(SETTING_LAST_SESSION_START_TIME, sessionStartTime.getTime());
-		editor.commit();
-		
-		// Get unique ID for device; may be null on emulator
-		cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
-		if (cookieId == null)
-			cookieId = "UNKNOWN_DEVICE_ID";
-		
-		// Set userId to cookieId if it isn't present
-		if (userId == null)
-			userId = cookieId;
-		
-		BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
-			instanceId, timeZoneOffset);
-		
-		// Try to send and queue if unsuccessful
 		APIResult result;
-		if (eventSender.sendToServer(be)) {
-			result = APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(be);
-			result = APIResult.QUEUED;
-		}
-		// Startup the event timer to send events back to the server
-		if (eventTimer == null) {
-			eventTimer = new Timer(true);
-			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+		
+		try {
+			Log.i(TAG, "start() called");
+			
+			if (activity.getApplication().getPackageManager()
+				.checkPermission(permission.INTERNET, activity.getApplication().getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+				hasInternetPermission = false;
+				return APIResult.NO_INTERNET_PERMISSION;
+			}
+			
+			if (sessionState == SessionState.STARTED)
+				return APIResult.ALREADY_STARTED;
+			
+			// If paused, resume and get out of here
+			if (sessionState == SessionState.PAUSED) {
+				resume();
+				return APIResult.SESSION_RESUMED;
+			}
+			
+			sessionState = SessionState.STARTED;
+			PlaynomicsSession.applicationId = applicationId;
+			
+			// Setup the activity callback function(s)
+			setActivityCallback(activity);
+			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
+				screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
+				screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
+			
+			if (screenReceiver == null) {
+				screenReceiver = new ScreenReceiver();
+				activity.registerReceiver(screenReceiver, screenIntentFilter);
+			}
+			
+			sequence = 1;
+			clicks = 0;
+			totalClicks = 0;
+			keys = 0;
+			totalKeys = 0;
+			
+			sessionStartTime = new Date();
+			
+			// Calc to conform to minute offset format
+			timeZoneOffset = TimeZone.getDefault().getRawOffset() / -60000;
+			// Collection mode for Android
+			collectMode = COLLECTION_MODE;
+			
+			settings = activity.getSharedPreferences("playnomics", Context.MODE_PRIVATE);
+			editor = settings.edit();
+			
+			playnomicsEventList.clear();
+			List<?> eventList = (List<BasicEvent>) ObjectCacheUtil.getObject(activity, FILE_PLAYNOMICS_EVENT_LIST);
+			if (eventList != null)
+				playnomicsEventList.addAll((List<PlaynomicsEvent>) eventList);
+			
+			EventType eventType;
+			
+			// Send an appStart if it has been > 3 min since the last session or
+			// a
+			// different user
+			// otherwise send an appPage
+			if (sessionStartTime.getTime() - settings.getLong(SETTING_LAST_SESSION_START_TIME, 0) > 180000
+				|| !settings.getString(SETTING_LAST_USER_ID, "").equals(userId)) {
+				sessionId = RandomGenerator.createRandomHex();
+				editor.putString(SETTING_LAST_SESSION_ID, sessionId);
+				instanceId = sessionId;
+				eventType = EventType.appStart;
+			}
+			else {
+				sessionId = settings.getString(SETTING_LAST_SESSION_ID, "");
+				instanceId = RandomGenerator.createRandomHex();
+				eventType = EventType.appPage;
+			}
+			
+			editor.putString(SETTING_LAST_USER_ID, userId);
+			editor.putLong(SETTING_LAST_SESSION_START_TIME, sessionStartTime.getTime());
+			editor.commit();
+			
+			// Get unique ID for device; may be null on emulator
+			cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
+			if (cookieId == null)
+				cookieId = "UNKNOWN_DEVICE_ID";
+			
+			// Set userId to cookieId if it isn't present
+			if (userId == null)
+				userId = cookieId;
+			
+			BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
+				instanceId, timeZoneOffset);
+			
+			// Try to send and queue if unsuccessful
+			if (eventSender.sendToServer(be)) {
+				result = APIResult.SENT;
+			}
+			else {
+				playnomicsEventList.add(be);
+				result = APIResult.QUEUED;
+			}
+			// Startup the event timer to send events back to the server
+			if (eventTimer == null) {
+				eventTimer = new Timer(true);
+				eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+			}
+			
+		} catch (Exception e) {
+			
+			// TODO: Send error to server
+			result = APIResult.FAIL_UNKNOWN;
 		}
 		
 		return result;
@@ -431,21 +440,28 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult switchActivity(Activity activity) {
 	
-		Log.i(TAG, "switchActivity() called");
+		APIResult result;
 		
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
+		try {
+			Log.i(TAG, "switchActivity() called");
+			if (sessionState != SessionState.STARTED) {
+				return APIResult.START_NOT_CALLED;
+			}
+			
+			if (PlaynomicsSession.activity != activity) {
+				// Restore original callback
+				PlaynomicsSession.activity.getWindow().setCallback(activityCallback);
+				setActivityCallback(activity);
+				result = APIResult.SWITCHED;
+			}
+			else {
+				result = APIResult.ALREADY_SWITCHED;
+			}
+		} catch (Exception e) {
+			result = APIResult.FAIL_UNKNOWN;
 		}
 		
-		if (PlaynomicsSession.activity != activity) {
-			// Restore original callback
-			PlaynomicsSession.activity.getWindow().setCallback(activityCallback);
-			setActivityCallback(activity);
-			return APIResult.SWITCHED;
-		}
-		else {
-			return APIResult.ALREADY_SWITCHED;
-		}
+		return result;
 	}
 	
 	/**
@@ -455,27 +471,35 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult stop() {
 	
-		Log.i(TAG, "stop() called");
-		if (sessionState.equals(SessionState.STOPPED))
-			return APIResult.ALREADY_STOPPED;
+		APIResult result;
 		
-		if (activity.isFinishing()) {
-			sessionState = SessionState.STOPPED;
-			eventTimer.cancel();
-			activity.unregisterReceiver(screenReceiver);
-			screenReceiver = null;
-			// Save eventList to disk for later sending
-			ObjectCacheUtil.saveObject(playnomicsEventList, activity, FILE_PLAYNOMICS_EVENT_LIST);
+		try {
+			Log.i(TAG, "stop() called");
+			if (sessionState.equals(SessionState.STOPPED))
+				return APIResult.ALREADY_STOPPED;
 			
-			// Restore original callback
-			activity.getWindow().setCallback(activityCallback);
-			PlaynomicsSession.activity = null;
+			if (activity.isFinishing()) {
+				sessionState = SessionState.STOPPED;
+				eventTimer.cancel();
+				activity.unregisterReceiver(screenReceiver);
+				screenReceiver = null;
+				// Save eventList to disk for later sending
+				ObjectCacheUtil.saveObject(playnomicsEventList, activity, FILE_PLAYNOMICS_EVENT_LIST);
+				
+				// Restore original callback
+				activity.getWindow().setCallback(activityCallback);
+				PlaynomicsSession.activity = null;
+			}
+			
+			result = APIResult.STOPPED;
+		} catch (Exception e) {
+			// TODO: send error to server
+			result = APIResult.FAIL_UNKNOWN;
 		}
 		
-		return APIResult.STOPPED;
-		
+		return result;
 	}
-
+	
 	/**
 	 * User info.
 	 * 
@@ -511,11 +535,11 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
 		Date birthday, UserInfoSource source, String sourceCampaign, Date installTime) {
-		
+	
 		return userInfo(type, country, subdivision, sex, birthday, source.toString(), sourceCampaign, installTime);
 	}
-
-		/**
+	
+	/**
 	 * User info.
 	 * 
 	 * @param type
@@ -539,23 +563,9 @@ public class PlaynomicsSession {
 	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
 		Date birthday, String source, String sourceCampaign, Date installTime) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
 		UserInfoEvent uie = new UserInfoEvent(applicationId, userId, type, country, subdivision, sex, birthday,
 			source, sourceCampaign, installTime);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(uie)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(uie);
-			return APIResult.QUEUED;
-		}
+		return sendOrQueueEvent(uie);
 	}
 	
 	/**
@@ -569,23 +579,10 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult sessionStart(String sessionId, String site) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
+		GameEvent ge = new GameEvent(EventType.sessionStart, applicationId, userId, sessionId, site, null, null, null,
+			null);
+		return sendOrQueueEvent(ge);
 		
-		GameEvent ge = new GameEvent(EventType.sessionStart, applicationId, userId, sessionId, site,
-			null, null, null, null);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(ge)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(ge);
-			return APIResult.QUEUED;
-		}
 	}
 	
 	/**
@@ -599,24 +596,9 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult sessionEnd(String sessionId, String reason) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
-		GameEvent ge = new GameEvent(EventType.sessionEnd, applicationId, userId, sessionId, null,
-			null, null, null, reason);
-		// Try to send and queue if unsuccessful
-		
-		if (eventSender.sendToServer(ge)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(ge);
-			return APIResult.QUEUED;
-		}
+		GameEvent ge = new GameEvent(EventType.sessionEnd, applicationId, userId, sessionId, null, null, null, null,
+			reason);
+		return sendOrQueueEvent(ge);
 	}
 	
 	/**
@@ -636,23 +618,9 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult gameStart(String instanceId, String sessionId, String site, String type, String gameId) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
-		GameEvent ge = new GameEvent(EventType.gameStart, applicationId, userId, sessionId, site,
-			instanceId, type, gameId, null);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(ge)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(ge);
-			return APIResult.QUEUED;
-		}
+		GameEvent ge = new GameEvent(EventType.gameStart, applicationId, userId, sessionId, site, instanceId, type,
+			gameId, null);
+		return sendOrQueueEvent(ge);
 	}
 	
 	/**
@@ -668,23 +636,9 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult gameEnd(String instanceId, String sessionId, String reason) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
-		GameEvent ge = new GameEvent(EventType.gameEnd, applicationId, userId, sessionId, null,
-			instanceId, null, null, reason);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(ge)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(ge);
-			return APIResult.QUEUED;
-		}
+		GameEvent ge = new GameEvent(EventType.gameEnd, applicationId, userId, sessionId, null, instanceId, null, null,
+			reason);
+		return sendOrQueueEvent(ge);
 	}
 	
 	/**
@@ -711,23 +665,9 @@ public class PlaynomicsSession {
 	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
 		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(te)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(te);
-			return APIResult.QUEUED;
-		}
+		return sendOrQueueEvent(te);
 	}
 	
 	/**
@@ -746,23 +686,9 @@ public class PlaynomicsSession {
 	public static APIResult invitationSent(String invitationId, String recipientUserId, String recipientAddress,
 		String method) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
 		SocialEvent se = new SocialEvent(EventType.invitationSent, applicationId, userId, invitationId,
 			recipientUserId, recipientAddress, method, null);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(se)) {
-			return APIResult.SENT;
-		}
-		else {
-			playnomicsEventList.add(se);
-			return APIResult.QUEUED;
-		}
+		return sendOrQueueEvent(se);
 	}
 	
 	/**
@@ -776,23 +702,37 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult invitationResponse(String invitationId, ResponseType response) {
 	
-		if (sessionState != SessionState.STARTED) {
-			return APIResult.START_NOT_CALLED;
-		}
-		else if (!hasInternetPermission) {
-			return APIResult.NO_INTERNET_PERMISSION;
-		}
-		
 		SocialEvent se = new SocialEvent(EventType.invitationResponse, applicationId, userId, invitationId, null, null,
 			null, response);
-		// Try to send and queue if unsuccessful
-		if (eventSender.sendToServer(se)) {
-			return APIResult.SENT;
+		return sendOrQueueEvent(se);
+	}
+	
+	private static APIResult sendOrQueueEvent(PlaynomicsEvent pe) {
+	
+		APIResult result;
+		
+		try {
+			if (sessionState != SessionState.STARTED) {
+				return APIResult.START_NOT_CALLED;
+			}
+			else if (!hasInternetPermission) {
+				return APIResult.NO_INTERNET_PERMISSION;
+			}
+			
+			// Try to send and queue if unsuccessful
+			if (eventSender.sendToServer(pe)) {
+				result = APIResult.SENT;
+			}
+			else {
+				playnomicsEventList.add(pe);
+				result = APIResult.QUEUED;
+			}
+		} catch (Exception e) {
+			// TODO: send error to server
+			result = APIResult.FAIL_UNKNOWN;
 		}
-		else {
-			playnomicsEventList.add(se);
-			return APIResult.QUEUED;
-		}
+		
+		return result;
 	}
 	
 	/**
@@ -808,26 +748,30 @@ public class PlaynomicsSession {
 		@Override
 		public void run() {
 		
-			// Only send appRunning event if we are started
-			if (sessionState == SessionState.STARTED) {
-				sequence += 1;
-				BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
-					sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
-					collectMode);
-				playnomicsEventList.add(runningBE);
+			try {
+				// Only send appRunning event if we are started
+				if (sessionState == SessionState.STARTED) {
+					sequence += 1;
+					BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
+						sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+						collectMode);
+					playnomicsEventList.add(runningBE);
+					
+					// Reset keys/clicks
+					keys = 0;
+					clicks = 0;
+				}
 				
-				// Reset keys/clicks
-				keys = 0;
-				clicks = 0;
-			}
-			
-			// Exit method if any sendToServer call fails (we'll try again next time)
-			for (PlaynomicsEvent pe : playnomicsEventList) {
-				
-				if (eventSender.sendToServer(pe))
-					playnomicsEventList.remove(pe);
-				else
-					return;
+				// Exit method if any sendToServer call fails (we'll try again time)
+				for (PlaynomicsEvent pe : playnomicsEventList) {
+					
+					if (eventSender.sendToServer(pe))
+						playnomicsEventList.remove(pe);
+					else
+						return;
+				}
+			} catch (Exception e) {
+				// TODO: send error to server
 			}
 		}
 	}
