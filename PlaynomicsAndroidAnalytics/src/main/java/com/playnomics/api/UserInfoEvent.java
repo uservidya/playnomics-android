@@ -4,30 +4,29 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
-import com.playnomics.api.PlaynomicsConstants.UserInfoSource;
 import com.playnomics.api.PlaynomicsConstants.UserInfoType;
 
 class UserInfoEvent extends PlaynomicsEvent {
 	
 	private static final long serialVersionUID = 1L;
-
+	
 	private UserInfoType type;
 	private String country;
 	private String subdivision;
 	private UserInfoSex sex;
 	private Date birthday;
-	private UserInfoSource source;
+	private String source;
 	private String sourceCampaign;
 	private Date installTime;
 	
 	public UserInfoEvent(Long applicationId, String userId, UserInfoType type) {
-		
+	
 		super(EventType.userInfo, applicationId, userId);
 		this.type = type;
 	}
 	
 	public UserInfoEvent(Long applicationId, String userId, UserInfoType type, String country,
-		String subdivision, UserInfoSex sex, Date birthday, UserInfoSource source, String sourceCampaign,
+		String subdivision, UserInfoSex sex, Date birthday, String source, String sourceCampaign,
 		Date installTime) {
 	
 		this(applicationId, userId, type);
@@ -90,12 +89,12 @@ class UserInfoEvent extends PlaynomicsEvent {
 		this.birthday = birthday;
 	}
 	
-	public UserInfoSource getSource() {
+	public String getSource() {
 	
 		return source;
 	}
 	
-	public void setSource(UserInfoSource source) {
+	public void setSource(String source) {
 	
 		this.source = source;
 	}
@@ -119,7 +118,7 @@ class UserInfoEvent extends PlaynomicsEvent {
 	
 		this.installTime = installTime;
 	}
-
+	
 	@Override
 	public String toQueryString() {
 	
@@ -133,7 +132,7 @@ class UserInfoEvent extends PlaynomicsEvent {
 		queryString = addOptionalParam(queryString, "pc", getCountry());
 		queryString = addOptionalParam(queryString, "ps", getSubdivision());
 		queryString = addOptionalParam(queryString, "px", getSex());
-	    SimpleDateFormat format = new SimpleDateFormat("MM-DD-yyyy");
+		SimpleDateFormat format = new SimpleDateFormat("MM-DD-yyyy");
 		queryString = addOptionalParam(queryString, "pb", format.format(getBirthday()));
 		queryString = addOptionalParam(queryString, "po", getSource());
 		queryString = addOptionalParam(queryString, "pm", getSourceCampaign());

@@ -485,7 +485,7 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult userInfo() {
 	
-		return userInfo(UserInfoType.update, null, null, null, null, null, null, null);
+		return userInfo(UserInfoType.update, null, null, null, null, "", null, null);
 	}
 	
 	/**
@@ -511,6 +511,33 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
 		Date birthday, UserInfoSource source, String sourceCampaign, Date installTime) {
+		
+		return userInfo(type, country, subdivision, sex, birthday, source.toString(), sourceCampaign, installTime);
+	}
+
+		/**
+	 * User info.
+	 * 
+	 * @param type
+	 *            the type
+	 * @param country
+	 *            the country
+	 * @param subdivision
+	 *            the subdivision
+	 * @param sex
+	 *            the sex
+	 * @param birthday
+	 *            the birthday
+	 * @param source
+	 *            the source
+	 * @param sourceCampaign
+	 *            the source campaign
+	 * @param installTime
+	 *            the install time
+	 * @return the API Result
+	 */
+	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
+		Date birthday, String source, String sourceCampaign, Date installTime) {
 	
 		if (sessionState != SessionState.STARTED) {
 			return APIResult.START_NOT_CALLED;

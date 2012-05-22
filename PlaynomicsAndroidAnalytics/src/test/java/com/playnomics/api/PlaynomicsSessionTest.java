@@ -32,7 +32,7 @@ public class PlaynomicsSessionTest {
 		
 		@SuppressWarnings("deprecation")
 		UserInfoEvent userInfoEvent = new UserInfoEvent(applicationId, userId, UserInfoType.update, "US", "CA",
-			UserInfoSex.Male, new Date("01/01/1999"), UserInfoSource.Other, "testCampaign", new Date());
+			UserInfoSex.Male, new Date("01/01/1999"), UserInfoSource.Other.toString(), "testCampaign", new Date());
 		eventList.add(userInfoEvent);
 		
 		GameEvent gameEvent = new GameEvent(EventType.gameStart, applicationId, userId,
