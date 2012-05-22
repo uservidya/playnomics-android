@@ -53,6 +53,9 @@ public class PlaynomicsSessionTest {
 
 		eventList.add(socialEvent);
 		
+		ErrorEvent ee = new ErrorEvent(new Exception("test exception"));
+		eventList.add(ee);
+		
 		for (PlaynomicsEvent pe : eventList) {
 			assertTrue(es.sendToServer(pe));
 		}	
