@@ -8,10 +8,11 @@ import android.util.Log;
 
 class EventSender {
 	
-	// TODO: Externalize this string or add test/prod modes
 	private static final String TAG = EventSender.class.getSimpleName();
+	
 	private String version;
 	private String baseUrl;
+	private int connectTimeout;
 	
 	private boolean testMode = false;
 	
@@ -27,6 +28,7 @@ class EventSender {
 			ResourceBundle b = ResourceBundle.getBundle("playnomicsAndroidAnalytics");
 			version = b.getString("version");
 			baseUrl = b.getString("baseUrl");
+			connectTimeout = new Integer(b.getString("connectTimeout"));
 		} catch (Exception e) {
 			// TODO: Send info to server
 			e.printStackTrace();
@@ -46,7 +48,7 @@ class EventSender {
 			
 			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
 			// con.setRequestMethod("HEAD");
-			con.setConnectTimeout(5000);
+			con.setConnectTimeout(connectTimeout);
 			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
 			if (testMode)
