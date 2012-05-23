@@ -677,6 +677,39 @@ public class PlaynomicsSession {
 	 *            the type
 	 * @param otherUserId
 	 *            the other user id
+	 * @param currencyType
+	 *            the currency type
+	 * @param currencyValue
+	 *            the currency value
+	 * @param currencyCategory
+	 *            the currency category
+	 * @return the API Result
+	 */
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
+		String otherUserId, String currencyType, double currencyValue, CurrencyCategory currencyCategory) {
+	
+		String[] currencyTypes = {currencyType};
+		double[] currencyValues = {currencyValue};
+		CurrencyCategory[] currencyCategories = {currencyCategory};
+		
+		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
+		return sendOrQueueEvent(te);
+	}
+	
+	/**
+	 * Transaction.
+	 * 
+	 * @param transactionId
+	 *            the transaction id
+	 * @param itemId
+	 *            the item id
+	 * @param quantity
+	 *            the quantity
+	 * @param type
+	 *            the type
+	 * @param otherUserId
+	 *            the other user id
 	 * @param currencyTypes
 	 *            the currency types
 	 * @param currencyValues
