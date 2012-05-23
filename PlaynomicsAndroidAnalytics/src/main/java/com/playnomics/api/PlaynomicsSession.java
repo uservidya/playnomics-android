@@ -29,6 +29,7 @@ import android.view.Window.Callback;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.playnomics.api.PlaynomicsConstants.CurrencyCategory;
+import com.playnomics.api.PlaynomicsConstants.CurrencyType;
 import com.playnomics.api.PlaynomicsConstants.ResponseType;
 import com.playnomics.api.PlaynomicsConstants.TransactionType;
 import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
@@ -54,6 +55,7 @@ public class PlaynomicsSession {
 		SESSION_RESUMED,
 		START_NOT_CALLED,
 		NO_INTERNET_PERMISSION,
+		MISSING_REQ_PARAM,
 		FAIL_UNKNOWN
 	};
 	
@@ -269,127 +271,134 @@ public class PlaynomicsSession {
 	 */
 	private static void setActivityCallback(Activity activity) {
 	
-		PlaynomicsSession.activity = activity;
-		activityCallback = activity.getWindow().getCallback();
-		activity.getWindow().setCallback(new Callback() {
+		try {
+			PlaynomicsSession.activity = activity;
+			activityCallback = activity.getWindow().getCallback();
 			
-			@Override
-			public void onWindowFocusChanged(boolean hasFocus) {
-			
-				activityCallback.onWindowFocusChanged(hasFocus);
+			activity.getWindow().setCallback(new Callback() {
 				
-				// Get out of here is we are finishing the activity
-				if (PlaynomicsSession.activity.isFinishing())
-					return;
+				@Override
+				public void onWindowFocusChanged(boolean hasFocus) {
 				
-				// Are we pausing?
-				if (hasFocus) {
-					resume();
-				}
-				else {
-					pause();
-				}
-			}
-			
-			@Override
-			public void onWindowAttributesChanged(android.view.WindowManager.LayoutParams attrs) {
-			
-				activityCallback.onWindowAttributesChanged(attrs);
-			}
-			
-			@Override
-			public boolean onSearchRequested() {
-			
-				return activityCallback.onSearchRequested();
-			}
-			
-			@Override
-			public boolean onPreparePanel(int featureId, View view, Menu menu) {
-			
-				return activityCallback.onPreparePanel(featureId, view, menu);
-			}
-			
-			@Override
-			public void onPanelClosed(int featureId, Menu menu) {
-			
-				activityCallback.onPanelClosed(featureId, menu);
-			}
-			
-			@Override
-			public boolean onMenuOpened(int featureId, Menu menu) {
-			
-				return activityCallback.onMenuOpened(featureId, menu);
-			}
-			
-			@Override
-			public boolean onMenuItemSelected(int featureId, MenuItem item) {
-			
-				return activityCallback.onMenuItemSelected(featureId, item);
-			}
-			
-			@Override
-			public void onDetachedFromWindow() {
-			
-				activityCallback.onDetachedFromWindow();
-			}
-			
-			@Override
-			public View onCreatePanelView(int featureId) {
-			
-				return activityCallback.onCreatePanelView(featureId);
-			}
-			
-			@Override
-			public boolean onCreatePanelMenu(int featureId, Menu menu) {
-			
-				return activityCallback.onCreatePanelMenu(featureId, menu);
-			}
-			
-			@Override
-			public void onContentChanged() {
-			
-				activityCallback.onContentChanged();
-			}
-			
-			@Override
-			public void onAttachedToWindow() {
-			
-				activityCallback.onAttachedToWindow();
-			}
-			
-			@Override
-			public boolean dispatchTrackballEvent(MotionEvent event) {
-			
-				return activityCallback.dispatchTrackballEvent(event);
-			}
-			
-			@Override
-			public boolean dispatchTouchEvent(MotionEvent event) {
-			
-				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					clicks += 1;
-					totalClicks += 1;
-				}
-				return activityCallback.dispatchTouchEvent(event);
-			}
-			
-			@Override
-			public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
-			
-				return activityCallback.dispatchPopulateAccessibilityEvent(event);
-			}
-			
-			@Override
-			public boolean dispatchKeyEvent(KeyEvent event) {
-			
-				if (event.getAction() == KeyEvent.ACTION_DOWN) {
-					keys += 1;
-					totalKeys += 1;
+					activityCallback.onWindowFocusChanged(hasFocus);
+					
+					// Get out of here is we are finishing the activity
+					if (PlaynomicsSession.activity.isFinishing())
+						return;
+					
+					// Are we pausing?
+					if (hasFocus) {
+						resume();
+					}
+					else {
+						pause();
+					}
 				}
 				
-				return activityCallback.dispatchKeyEvent(event);
-			}
-		});
+				@Override
+				public void onWindowAttributesChanged(android.view.WindowManager.LayoutParams attrs) {
+				
+					activityCallback.onWindowAttributesChanged(attrs);
+				}
+				
+				@Override
+				public boolean onSearchRequested() {
+				
+					return activityCallback.onSearchRequested();
+				}
+				
+				@Override
+				public boolean onPreparePanel(int featureId, View view, Menu menu) {
+				
+					return activityCallback.onPreparePanel(featureId, view, menu);
+				}
+				
+				@Override
+				public void onPanelClosed(int featureId, Menu menu) {
+				
+					activityCallback.onPanelClosed(featureId, menu);
+				}
+				
+				@Override
+				public boolean onMenuOpened(int featureId, Menu menu) {
+				
+					return activityCallback.onMenuOpened(featureId, menu);
+				}
+				
+				@Override
+				public boolean onMenuItemSelected(int featureId, MenuItem item) {
+				
+					return activityCallback.onMenuItemSelected(featureId, item);
+				}
+				
+				@Override
+				public void onDetachedFromWindow() {
+				
+					activityCallback.onDetachedFromWindow();
+				}
+				
+				@Override
+				public View onCreatePanelView(int featureId) {
+				
+					return activityCallback.onCreatePanelView(featureId);
+				}
+				
+				@Override
+				public boolean onCreatePanelMenu(int featureId, Menu menu) {
+				
+					return activityCallback.onCreatePanelMenu(featureId, menu);
+				}
+				
+				@Override
+				public void onContentChanged() {
+				
+					activityCallback.onContentChanged();
+				}
+				
+				@Override
+				public void onAttachedToWindow() {
+				
+					activityCallback.onAttachedToWindow();
+				}
+				
+				@Override
+				public boolean dispatchTrackballEvent(MotionEvent event) {
+				
+					return activityCallback.dispatchTrackballEvent(event);
+				}
+				
+				@Override
+				public boolean dispatchTouchEvent(MotionEvent event) {
+				
+					if (event.getAction() == MotionEvent.ACTION_DOWN) {
+						clicks += 1;
+						totalClicks += 1;
+					}
+					return activityCallback.dispatchTouchEvent(event);
+				}
+				
+				@Override
+				public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
+				
+					return activityCallback.dispatchPopulateAccessibilityEvent(event);
+				}
+				
+				@Override
+				public boolean dispatchKeyEvent(KeyEvent event) {
+				
+					if (event.getAction() == KeyEvent.ACTION_DOWN) {
+						keys += 1;
+						totalKeys += 1;
+					}
+					
+					return activityCallback.dispatchKeyEvent(event);
+				}
+			});
+		} catch (Exception e) {
+			ErrorEvent ee = new ErrorEvent(e);
+			if (!eventSender.sendToServer(ee))
+				playnomicsEventList.add(ee);
+		}
 	}
 	
 	/**
@@ -686,6 +695,34 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
+		String otherUserId, CurrencyType currencyType, double currencyValue, CurrencyCategory currencyCategory) {
+	
+		return transaction(transactionId, itemId, quantity, type, otherUserId, 
+			currencyType.toString(), currencyValue, currencyCategory);
+	}
+	
+	/**
+	 * Transaction.
+	 * 
+	 * @param transactionId
+	 *            the transaction id
+	 * @param itemId
+	 *            the item id
+	 * @param quantity
+	 *            the quantity
+	 * @param type
+	 *            the type
+	 * @param otherUserId
+	 *            the other user id
+	 * @param currencyType
+	 *            the currency type
+	 * @param currencyValue
+	 *            the currency value
+	 * @param currencyCategory
+	 *            the currency category
+	 * @return the API Result
+	 */
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String currencyType, double currencyValue, CurrencyCategory currencyCategory) {
 	
 		String[] currencyTypes = {currencyType};
@@ -695,6 +732,45 @@ public class PlaynomicsSession {
 		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
 		return sendOrQueueEvent(te);
+	}
+	
+	/**
+	 * Transaction.
+	 * 
+	 * @param transactionId
+	 *            the transaction id
+	 * @param itemId
+	 *            the item id
+	 * @param quantity
+	 *            the quantity
+	 * @param type
+	 *            the type
+	 * @param otherUserId
+	 *            the other user id
+	 * @param currencyTypes
+	 *            the currency types
+	 * @param currencyValues
+	 *            the currency values
+	 * @param currencyCategories
+	 *            the currency categories
+	 * @return the API Result
+	 */
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
+		String otherUserId, CurrencyType[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
+	
+		try {
+			String[] currencyTypeStrings = new String[currencyTypes.length];
+			
+			for (int i = 0; i < currencyTypes.length; i++) {
+				currencyTypeStrings[i] = currencyTypes[i].toString();
+			}
+			
+			TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+				quantity, type, otherUserId, currencyTypeStrings, currencyValues, currencyCategories);
+			return sendOrQueueEvent(te);
+		} catch (Exception e) {
+			return APIResult.FAIL_UNKNOWN;
+		}
 	}
 	
 	/**

@@ -33,7 +33,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	protected void onStart() {
 	
 		super.onStart();
-		PlaynomicsSession.switchActivity(this);
+		Toast.makeText(this, "SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this), Toast.LENGTH_LONG).show();
 	};
 	
 	@Override
@@ -115,13 +115,12 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 	public void onSwitchActivityClick(View view) {
 	
-		Intent myIntent = new Intent(view.getContext(), PlaynomicsTestAppActivity2.class);
-		startActivityForResult(myIntent, 0);
-		
+		Intent myIntent = new Intent(this, PlaynomicsTestAppActivity2.class);
+		startActivity(myIntent);
 	}
-
+	
 	public void onCloseClick(View view) {
 		
-		this.finish();
+		finish();
 	}
 }

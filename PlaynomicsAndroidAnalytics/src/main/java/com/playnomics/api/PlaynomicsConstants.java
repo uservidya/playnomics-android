@@ -37,7 +37,7 @@ public class PlaynomicsConstants {
 	};
 	
 	public static enum UserInfoSex {
-		Male("M"), Femaile("F"), Unknown("U");
+		Male("M"), Female("F"), Unknown("U");
 		
 		private UserInfoSex(String name) {
 		
