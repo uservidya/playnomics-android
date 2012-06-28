@@ -216,6 +216,7 @@ public class PlaynomicsSession {
 				eventType = EventType.appStart;
 			}
 			else {
+				sessionStartTime = new Date(settings.getLong(SETTING_LAST_SESSION_START_TIME, 0));
 				sessionId = settings.getString(SETTING_LAST_SESSION_ID, "");
 				instanceId = RandomGenerator.createRandomHex();
 				eventType = EventType.appPage;

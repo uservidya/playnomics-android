@@ -104,7 +104,6 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 		queryString = addOptionalParam(queryString, "ss", getSite());
 		queryString = addOptionalParam(queryString, "r", getReason());
 		queryString = addOptionalParam(queryString, "g", getInstanceId());
-		queryString = addOptionalParam(queryString, "ss", getSite());
 		queryString = addOptionalParam(queryString, "gt", getType());
 		queryString = addOptionalParam(queryString, "gi", getGameId());
 		
