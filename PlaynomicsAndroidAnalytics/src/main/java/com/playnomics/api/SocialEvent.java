@@ -6,13 +6,13 @@ class SocialEvent extends PlaynomicsEvent {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String invitationId;
+	private Long invitationId;
 	private String recipientUserId;
 	private String recipientAddress;
 	private String method;
 	private ResponseType response;
 	
-	public SocialEvent(EventType eventType, Long applicationId, String userId, String invitationId,
+	public SocialEvent(EventType eventType, Long applicationId, String userId, Long invitationId,
 		String recipientUserId, String recipientAddress, String method, ResponseType response) {
 	
 		super(eventType, applicationId, userId);
@@ -23,12 +23,12 @@ class SocialEvent extends PlaynomicsEvent {
 		this.response = response;
 	}
 	
-	public String getInvitationId() {
+	public Long getInvitationId() {
 	
 		return invitationId;
 	}
 	
-	public void setInvitationId(String invitationId) {
+	public void setInvitationId(Long invitationId) {
 	
 		this.invitationId = invitationId;
 	}

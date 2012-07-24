@@ -36,7 +36,7 @@ public class PlaynomicsSessionTest {
 		eventList.add(userInfoEvent);
 		
 		GameEvent gameEvent = new GameEvent(EventType.gameStart, applicationId, userId,
-			RandomGenerator.createRandomHex(), "testSite", RandomGenerator.createRandomHex(), "testType",
+			3L, "testSite", 3L, "testType",
 			"testGameId", null);
 		eventList.add(gameEvent);
 	
@@ -48,7 +48,7 @@ public class PlaynomicsSessionTest {
 
 		eventList.add(transactionEvent);
 		
-		SocialEvent socialEvent = new SocialEvent(EventType.invitationSent, applicationId, userId, "testInvitationId",
+		SocialEvent socialEvent = new SocialEvent(EventType.invitationSent, applicationId, userId, 3L,
 			"testRecipientId", "test@test.com", "email",null);
 
 		eventList.add(socialEvent);
