@@ -419,9 +419,11 @@ public class PlaynomicsSession {
 			
 			sessionState = SessionState.PAUSED;
 			
-			BasicEvent be = new BasicEvent(EventType.appPause, PlaynomicsSession.applicationId, userId,
-				cookieId, sessionId, instanceId, timeZoneOffset);
+			BasicEvent be = new BasicEvent(EventType.appPause, applicationId, userId, cookieId,
+				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+				collectMode);
 			pauseTime = new Date();
+			sequence += 1;
 			be.setSequence(sequence);
 			be.setSessionStartTime(sessionStartTime);
 			// Try to send and queue if unsuccessful
@@ -443,14 +445,15 @@ public class PlaynomicsSession {
 				return;
 			
 			sessionState = SessionState.STARTED;
-			BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId,
-				cookieId, sessionId, instanceId, timeZoneOffset);
+			BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId, cookieId,
+				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+				collectMode);
 			be.setPauseTime(pauseTime);
 			be.setSessionStartTime(sessionStartTime);
-			sequence += 1;
 			be.setSequence(sequence);
 			// Try to send and queue if unsuccessful
 			sendEvent(be);
+			
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
 			sendEvent(ee);
@@ -875,18 +878,22 @@ public class PlaynomicsSession {
 	// Send events to server in background thread
 	private static void sendEvent(final PlaynomicsEvent pe) {
 	
-		new AsyncTask<Void, Void, Void>() {
-			
-			@Override
-			protected Void doInBackground(Void... arg0) {
-			
-				// Queue event on failure
-				if (!eventSender.sendToServer(pe)) {
-					playnomicsEventList.add(pe);
+		try {
+			new AsyncTask<Void, Void, Void>() {
+				
+				@Override
+				protected Void doInBackground(Void... arg0) {
+				
+					// Queue event on failure
+					if (!eventSender.sendToServer(pe)) {
+						playnomicsEventList.add(pe);
+					}
+					return null;
 				}
-				return null;
-			}
-		}.doInBackground();
+			}.doInBackground();
+		} catch (Exception e) {
+			// Do nothing?
+		}
 	}
 	
 	/**
