@@ -12,10 +12,10 @@ class SocialEvent extends PlaynomicsEvent {
 	private String method;
 	private ResponseType response;
 	
-	public SocialEvent(EventType eventType, Long applicationId, String userId, Long invitationId,
+	public SocialEvent(EventType eventType, String sessionId, Long applicationId, String userId, Long invitationId,
 		String recipientUserId, String recipientAddress, String method, ResponseType response) {
 	
-		super(eventType, applicationId, userId);
+		super(eventType, sessionId, applicationId, userId);
 		this.invitationId = invitationId;
 		this.recipientUserId = recipientUserId;
 		this.recipientAddress = recipientAddress;
@@ -72,7 +72,7 @@ class SocialEvent extends PlaynomicsEvent {
 	
 		this.response = response;
 	}
-
+	
 	@Override
 	public String toQueryString() {
 	
@@ -81,17 +81,18 @@ class SocialEvent extends PlaynomicsEvent {
 			+ "?t=" + getEventTime().getTime()
 			+ "&a=" + getApplicationId()
 			+ "&u=" + getUserId()
-			+ "&ii=" + getInvitationId();
+			+ "&ii=" + getInvitationId()
+			+ "&jsh=" + getSessionId();
 		
 		if (getEventType() == EventType.invitationResponse) {
 			queryString += "&ie=" + getResponse()
-				+ "&ir=" + getRecipientUserId();	
+				+ "&ir=" + getRecipientUserId();
 		}
 		else {
 			// Optional params
 			queryString = addOptionalParam(queryString, "ir", getRecipientUserId());
 			queryString = addOptionalParam(queryString, "ia", getRecipientAddress());
-			queryString = addOptionalParam(queryString, "im", getMethod());			
+			queryString = addOptionalParam(queryString, "im", getMethod());
 		}
 		
 		return queryString;

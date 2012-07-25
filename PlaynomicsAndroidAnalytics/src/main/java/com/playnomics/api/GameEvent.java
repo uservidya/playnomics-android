@@ -6,35 +6,34 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Long sessionId;
+	private Long gameSessionId;
 	private String site;
 	private Long instanceId;
 	private String type;
 	private String gameId;
 	private String reason;
 	
-	public GameEvent(EventType eventType, Long applicationId, String userId, Long sessionId, String site,
+	public GameEvent(EventType eventType, String sessionId, Long applicationId, String userId, Long gameSessionId, String site,
 		Long instanceId, String type, String gameId, String reason) {
 	
-		super(eventType, applicationId, userId);
-		this.sessionId = sessionId;
+		super(eventType, sessionId, applicationId, userId);
+		this.gameSessionId = gameSessionId;
 		this.site = site;
 		this.instanceId = instanceId;
 		this.type = type;
 		this.gameId = gameId;
 		this.reason = reason;
 	}
+		
+	public Long getGameSessionId() {
 	
-	
-	public Long getSessionId() {
-	
-		return sessionId;
+		return gameSessionId;
 	}
 
 	
-	public void setSessionId(Long sessionId) {
+	public void setGameSessionId(Long sessionId) {
 	
-		this.sessionId = sessionId;
+		this.gameSessionId = sessionId;
 	}
 
 	public Long getInstanceId() {
@@ -94,12 +93,14 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 		String queryString =  getEventType()
 			+ "?t=" + getEventTime().getTime()
 			+ "&a=" + getApplicationId()
-			+ "&u=" + getUserId();
+			+ "&u=" + getUserId()
+			+ "&jsh=" + getSessionId();
+			
 		// sessionId is optional for game events
 		if (getEventType() == EventType.gameStart || getEventType() == EventType.gameEnd)
-			queryString = addOptionalParam(queryString, "s", getSessionId());
+			queryString = addOptionalParam(queryString, "s", getGameSessionId());
 		else
-			queryString += "&s=" + getSessionId();
+			queryString += "&s=" + getGameSessionId();
 		// Optional params
 		queryString = addOptionalParam(queryString, "ss", getSite());
 		queryString = addOptionalParam(queryString, "r", getReason());

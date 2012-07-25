@@ -16,18 +16,19 @@ abstract class PlaynomicsEvent implements Serializable {
 	private Date eventTime;
 	private Long applicationId;
 	private String userId;
+	private String sessionId;
 	
 	
-	protected PlaynomicsEvent(EventType eventType, Long applicationId, String userId) {
+	protected PlaynomicsEvent(EventType eventType, String sessionId, Long applicationId, String userId) {
 	
 		super();
 		eventTime = new Date();
 		this.eventType = eventType;
+		this.sessionId = sessionId;
 		this.applicationId = applicationId;
 		this.userId = userId;
 	}
-	
-	
+		
 	public PlaynomicsEvent() {
 		
 	}
@@ -50,6 +51,16 @@ abstract class PlaynomicsEvent implements Serializable {
 	protected void setEventTime(Date eventTime) {
 	
 		this.eventTime = eventTime;
+	}
+	
+	protected String getSessionId() {
+		
+		return sessionId;
+	}
+	
+	protected void setSessionId(String sessionId) {
+	
+		this.sessionId = sessionId;
 	}
 	
 	protected Long getApplicationId() {

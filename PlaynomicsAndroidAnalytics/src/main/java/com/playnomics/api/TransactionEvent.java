@@ -16,11 +16,12 @@ public class TransactionEvent extends PlaynomicsEvent {
 	private double[] currencyValues;
 	private CurrencyCategory[] currencyCategories;
 	
-	public TransactionEvent(EventType eventType, Long applicationId, String userId, long transactionId,
+	public TransactionEvent(EventType eventType, String sessionId, Long applicationId, String userId,
+		long transactionId,
 		String itemId, double quantity, TransactionType type, String otherUserId, String[] currencyTypes,
 		double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
-		super(eventType, applicationId, userId);
+		super(eventType, sessionId, applicationId, userId);
 		this.transactionId = transactionId;
 		this.itemId = itemId;
 		this.quantity = quantity;
@@ -119,7 +120,8 @@ public class TransactionEvent extends PlaynomicsEvent {
 			+ "?t=" + getEventTime().getTime()
 			+ "&a=" + getApplicationId()
 			+ "&u=" + getUserId()
-			+ "&tt=" + getType();
+			+ "&tt=" + getType()
+			+ "&jsh=" + getSessionId();
 		
 		for (int i = 0; i < getCurrencyTypes().length; i++) {
 			

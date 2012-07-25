@@ -122,8 +122,9 @@ public class PlaynomicsSession {
 	 * 
 	 * @param testMode
 	 *            if true, sends data to test server
-	 */	public static void setTestMode(boolean testMode) {
-		 
+	 */
+	public static void setTestMode(boolean testMode) {
+	
 		eventSender.setTestMode(testMode);
 	}
 	
@@ -251,7 +252,7 @@ public class PlaynomicsSession {
 			// Try to send and queue if unsuccessful
 			sendEvent(be);
 			result = APIResult.SENT;
-
+			
 			// Startup the event timer to send events back to the server
 			if (eventTimer == null) {
 				eventTimer = new Timer(true);
@@ -594,7 +595,8 @@ public class PlaynomicsSession {
 	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
 		Date birthday, String source, String sourceCampaign, Date installTime) {
 	
-		UserInfoEvent uie = new UserInfoEvent(applicationId, userId, type, country, subdivision, sex, birthday,
+		UserInfoEvent uie = new UserInfoEvent(sessionId, applicationId, userId, type, country, subdivision, sex,
+			birthday,
 			source, sourceCampaign, installTime);
 		return sendOrQueueEvent(uie);
 	}
@@ -608,9 +610,10 @@ public class PlaynomicsSession {
 	 *            the site
 	 * @return the API Result
 	 */
-	public static APIResult sessionStart(Long sessionId, String site) {
+	public static APIResult sessionStart(Long gameSessionId, String site) {
 	
-		GameEvent ge = new GameEvent(EventType.sessionStart, applicationId, userId, sessionId, site, null, null, null,
+		GameEvent ge = new GameEvent(EventType.sessionStart, sessionId, applicationId, userId, gameSessionId, site,
+			null, null, null,
 			null);
 		return sendOrQueueEvent(ge);
 		
@@ -625,9 +628,10 @@ public class PlaynomicsSession {
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult sessionEnd(Long sessionId, String reason) {
+	public static APIResult sessionEnd(Long gameSessionId, String reason) {
 	
-		GameEvent ge = new GameEvent(EventType.sessionEnd, applicationId, userId, sessionId, null, null, null, null,
+		GameEvent ge = new GameEvent(EventType.sessionEnd, sessionId, applicationId, userId, gameSessionId, null, null,
+			null, null,
 			reason);
 		return sendOrQueueEvent(ge);
 	}
@@ -647,9 +651,10 @@ public class PlaynomicsSession {
 	 *            the game id
 	 * @return the API Result
 	 */
-	public static APIResult gameStart(Long instanceId, Long sessionId, String site, String type, String gameId) {
+	public static APIResult gameStart(Long instanceId, Long gameSessionId, String site, String type, String gameId) {
 	
-		GameEvent ge = new GameEvent(EventType.gameStart, applicationId, userId, sessionId, site, instanceId, type,
+		GameEvent ge = new GameEvent(EventType.gameStart, sessionId, applicationId, userId, gameSessionId, site,
+			instanceId, type,
 			gameId, null);
 		return sendOrQueueEvent(ge);
 	}
@@ -665,9 +670,10 @@ public class PlaynomicsSession {
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult gameEnd(Long instanceId, Long sessionId, String reason) {
+	public static APIResult gameEnd(Long instanceId, Long gameSessionId, String reason) {
 	
-		GameEvent ge = new GameEvent(EventType.gameEnd, applicationId, userId, sessionId, null, instanceId, null, null,
+		GameEvent ge = new GameEvent(EventType.gameEnd, sessionId, applicationId, userId, gameSessionId, null,
+			instanceId, null, null,
 			reason);
 		return sendOrQueueEvent(ge);
 	}
@@ -696,7 +702,7 @@ public class PlaynomicsSession {
 	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, CurrencyType currencyType, double currencyValue, CurrencyCategory currencyCategory) {
 	
-		return transaction(transactionId, itemId, quantity, type, otherUserId, 
+		return transaction(transactionId, itemId, quantity, type, otherUserId,
 			currencyType.toString(), currencyValue, currencyCategory);
 	}
 	
@@ -724,11 +730,12 @@ public class PlaynomicsSession {
 	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String currencyType, double currencyValue, CurrencyCategory currencyCategory) {
 	
-		String[] currencyTypes = {currencyType};
-		double[] currencyValues = {currencyValue};
-		CurrencyCategory[] currencyCategories = {currencyCategory};
+		String[] currencyTypes = { currencyType };
+		double[] currencyValues = { currencyValue };
+		CurrencyCategory[] currencyCategories = { currencyCategory };
 		
-		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+		TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+			transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
 		return sendOrQueueEvent(te);
 	}
@@ -764,7 +771,8 @@ public class PlaynomicsSession {
 				currencyTypeStrings[i] = currencyTypes[i].toString();
 			}
 			
-			TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+			TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+				transactionId, itemId,
 				quantity, type, otherUserId, currencyTypeStrings, currencyValues, currencyCategories);
 			return sendOrQueueEvent(te);
 		} catch (Exception e) {
@@ -796,7 +804,8 @@ public class PlaynomicsSession {
 	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
-		TransactionEvent te = new TransactionEvent(EventType.transaction, applicationId, userId, transactionId, itemId,
+		TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+			transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
 		return sendOrQueueEvent(te);
 	}
@@ -817,7 +826,7 @@ public class PlaynomicsSession {
 	public static APIResult invitationSent(Long invitationId, String recipientUserId, String recipientAddress,
 		String method) {
 	
-		SocialEvent se = new SocialEvent(EventType.invitationSent, applicationId, userId, invitationId,
+		SocialEvent se = new SocialEvent(EventType.invitationSent, sessionId, applicationId, userId, invitationId,
 			recipientUserId, recipientAddress, method, null);
 		return sendOrQueueEvent(se);
 	}
@@ -833,8 +842,8 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult invitationResponse(Long invitationId, ResponseType response) {
 	
-		SocialEvent se = new SocialEvent(EventType.invitationResponse, applicationId, userId, invitationId, null, null,
-			null, response);
+		SocialEvent se = new SocialEvent(EventType.invitationResponse, sessionId, applicationId, userId, invitationId,
+			null, null, null, response);
 		return sendOrQueueEvent(se);
 	}
 	
@@ -852,7 +861,7 @@ public class PlaynomicsSession {
 			
 			sendEvent(pe);
 			result = APIResult.SENT;
-
+			
 		} catch (Exception e) {
 			result = APIResult.FAIL_UNKNOWN;
 			
@@ -863,18 +872,18 @@ public class PlaynomicsSession {
 		return result;
 	}
 	
-	
 	// Send events to server in background thread
 	private static void sendEvent(final PlaynomicsEvent pe) {
-		
+	
 		new AsyncTask<Void, Void, Void>() {
 			
 			@Override
 			protected Void doInBackground(Void... arg0) {
+			
 				// Queue event on failure
 				if (!eventSender.sendToServer(pe)) {
 					playnomicsEventList.add(pe);
-				}				
+				}
 				return null;
 			}
 		}.doInBackground();
@@ -907,7 +916,8 @@ public class PlaynomicsSession {
 					clicks = 0;
 				}
 				
-				// Exit method if any sendToServer call fails (we'll try again next time)
+				// Exit method if any sendToServer call fails (we'll try again
+				// next time)
 				for (PlaynomicsEvent pe : playnomicsEventList) {
 					
 					if (eventSender.sendToServer(pe))

@@ -8,7 +8,6 @@ class BasicEvent extends PlaynomicsEvent {
 	private static final int UPDATE_INTERVAL = 60000;
 	
 	private String cookieId;
-	private String sessionId;
 	private String instanceId;
 	private Date sessionStartTime;
 	private Date pauseTime;
@@ -24,9 +23,8 @@ class BasicEvent extends PlaynomicsEvent {
 		String sessionId, String instanceId, Date sessionStartTime, int sequence, int clicks,
 		int totalClicks, int keys, int totalKeys, int collectMode) {
 	
-		super(eventType, applicationId, userId);
+		super(eventType, sessionId, applicationId, userId);
 		this.cookieId = cookieId;
-		this.sessionId = sessionId;
 		this.instanceId = instanceId;
 		this.sessionStartTime = sessionStartTime;
 		this.sequence = sequence;
@@ -40,9 +38,8 @@ class BasicEvent extends PlaynomicsEvent {
 	protected BasicEvent(EventType eventType, Long applicationId, String userId, String cookieId,
 		String sessionId, String instanceId, int timeZoneOffset) {
 	
-		super(eventType, applicationId, userId);
+		super(eventType, sessionId, applicationId, userId);
 		this.cookieId = cookieId;
-		this.sessionId = sessionId;
 		this.instanceId = instanceId;
 		this.timeZoneOffset = timeZoneOffset;
 	}
@@ -55,16 +52,6 @@ class BasicEvent extends PlaynomicsEvent {
 	protected void setCookieId(String cookieId) {
 	
 		this.cookieId = cookieId;
-	}
-	
-	protected String getSessionId() {
-	
-		return sessionId;
-	}
-	
-	protected void setSessionId(String sessionId) {
-	
-		this.sessionId = sessionId;
 	}
 	
 	protected String getInstanceId() {

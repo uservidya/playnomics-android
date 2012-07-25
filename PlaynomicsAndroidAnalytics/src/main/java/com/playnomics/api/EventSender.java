@@ -29,10 +29,7 @@ class EventSender {
 			resourceBundle = ResourceBundle.getBundle("playnomicsAndroidAnalytics");
 			version = resourceBundle.getString("version");
 			// Are we in test mode?
-			if (testMode)
-				baseUrl = resourceBundle.getString("baseTestUrl");
-			else
-				baseUrl = resourceBundle.getString("baseProdUrl");
+			setTestMode(testMode);
 			
 			connectTimeout = new Integer(resourceBundle.getString("connectTimeout"));
 		} catch (Exception e) {
@@ -42,7 +39,7 @@ class EventSender {
 	}
 	
 	protected void setTestMode(boolean testMode) {
-
+	
 		// Are we in test mode?
 		if (testMode)
 			baseUrl = resourceBundle.getString("baseTestUrl");
