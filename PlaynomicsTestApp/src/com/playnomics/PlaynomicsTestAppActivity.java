@@ -24,6 +24,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		PlaynomicsSession.setTestMode(true);
 		Toast.makeText(this, "START: " + PlaynomicsSession.start(this, 3L, "testUserId").toString(),
 			Toast.LENGTH_LONG)
 			.show();
@@ -53,13 +54,13 @@ public class PlaynomicsTestAppActivity extends Activity {
 	public void onSessionStartClick(View view) {
 	
 		Toast.makeText(this,
-			"SESSION START: " + PlaynomicsSession.sessionStart("TEST_SESSION_ID", "TEST_SITE").toString(),
+			"SESSION START: " + PlaynomicsSession.sessionStart(3L, "TEST_SITE").toString(),
 			Toast.LENGTH_LONG).show();
 	}
 	
 	public void onSessionEndClick(View view) {
 	
-		Toast.makeText(this, "SESSION END: " + PlaynomicsSession.sessionEnd("TEST_SESSION_ID", "QUIT").toString(),
+		Toast.makeText(this, "SESSION END: " + PlaynomicsSession.sessionEnd(3L, "QUIT").toString(),
 			Toast.LENGTH_LONG)
 			.show();
 	}
@@ -70,7 +71,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 			this,
 			"GAME START: "
 				+
-				PlaynomicsSession.gameStart("TEST_INSTANCE_ID", "TEST_SESSION_ID", "TEST_SITE", "TEST_TYPE",
+				PlaynomicsSession.gameStart(3L, 3L, "TEST_SITE", "TEST_TYPE",
 					"TEST_GAME")
 					.toString(), Toast.LENGTH_LONG).show();
 	}
@@ -78,7 +79,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	public void onGameEndClick(View view) {
 	
 		Toast.makeText(this,
-			"GAME END: " + PlaynomicsSession.gameEnd("TEST_INSTANCE_ID", "TEST_SESSION_ID", "LOSE").toString(),
+			"GAME END: " + PlaynomicsSession.gameEnd(3L, 3L, "LOSE").toString(),
 			Toast.LENGTH_LONG).show();
 	}
 	
@@ -89,7 +90,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		CurrencyCategory[] currencyCategories = { CurrencyCategory.Real, CurrencyCategory.Virtual };
 		
 		Toast.makeText(this, "TRANSACTION: " +
-			PlaynomicsSession.transaction(1234567890, "TEST_ITEM_ID", 1, TransactionType.BuyItem, "TEST_USER_ID",
+			PlaynomicsSession.transaction(1234567890L, "TEST_ITEM_ID", 1, TransactionType.BuyItem, "TEST_USER_ID",
 				currencyTypes, currencyValues, currencyCategories).toString(),
 			Toast.LENGTH_LONG).show();
 	}
@@ -99,7 +100,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		Toast.makeText(
 			this,
 			"INVITATION SENT: "
-				+ PlaynomicsSession.invitationSent("TEST_INVITATION_ID", "TEST_USER_ID", "TEST_ADDRESS", "TEST_METHOD")
+				+ PlaynomicsSession.invitationSent(3L, "TEST_USER_ID", "TEST_ADDRESS", "TEST_METHOD")
 					.toString(),
 			Toast.LENGTH_LONG).show();
 	}
@@ -109,7 +110,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		Toast.makeText(
 			this,
 			"INVITATION RESPONSE: "
-				+ PlaynomicsSession.invitationResponse("TEST_INVITATION_ID", ResponseType.accepted).toString(),
+				+ PlaynomicsSession.invitationResponse(3L, ResponseType.accepted).toString(),
 			Toast.LENGTH_LONG).show();
 	}
 	

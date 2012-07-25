@@ -18,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -46,7 +47,6 @@ public class PlaynomicsSession {
 	public enum APIResult {
 		
 		SENT,
-		QUEUED,
 		SWITCHED,
 		STOPPED,
 		ALREADY_STARTED,
@@ -115,6 +115,16 @@ public class PlaynomicsSession {
 	// Prevent instantiation
 	private PlaynomicsSession() {
 	
+	}
+	
+	/**
+	 * setTestMode.
+	 * 
+	 * @param testMode
+	 *            if true, sends data to test server
+	 */	public static void setTestMode(boolean testMode) {
+		 
+		eventSender.setTestMode(testMode);
 	}
 	
 	/**
@@ -239,13 +249,9 @@ public class PlaynomicsSession {
 				instanceId, timeZoneOffset);
 			
 			// Try to send and queue if unsuccessful
-			if (eventSender.sendToServer(be)) {
-				result = APIResult.SENT;
-			}
-			else {
-				playnomicsEventList.add(be);
-				result = APIResult.QUEUED;
-			}
+			sendEvent(be);
+			result = APIResult.SENT;
+
 			// Startup the event timer to send events back to the server
 			if (eventTimer == null) {
 				eventTimer = new Timer(true);
@@ -257,8 +263,7 @@ public class PlaynomicsSession {
 			
 			ErrorEvent ee = new ErrorEvent(e);
 			// Not sure if we should try to send immediately, but whatever
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 		
 		return result;
@@ -397,8 +402,7 @@ public class PlaynomicsSession {
 			});
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 	}
 	
@@ -420,12 +424,10 @@ public class PlaynomicsSession {
 			be.setSequence(sequence);
 			be.setSessionStartTime(sessionStartTime);
 			// Try to send and queue if unsuccessful
-			if (!eventSender.sendToServer(be))
-				playnomicsEventList.add(be);
+			sendEvent(be);
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 	}
 	
@@ -447,12 +449,10 @@ public class PlaynomicsSession {
 			sequence += 1;
 			be.setSequence(sequence);
 			// Try to send and queue if unsuccessful
-			if (!eventSender.sendToServer(be))
-				playnomicsEventList.add(be);
+			sendEvent(be);
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 	}
 	
@@ -487,8 +487,7 @@ public class PlaynomicsSession {
 			
 			ErrorEvent ee = new ErrorEvent(e);
 			// Not sure if we should try to send immediately, but whatever
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 		
 		return result;
@@ -526,8 +525,7 @@ public class PlaynomicsSession {
 			result = APIResult.FAIL_UNKNOWN;
 			
 			ErrorEvent ee = new ErrorEvent(e);
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 		
 		return result;
@@ -852,23 +850,34 @@ public class PlaynomicsSession {
 				return APIResult.NO_INTERNET_PERMISSION;
 			}
 			
-			// Try to send and queue if unsuccessful
-			if (eventSender.sendToServer(pe)) {
-				result = APIResult.SENT;
-			}
-			else {
-				playnomicsEventList.add(pe);
-				result = APIResult.QUEUED;
-			}
+			sendEvent(pe);
+			result = APIResult.SENT;
+
 		} catch (Exception e) {
 			result = APIResult.FAIL_UNKNOWN;
 			
 			ErrorEvent ee = new ErrorEvent(e);
-			if (!eventSender.sendToServer(ee))
-				playnomicsEventList.add(ee);
+			sendEvent(ee);
 		}
 		
 		return result;
+	}
+	
+	
+	// Send events to server in background thread
+	private static void sendEvent(final PlaynomicsEvent pe) {
+		
+		new AsyncTask<Void, Void, Void>() {
+			
+			@Override
+			protected Void doInBackground(Void... arg0) {
+				// Queue event on failure
+				if (!eventSender.sendToServer(pe)) {
+					playnomicsEventList.add(pe);
+				}				
+				return null;
+			}
+		}.doInBackground();
 	}
 	
 	/**
@@ -898,8 +907,7 @@ public class PlaynomicsSession {
 					clicks = 0;
 				}
 				
-				// Exit method if any sendToServer call fails (we'll try again
-				// time)
+				// Exit method if any sendToServer call fails (we'll try again next time)
 				for (PlaynomicsEvent pe : playnomicsEventList) {
 					
 					if (eventSender.sendToServer(pe))

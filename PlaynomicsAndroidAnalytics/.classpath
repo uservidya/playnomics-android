@@ -7,6 +7,5 @@
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/Users/martin/Programming/Android/android-sdk-mac_x86/platforms/android-7/android.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
