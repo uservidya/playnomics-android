@@ -6,9 +6,10 @@ package com.playnomics.api;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.Manifest.permission;
 import android.app.Activity;
@@ -71,7 +72,7 @@ public class PlaynomicsSession {
 	
 	private static boolean hasInternetPermission = true;
 	
-	private static Timer eventTimer;
+	private static  ScheduledThreadPoolExecutor eventTimer;
 	
 	private static List<PlaynomicsEvent> playnomicsEventList = new CopyOnWriteArrayList<PlaynomicsEvent>();
 	
@@ -126,6 +127,24 @@ public class PlaynomicsSession {
 	public static void setTestMode(boolean testMode) {
 	
 		eventSender.setTestMode(testMode);
+	}
+	
+	/**
+	 * Change User.
+	 * 
+	 * @param activity
+	 *            the activity
+	 * @param applicationId
+	 *            the application id
+	 * @param userId
+	 *            the user id
+	 * @return the API Result
+	 */
+	public static APIResult changeUser(String userId) {
+	
+		PlaynomicsSession.userId = userId;
+		stop();
+		return start(activity, applicationId);
 	}
 	
 	/**
@@ -255,8 +274,8 @@ public class PlaynomicsSession {
 			
 			// Startup the event timer to send events back to the server
 			if (eventTimer == null) {
-				eventTimer = new Timer(true);
-				eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
+				eventTimer = new ScheduledThreadPoolExecutor(1);
+				eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
 			}
 			
 		} catch (Exception e) {
@@ -445,6 +464,12 @@ public class PlaynomicsSession {
 				return;
 			
 			sessionState = SessionState.STARTED;
+			// reset timer
+			timerTask.cancel();
+			eventTimer.shutdownNow();
+			eventTimer = new ScheduledThreadPoolExecutor(1);
+			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL, TimeUnit.MILLISECONDS);	
+
 			BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId, cookieId,
 				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
 				collectMode);
@@ -453,7 +478,6 @@ public class PlaynomicsSession {
 			be.setSequence(sequence);
 			// Try to send and queue if unsuccessful
 			sendEvent(be);
-			
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
 			sendEvent(ee);
@@ -513,7 +537,7 @@ public class PlaynomicsSession {
 			
 			if (activity.isFinishing()) {
 				sessionState = SessionState.STOPPED;
-				eventTimer.cancel();
+				eventTimer.shutdownNow();
 				activity.unregisterReceiver(screenReceiver);
 				screenReceiver = null;
 				// Save eventList to disk for later sending
@@ -524,6 +548,7 @@ public class PlaynomicsSession {
 				PlaynomicsSession.activity = null;
 			}
 			
+			sessionState = SessionState.STOPPED;
 			result = APIResult.STOPPED;
 		} catch (Exception e) {
 			result = APIResult.FAIL_UNKNOWN;

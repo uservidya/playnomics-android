@@ -171,7 +171,12 @@ class BasicEvent extends PlaynomicsEvent {
 			case appPage:
 				queryString += "&z=" + getTimeZoneOffset();
 				break;
-			
+			// Note fall through of cases
+			case appResume:
+				queryString += "&p=" + getPauseTime().getTime();
+			case appPause:
+				queryString += "&r=" + getSessionStartTime().getTime()
+					+ "&q=" + getSequence();
 			case appRunning:
 				queryString += "&r=" + getSessionStartTime().getTime()
 					+ "&q=" + getSequence()
@@ -180,15 +185,7 @@ class BasicEvent extends PlaynomicsEvent {
 					+ "&e=" + getTotalClicks()
 					+ "&k=" + getKeys()
 					+ "&l=" + getTotalKeys()
-					+ "&m=" + getCollectMode();
-				break;
-			
-			case appResume:
-				queryString += "&p=" + getPauseTime().getTime();
-			case appPause:
-				queryString += "&r=" + getSessionStartTime().getTime()
-					+ "&q=" + getSequence();
-				break;
+					+ "&m=" + getCollectMode();			
 		}
 		
 		return queryString;
