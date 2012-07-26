@@ -44,8 +44,14 @@ public class PlaynomicsTestAppActivity extends Activity {
 		super.onDestroy();
 	}
 	
-	public void onUserInfoClick(View view) {
+	public void onChangeUserClick(View view) {
+		
+		Toast.makeText(this, "CHANGE USER: " +
+			PlaynomicsSession.changeUser("testChangeUserId").toString(), Toast.LENGTH_LONG).show();
+	}
 	
+	public void onUserInfoClick(View view) {
+		
 		Toast.makeText(this, "USER INFO: " +
 			PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.Male, new Date("1/1/1999"),
 				UserInfoSource.Other, "test", new Date()).toString(), Toast.LENGTH_LONG).show();

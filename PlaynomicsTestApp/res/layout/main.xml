@@ -9,6 +9,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Activity 1" />
+ 
+    <Button
+        android:id="@+id/changeUserButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="changeUser"
+        android:onClick="onChangeUserClick" />
+ 
     <Button
         android:id="@+id/userInfoButton"
         android:layout_width="wrap_content"
