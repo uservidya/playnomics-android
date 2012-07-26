@@ -638,7 +638,7 @@ public class PlaynomicsSession {
 	 *            the site
 	 * @return the API Result
 	 */
-	public static APIResult sessionStart(Long gameSessionId, String site) {
+	public static APIResult sessionStart(long gameSessionId, String site) {
 	
 		GameEvent ge = new GameEvent(EventType.sessionStart, sessionId, applicationId, userId, gameSessionId, site,
 			null, null, null,
@@ -656,7 +656,7 @@ public class PlaynomicsSession {
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult sessionEnd(Long gameSessionId, String reason) {
+	public static APIResult sessionEnd(long gameSessionId, String reason) {
 	
 		GameEvent ge = new GameEvent(EventType.sessionEnd, sessionId, applicationId, userId, gameSessionId, null, null,
 			null, null,
@@ -679,7 +679,7 @@ public class PlaynomicsSession {
 	 *            the game id
 	 * @return the API Result
 	 */
-	public static APIResult gameStart(Long instanceId, Long gameSessionId, String site, String type, String gameId) {
+	public static APIResult gameStart(long instanceId, long gameSessionId, String site, String type, String gameId) {
 	
 		GameEvent ge = new GameEvent(EventType.gameStart, sessionId, applicationId, userId, gameSessionId, site,
 			instanceId, type,
@@ -698,7 +698,7 @@ public class PlaynomicsSession {
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult gameEnd(Long instanceId, Long gameSessionId, String reason) {
+	public static APIResult gameEnd(long instanceId, long gameSessionId, String reason) {
 	
 		GameEvent ge = new GameEvent(EventType.gameEnd, sessionId, applicationId, userId, gameSessionId, null,
 			instanceId, null, null,
@@ -727,7 +727,7 @@ public class PlaynomicsSession {
 	 *            the currency category
 	 * @return the API Result
 	 */
-	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, CurrencyType currencyType, double currencyValue, CurrencyCategory currencyCategory) {
 	
 		return transaction(transactionId, itemId, quantity, type, otherUserId,
@@ -755,7 +755,7 @@ public class PlaynomicsSession {
 	 *            the currency category
 	 * @return the API Result
 	 */
-	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String currencyType, double currencyValue, CurrencyCategory currencyCategory) {
 	
 		String[] currencyTypes = { currencyType };
@@ -789,7 +789,7 @@ public class PlaynomicsSession {
 	 *            the currency categories
 	 * @return the API Result
 	 */
-	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, CurrencyType[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
 		try {
@@ -829,7 +829,7 @@ public class PlaynomicsSession {
 	 *            the currency categories
 	 * @return the API Result
 	 */
-	public static APIResult transaction(Long transactionId, String itemId, double quantity, TransactionType type,
+	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
 		TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
@@ -851,7 +851,7 @@ public class PlaynomicsSession {
 	 *            the method
 	 * @return the API Result
 	 */
-	public static APIResult invitationSent(Long invitationId, String recipientUserId, String recipientAddress,
+	public static APIResult invitationSent(long invitationId, String recipientUserId, String recipientAddress,
 		String method) {
 	
 		SocialEvent se = new SocialEvent(EventType.invitationSent, sessionId, applicationId, userId, invitationId,
@@ -868,7 +868,7 @@ public class PlaynomicsSession {
 	 *            the response
 	 * @return the API Result
 	 */
-	public static APIResult invitationResponse(Long invitationId, ResponseType response) {
+	public static APIResult invitationResponse(long invitationId, ResponseType response) {
 	
 		SocialEvent se = new SocialEvent(EventType.invitationResponse, sessionId, applicationId, userId, invitationId,
 			null, null, null, response);
