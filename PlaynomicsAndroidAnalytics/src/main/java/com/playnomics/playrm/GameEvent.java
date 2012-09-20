@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.io.Serializable;
 
@@ -6,18 +6,18 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private Long gameSessionId;
+	private Long sessionId;
 	private String site;
 	private Long instanceId;
 	private String type;
 	private String gameId;
 	private String reason;
 	
-	public GameEvent(EventType eventType, String sessionId, Long applicationId, String userId, Long gameSessionId, String site,
+	public GameEvent(EventType eventType, String internalSessionId, Long applicationId, String userId, Long sessionId, String site,
 		Long instanceId, String type, String gameId, String reason) {
 	
-		super(eventType, sessionId, applicationId, userId);
-		this.gameSessionId = gameSessionId;
+		super(eventType, internalSessionId, applicationId, userId);
+		this.sessionId = sessionId;
 		this.site = site;
 		this.instanceId = instanceId;
 		this.type = type;
@@ -27,13 +27,13 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 		
 	public Long getGameSessionId() {
 	
-		return gameSessionId;
+		return sessionId;
 	}
 
 	
 	public void setGameSessionId(Long sessionId) {
 	
-		this.gameSessionId = sessionId;
+		this.sessionId = sessionId;
 	}
 
 	public Long getInstanceId() {

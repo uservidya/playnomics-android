@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.util.Date;
 
@@ -20,10 +20,10 @@ class BasicEvent extends PlaynomicsEvent {
 	private int collectMode;
 	
 	protected BasicEvent(EventType eventType, Long applicationId, String userId, String cookieId,
-		String sessionId, String instanceId, Date sessionStartTime, int sequence, int clicks,
+		String internalSessionId, String instanceId, Date sessionStartTime, int sequence, int clicks,
 		int totalClicks, int keys, int totalKeys, int collectMode) {
 	
-		super(eventType, sessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId);
 		this.cookieId = cookieId;
 		this.instanceId = instanceId;
 		this.sessionStartTime = sessionStartTime;

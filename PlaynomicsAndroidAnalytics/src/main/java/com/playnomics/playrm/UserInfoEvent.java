@@ -1,10 +1,10 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
-import com.playnomics.api.PlaynomicsConstants.UserInfoType;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
 
 class UserInfoEvent extends PlaynomicsEvent {
 	
@@ -19,9 +19,9 @@ class UserInfoEvent extends PlaynomicsEvent {
 	private String sourceCampaign;
 	private Date installTime;
 	
-	public UserInfoEvent(String sessionId, Long applicationId, String userId, UserInfoType type) {
+	public UserInfoEvent(String internalSessionId, Long applicationId, String userId, UserInfoType type) {
 	
-		super(EventType.userInfo, sessionId, applicationId, userId);
+		super(EventType.userInfo, internalSessionId, applicationId, userId);
 		this.type = type;
 	}
 	

@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

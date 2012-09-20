@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.io.File;
 import java.io.FileInputStream;

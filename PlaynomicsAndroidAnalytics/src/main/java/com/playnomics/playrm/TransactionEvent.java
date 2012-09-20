@@ -1,7 +1,7 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
-import com.playnomics.api.PlaynomicsConstants.CurrencyCategory;
-import com.playnomics.api.PlaynomicsConstants.TransactionType;
+import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
+import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
 
 public class TransactionEvent extends PlaynomicsEvent {
 	
@@ -16,12 +16,12 @@ public class TransactionEvent extends PlaynomicsEvent {
 	private double[] currencyValues;
 	private CurrencyCategory[] currencyCategories;
 	
-	public TransactionEvent(EventType eventType, String sessionId, Long applicationId, String userId,
+	public TransactionEvent(EventType eventType, String internalSessionId, Long applicationId, String userId,
 		long transactionId,
 		String itemId, double quantity, TransactionType type, String otherUserId, String[] currencyTypes,
 		double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
-		super(eventType, sessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId);
 		this.transactionId = transactionId;
 		this.itemId = itemId;
 		this.quantity = quantity;

@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,7 +29,7 @@ public class ErrorEvent extends PlaynomicsEvent {
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);	
 			
-			queryString = "ajlog?m=" +  URLEncoder.encode(sw.toString(), "US-ASCII");
+			queryString = "jslog?m=" +  URLEncoder.encode(sw.toString(), "US-ASCII");
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

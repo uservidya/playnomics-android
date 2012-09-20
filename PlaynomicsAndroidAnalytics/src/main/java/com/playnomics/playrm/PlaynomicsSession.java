@@ -1,7 +1,7 @@
 /*
  * 
  */
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.util.Date;
 import java.util.List;
@@ -30,14 +30,14 @@ import android.view.View;
 import android.view.Window.Callback;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.playnomics.api.PlaynomicsConstants.CurrencyCategory;
-import com.playnomics.api.PlaynomicsConstants.CurrencyType;
-import com.playnomics.api.PlaynomicsConstants.ResponseType;
-import com.playnomics.api.PlaynomicsConstants.TransactionType;
-import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
-import com.playnomics.api.PlaynomicsConstants.UserInfoSource;
-import com.playnomics.api.PlaynomicsConstants.UserInfoType;
-import com.playnomics.api.PlaynomicsEvent.EventType;
+import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
+import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
+import com.playnomics.playrm.PlaynomicsConstants.ResponseType;
+import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
+import com.playnomics.playrm.PlaynomicsEvent.EventType;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -92,7 +92,7 @@ public class PlaynomicsSession {
 	private static int sequence = 0;
 	private static Long applicationId;
 	private static String cookieId;
-	private static String sessionId;
+	private static String internalSessionId;
 	private static String instanceId;
 	private static Date sessionStartTime;
 	private static String userId = "";
@@ -240,14 +240,14 @@ public class PlaynomicsSession {
 			// otherwise send an appPage
 			if (sessionStartTime.getTime() - settings.getLong(SETTING_LAST_SESSION_START_TIME, 0) > 180000
 				|| !settings.getString(SETTING_LAST_USER_ID, "").equals(userId)) {
-				sessionId = RandomGenerator.createRandomHex();
-				editor.putString(SETTING_LAST_SESSION_ID, sessionId);
-				instanceId = sessionId;
+				internalSessionId = RandomGenerator.createRandomHex();
+				editor.putString(SETTING_LAST_SESSION_ID, internalSessionId);
+				instanceId = internalSessionId;
 				eventType = EventType.appStart;
 			}
 			else {
 				sessionStartTime = new Date(settings.getLong(SETTING_LAST_SESSION_START_TIME, 0));
-				sessionId = settings.getString(SETTING_LAST_SESSION_ID, "");
+				internalSessionId = settings.getString(SETTING_LAST_SESSION_ID, "");
 				instanceId = RandomGenerator.createRandomHex();
 				eventType = EventType.appPage;
 			}
@@ -265,7 +265,7 @@ public class PlaynomicsSession {
 			if (userId == null)
 				userId = cookieId;
 			
-			BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, sessionId,
+			BasicEvent be = new BasicEvent(eventType, applicationId, userId, cookieId, internalSessionId,
 				instanceId, timeZoneOffset);
 			
 			// Try to send and queue if unsuccessful
@@ -439,7 +439,7 @@ public class PlaynomicsSession {
 			sessionState = SessionState.PAUSED;
 			
 			BasicEvent be = new BasicEvent(EventType.appPause, applicationId, userId, cookieId,
-				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+				internalSessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
 				collectMode);
 			pauseTime = new Date();
 			sequence += 1;
@@ -471,7 +471,7 @@ public class PlaynomicsSession {
 			eventTimer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL, TimeUnit.MILLISECONDS);	
 
 			BasicEvent be = new BasicEvent(EventType.appResume, applicationId, userId, cookieId,
-				sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+				internalSessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
 				collectMode);
 			be.setPauseTime(pauseTime);
 			be.setSessionStartTime(sessionStartTime);
@@ -563,13 +563,28 @@ public class PlaynomicsSession {
 	/**
 	 * User info.
 	 * 
+	 * @param type
+	 *            the type
+	 * @param country
+	 *            the country
+	 * @param subdivision
+	 *            the subdivision
+	 * @param sex
+	 *            the sex
+	 * @param birthyear
+	 *            the birthyear
+	 * @param source
+	 *            the source
+	 * @param sourceCampaign
+	 *            the source campaign
+	 * @param installTime
+	 *            the install time
 	 * @return the API Result
-	 * @throws StartNotCalledException
-	 *             the start not called exception
 	 */
-	public static APIResult userInfo() {
+	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
+		Date birthyear, UserInfoSource source, String sourceCampaign, Date installTime) {
 	
-		return userInfo(UserInfoType.update, null, null, null, null, "", null, null);
+		return userInfo(type, country, subdivision, sex, birthyear, source.toString(), sourceCampaign, installTime);
 	}
 	
 	/**
@@ -583,8 +598,8 @@ public class PlaynomicsSession {
 	 *            the subdivision
 	 * @param sex
 	 *            the sex
-	 * @param birthday
-	 *            the birthday
+	 * @param birthyear
+	 *            the birthyear
 	 * @param source
 	 *            the source
 	 * @param sourceCampaign
@@ -594,37 +609,10 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
-		Date birthday, UserInfoSource source, String sourceCampaign, Date installTime) {
+		Date birthyear, String source, String sourceCampaign, Date installTime) {
 	
-		return userInfo(type, country, subdivision, sex, birthday, source.toString(), sourceCampaign, installTime);
-	}
-	
-	/**
-	 * User info.
-	 * 
-	 * @param type
-	 *            the type
-	 * @param country
-	 *            the country
-	 * @param subdivision
-	 *            the subdivision
-	 * @param sex
-	 *            the sex
-	 * @param birthday
-	 *            the birthday
-	 * @param source
-	 *            the source
-	 * @param sourceCampaign
-	 *            the source campaign
-	 * @param installTime
-	 *            the install time
-	 * @return the API Result
-	 */
-	public static APIResult userInfo(UserInfoType type, String country, String subdivision, UserInfoSex sex,
-		Date birthday, String source, String sourceCampaign, Date installTime) {
-	
-		UserInfoEvent uie = new UserInfoEvent(sessionId, applicationId, userId, type, country, subdivision, sex,
-			birthday,
+		UserInfoEvent uie = new UserInfoEvent(internalSessionId, applicationId, userId, type, country, subdivision, sex,
+			birthyear,
 			source, sourceCampaign, installTime);
 		return sendOrQueueEvent(uie);
 	}
@@ -632,15 +620,15 @@ public class PlaynomicsSession {
 	/**
 	 * Session start.
 	 * 
-	 * @param sessionId
+	 * @param internalSessionId
 	 *            the session id
 	 * @param site
 	 *            the site
 	 * @return the API Result
 	 */
-	public static APIResult sessionStart(long gameSessionId, String site) {
+	public static APIResult sessionStart(long sessionId, String site) {
 	
-		GameEvent ge = new GameEvent(EventType.sessionStart, sessionId, applicationId, userId, gameSessionId, site,
+		GameEvent ge = new GameEvent(EventType.sessionStart, internalSessionId, applicationId, userId, sessionId, site,
 			null, null, null,
 			null);
 		return sendOrQueueEvent(ge);
@@ -650,15 +638,15 @@ public class PlaynomicsSession {
 	/**
 	 * Session end.
 	 * 
-	 * @param sessionId
+	 * @param internalSessionId
 	 *            the session id
 	 * @param reason
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult sessionEnd(long gameSessionId, String reason) {
+	public static APIResult sessionEnd(long sessionId, String reason) {
 	
-		GameEvent ge = new GameEvent(EventType.sessionEnd, sessionId, applicationId, userId, gameSessionId, null, null,
+		GameEvent ge = new GameEvent(EventType.sessionEnd, internalSessionId, applicationId, userId, sessionId, null, null,
 			null, null,
 			reason);
 		return sendOrQueueEvent(ge);
@@ -669,7 +657,7 @@ public class PlaynomicsSession {
 	 * 
 	 * @param instanceId
 	 *            the instance id
-	 * @param sessionId
+	 * @param internalSessionId
 	 *            the session id
 	 * @param site
 	 *            the site
@@ -679,9 +667,9 @@ public class PlaynomicsSession {
 	 *            the game id
 	 * @return the API Result
 	 */
-	public static APIResult gameStart(long instanceId, long gameSessionId, String site, String type, String gameId) {
+	public static APIResult gameStart(long instanceId, long sessionId, String site, String type, String gameId) {
 	
-		GameEvent ge = new GameEvent(EventType.gameStart, sessionId, applicationId, userId, gameSessionId, site,
+		GameEvent ge = new GameEvent(EventType.gameStart, internalSessionId, applicationId, userId, sessionId, site,
 			instanceId, type,
 			gameId, null);
 		return sendOrQueueEvent(ge);
@@ -692,15 +680,15 @@ public class PlaynomicsSession {
 	 * 
 	 * @param instanceId
 	 *            the instance id
-	 * @param sessionId
+	 * @param internalSessionId
 	 *            the session id
 	 * @param reason
 	 *            the reason
 	 * @return the API Result
 	 */
-	public static APIResult gameEnd(long instanceId, long gameSessionId, String reason) {
+	public static APIResult gameEnd(long instanceId, long sessionId, String reason) {
 	
-		GameEvent ge = new GameEvent(EventType.gameEnd, sessionId, applicationId, userId, gameSessionId, null,
+		GameEvent ge = new GameEvent(EventType.gameEnd, internalSessionId, applicationId, userId, sessionId, null,
 			instanceId, null, null,
 			reason);
 		return sendOrQueueEvent(ge);
@@ -762,7 +750,7 @@ public class PlaynomicsSession {
 		double[] currencyValues = { currencyValue };
 		CurrencyCategory[] currencyCategories = { currencyCategory };
 		
-		TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+		TransactionEvent te = new TransactionEvent(EventType.transaction, internalSessionId, applicationId, userId,
 			transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
 		return sendOrQueueEvent(te);
@@ -799,7 +787,7 @@ public class PlaynomicsSession {
 				currencyTypeStrings[i] = currencyTypes[i].toString();
 			}
 			
-			TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+			TransactionEvent te = new TransactionEvent(EventType.transaction, internalSessionId, applicationId, userId,
 				transactionId, itemId,
 				quantity, type, otherUserId, currencyTypeStrings, currencyValues, currencyCategories);
 			return sendOrQueueEvent(te);
@@ -832,7 +820,7 @@ public class PlaynomicsSession {
 	public static APIResult transaction(long transactionId, String itemId, double quantity, TransactionType type,
 		String otherUserId, String[] currencyTypes, double[] currencyValues, CurrencyCategory[] currencyCategories) {
 	
-		TransactionEvent te = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId,
+		TransactionEvent te = new TransactionEvent(EventType.transaction, internalSessionId, applicationId, userId,
 			transactionId, itemId,
 			quantity, type, otherUserId, currencyTypes, currencyValues, currencyCategories);
 		return sendOrQueueEvent(te);
@@ -854,7 +842,7 @@ public class PlaynomicsSession {
 	public static APIResult invitationSent(long invitationId, String recipientUserId, String recipientAddress,
 		String method) {
 	
-		SocialEvent se = new SocialEvent(EventType.invitationSent, sessionId, applicationId, userId, invitationId,
+		SocialEvent se = new SocialEvent(EventType.invitationSent, internalSessionId, applicationId, userId, invitationId,
 			recipientUserId, recipientAddress, method, null);
 		return sendOrQueueEvent(se);
 	}
@@ -868,10 +856,10 @@ public class PlaynomicsSession {
 	 *            the response
 	 * @return the API Result
 	 */
-	public static APIResult invitationResponse(long invitationId, ResponseType response) {
+	public static APIResult invitationResponse(long invitationId, String recipientUserId, ResponseType response) {
 	
-		SocialEvent se = new SocialEvent(EventType.invitationResponse, sessionId, applicationId, userId, invitationId,
-			null, null, null, response);
+		SocialEvent se = new SocialEvent(EventType.invitationResponse, internalSessionId, applicationId, userId, invitationId,
+			recipientUserId, null, null, response);
 		return sendOrQueueEvent(se);
 	}
 	
@@ -939,7 +927,7 @@ public class PlaynomicsSession {
 				if (sessionState == SessionState.STARTED) {
 					sequence += 1;
 					BasicEvent runningBE = new BasicEvent(EventType.appRunning, applicationId, userId, cookieId,
-						sessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
+						internalSessionId, instanceId, sessionStartTime, sequence, clicks, totalClicks, keys, totalKeys,
 						collectMode);
 					playnomicsEventList.add(runningBE);
 					

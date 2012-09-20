@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,15 +16,15 @@ abstract class PlaynomicsEvent implements Serializable {
 	private Date eventTime;
 	private Long applicationId;
 	private String userId;
-	private String sessionId;
+	private String internalSessionId;
 	
 	
-	protected PlaynomicsEvent(EventType eventType, String sessionId, Long applicationId, String userId) {
+	protected PlaynomicsEvent(EventType eventType, String internalSessionId, Long applicationId, String userId) {
 	
 		super();
 		eventTime = new Date();
 		this.eventType = eventType;
-		this.sessionId = sessionId;
+		this.internalSessionId = internalSessionId;
 		this.applicationId = applicationId;
 		this.userId = userId;
 	}
@@ -55,12 +55,12 @@ abstract class PlaynomicsEvent implements Serializable {
 	
 	protected String getSessionId() {
 		
-		return sessionId;
+		return internalSessionId;
 	}
 	
 	protected void setSessionId(String sessionId) {
 	
-		this.sessionId = sessionId;
+		this.internalSessionId = sessionId;
 	}
 	
 	protected Long getApplicationId() {

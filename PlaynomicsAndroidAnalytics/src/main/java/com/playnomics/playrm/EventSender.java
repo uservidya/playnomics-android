@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

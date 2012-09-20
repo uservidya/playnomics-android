@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.playnomics.api.PlaynomicsSession;
+import com.playnomics.playrm.PlaynomicsSession;
 
 
 public class PlaynomicsTestAppActivity2 extends Activity {

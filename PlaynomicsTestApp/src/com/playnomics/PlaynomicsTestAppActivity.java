@@ -8,14 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.playnomics.api.PlaynomicsConstants.CurrencyCategory;
-import com.playnomics.api.PlaynomicsConstants.CurrencyType;
-import com.playnomics.api.PlaynomicsConstants.ResponseType;
-import com.playnomics.api.PlaynomicsConstants.TransactionType;
-import com.playnomics.api.PlaynomicsConstants.UserInfoSex;
-import com.playnomics.api.PlaynomicsConstants.UserInfoSource;
-import com.playnomics.api.PlaynomicsConstants.UserInfoType;
-import com.playnomics.api.PlaynomicsSession;
+import com.playnomics.playrm.PlaynomicsSession;
+import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
+import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
+import com.playnomics.playrm.PlaynomicsConstants.ResponseType;
+import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
+import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
 
 public class PlaynomicsTestAppActivity extends Activity {
 	
@@ -106,7 +106,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		Toast.makeText(
 			this,
 			"INVITATION SENT: "
-				+ PlaynomicsSession.invitationSent(3L, "TEST_USER_ID", "TEST_ADDRESS", "TEST_METHOD")
+				+ PlaynomicsSession.invitationSent(3L, "TEST_RECIPIENT", "TEST_ADDRESS", "TEST_METHOD")
 					.toString(),
 			Toast.LENGTH_LONG).show();
 	}
@@ -116,7 +116,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		Toast.makeText(
 			this,
 			"INVITATION RESPONSE: "
-				+ PlaynomicsSession.invitationResponse(3L, ResponseType.accepted).toString(),
+				+ PlaynomicsSession.invitationResponse(3L, "TEST_RECIPIENT",ResponseType.accepted).toString(),
 			Toast.LENGTH_LONG).show();
 	}
 	

@@ -1,6 +1,6 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
-import com.playnomics.api.PlaynomicsConstants.ResponseType;
+import com.playnomics.playrm.PlaynomicsConstants.ResponseType;
 
 class SocialEvent extends PlaynomicsEvent {
 	
@@ -12,10 +12,10 @@ class SocialEvent extends PlaynomicsEvent {
 	private String method;
 	private ResponseType response;
 	
-	public SocialEvent(EventType eventType, String sessionId, Long applicationId, String userId, Long invitationId,
+	public SocialEvent(EventType eventType, String internalSessionId, Long applicationId, String userId, Long invitationId,
 		String recipientUserId, String recipientAddress, String method, ResponseType response) {
 	
-		super(eventType, sessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId);
 		this.invitationId = invitationId;
 		this.recipientUserId = recipientUserId;
 		this.recipientAddress = recipientAddress;

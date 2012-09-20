@@ -1,4 +1,4 @@
-package com.playnomics.api;
+package com.playnomics.playrm;
 
 /**
  * Copyright (c) 2009 Mark S. Kolich
