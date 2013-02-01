@@ -9,7 +9,7 @@ abstract class PlaynomicsEvent implements Serializable {
 
 	protected enum EventType {
 		appStart, appPage, appRunning, appPause, appResume, appStop, userInfo, sessionStart, sessionEnd,
-		gameStart, gameEnd, transaction, invitationSent, invitationResponse
+		gameStart, gameEnd, transaction, invitationSent, invitationResponse, milestone
 	};
 	
 	private EventType eventType;
@@ -17,7 +17,6 @@ abstract class PlaynomicsEvent implements Serializable {
 	private Long applicationId;
 	private String userId;
 	private String internalSessionId;
-	
 	
 	protected PlaynomicsEvent(EventType eventType, String internalSessionId, Long applicationId, String userId) {
 	
@@ -33,6 +32,10 @@ abstract class PlaynomicsEvent implements Serializable {
 		
 	}
 
+	protected String getInternalSessionId(){
+		return this.internalSessionId;
+	}
+	
 	protected EventType getEventType() {
 	
 		return eventType;

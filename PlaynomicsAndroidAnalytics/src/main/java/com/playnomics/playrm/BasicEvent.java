@@ -185,7 +185,9 @@ class BasicEvent extends PlaynomicsEvent {
 					+ "&e=" + getTotalClicks()
 					+ "&k=" + getKeys()
 					+ "&l=" + getTotalKeys()
-					+ "&m=" + getCollectMode();			
+					+ "&m=" + getCollectMode();
+		default:
+			break;			
 		}
 		
 		return queryString;

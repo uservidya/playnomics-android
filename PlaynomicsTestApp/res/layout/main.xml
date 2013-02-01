@@ -73,11 +73,19 @@
         android:text="invitationResponse" 
         android:onClick="onInvitationResponseClick"/>
     
+    <Button
+        android:id="@+id/milestoneSentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mile stone"
+        android:onClick="onMilestoneClick" />
+    
 	<Button android:id="@+id/switchActivityButton"
 	    android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Switch Activity" 
         android:onClick="onSwitchActivityClick"/>
+	
 	<Button android:id="@+id/closeButton"
 	    android:layout_width="wrap_content"
         android:layout_height="wrap_content"

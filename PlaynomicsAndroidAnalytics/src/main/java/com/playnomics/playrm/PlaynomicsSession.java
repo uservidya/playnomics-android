@@ -67,7 +67,7 @@ public class PlaynomicsSession {
 	
 	private static final String FILE_PLAYNOMICS_EVENT_LIST = "playnomicsEventList";
 	
-	private static final int UPDATE_INTERVAL = 60000;
+	private static final int UPDATE_INTERVAL = 30000;
 	private static final int COLLECTION_MODE = 7;
 	
 	private static boolean hasInternetPermission = true;
@@ -102,9 +102,9 @@ public class PlaynomicsSession {
 	private static int keys;
 	private static int totalKeys;
 	private static Date pauseTime;
+	private static boolean testMode;
 	
 	private enum SessionState {
-		
 		UNKNOWN,
 		STARTED,
 		PAUSED,
@@ -124,9 +124,25 @@ public class PlaynomicsSession {
 	 * @param testMode
 	 *            if true, sends data to test server
 	 */
-	public static void setTestMode(boolean testMode) {
+	public static void setTestMode(boolean testing) {
+		testMode = testing;
+		eventSender.setTestMode(testing);
+	}
 	
-		eventSender.setTestMode(testMode);
+	public static boolean getTestMode(){
+		return testMode;
+	}
+	
+	public static long getAppID(){
+		return applicationId;
+	}
+	
+	public static String getUserID(){
+		return userId;
+	}
+	
+	public static String getCookieID(){
+		return cookieId;
 	}
 	
 	/**
@@ -141,9 +157,8 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult changeUser(String userId) {
-	
-		PlaynomicsSession.userId = userId;
 		stop();
+		PlaynomicsSession.userId = userId;
 		return start(activity, applicationId);
 	}
 	
@@ -158,8 +173,7 @@ public class PlaynomicsSession {
 	 *            the user id
 	 * @return the API Result
 	 */
-	public static APIResult start(Activity activity, Long applicationId, String userId) {
-	
+	public static APIResult start(Activity activity, Long applicationId, String userId) {	
 		PlaynomicsSession.userId = userId;
 		return start(activity, applicationId);
 	}
@@ -335,7 +349,6 @@ public class PlaynomicsSession {
 				
 				@Override
 				public boolean onPreparePanel(int featureId, View view, Menu menu) {
-				
 					return activityCallback.onPreparePanel(featureId, view, menu);
 				}
 				
@@ -389,13 +402,11 @@ public class PlaynomicsSession {
 				
 				@Override
 				public boolean dispatchTrackballEvent(MotionEvent event) {
-				
 					return activityCallback.dispatchTrackballEvent(event);
 				}
 				
 				@Override
-				public boolean dispatchTouchEvent(MotionEvent event) {
-				
+				public boolean dispatchTouchEvent(MotionEvent event) {				
 					if (event.getAction() == MotionEvent.ACTION_DOWN) {
 						clicks += 1;
 						totalClicks += 1;
@@ -405,20 +416,18 @@ public class PlaynomicsSession {
 				
 				@Override
 				public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
-				
 					return activityCallback.dispatchPopulateAccessibilityEvent(event);
 				}
 				
 				@Override
 				public boolean dispatchKeyEvent(KeyEvent event) {
-				
 					if (event.getAction() == KeyEvent.ACTION_DOWN) {
 						keys += 1;
 						totalKeys += 1;
 					}
-					
 					return activityCallback.dispatchKeyEvent(event);
 				}
+				
 			});
 		} catch (Exception e) {
 			ErrorEvent ee = new ErrorEvent(e);
@@ -863,6 +872,18 @@ public class PlaynomicsSession {
 		return sendOrQueueEvent(se);
 	}
 	
+	public static APIResult milestone(long milestoneId, String milestoneName) {
+		
+		MilestoneEvent ms = new MilestoneEvent(EventType.milestone, internalSessionId, applicationId, userId, cookieId,
+			milestoneId, milestoneName);
+		return sendOrQueueEvent(ms);
+	}
+	
+	public static void errorReport(ErrorDetail errorDetail){
+		ErrorEvent error = new ErrorEvent(errorDetail);
+		sendEvent(error);
+	}
+	
 	private static APIResult sendOrQueueEvent(PlaynomicsEvent pe) {
 	
 		APIResult result;
@@ -901,6 +922,7 @@ public class PlaynomicsSession {
 					if (!eventSender.sendToServer(pe)) {
 						playnomicsEventList.add(pe);
 					}
+					
 					return null;
 				}
 			}.doInBackground();
