@@ -134,12 +134,40 @@ public class Frame implements BaseAdComponentInterface{
 			this.adArea.layoutComponents(this.background.xOffset, this.background.yOffset);
 			this.closeButton.layoutComponents(this.background.xOffset, this.background.yOffset);
 						
+			this.checkForNullInfo();
+			
 			this.background.layout.setTag(this.adArea.imageUrl);	
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private void checkForNullInfo(){
+		if(this.background.imageUrl == null || this.background.imageUrl.equals("null")){
+			
+			this.background.setUpLayoutParameters();
+			
+			System.out.println(this.background.width);
+			System.out.println(this.background.height);
+			
+			System.out.println(this.background.layout.getMeasuredWidth());
+			System.out.println(this.background.layout.getMeasuredHeight());
+			
+			System.out.println(this.adArea.layout.getMeasuredWidth());
+			System.out.println(this.adArea.layout.getMeasuredHeight());
+			
+			this.background.status = AdComponentStatus.adComponentStatusCompleted;
+			System.out.println("background null");
+		}
+		
+		if(this.closeButton.imageUrl == null || this.closeButton.imageUrl.equals("null")){
+			this.closeButton.status = AdComponentStatus.adComponentStatusCompleted;
+			System.out.println("close null");
+//			this.baseAdComponentReady();
+		}
+		this.baseAdComponentReady();
 	}
 	
 	private JSONObject mergedAdInfoProperties(){

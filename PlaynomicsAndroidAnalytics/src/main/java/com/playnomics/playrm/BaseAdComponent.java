@@ -75,7 +75,7 @@ public class BaseAdComponent{
     	this.createComponentView();
     	
     	// make sure image url is not null
-    	if(this.imageUrl != null && this.imageUrl.length() > 0 && this.image == null)
+    	if(this.imageUrl != null && this.imageUrl.length() > 0 && this.image == null && !this.imageUrl.equals("null"))
     		this.startImageDownload();
     }
     
@@ -89,6 +89,8 @@ public class BaseAdComponent{
 			this.height = this.properties.getInt(this.resourceBundle.getString("frameResponseHeight"));
 			this.width = this.properties.getInt(this.resourceBundle.getString("frameResponseWidth"));
 			
+			System.out.println();
+			
 			// no sense getting image if it has 0 height or width
 			if(this.width == 0 || this.height == 0)
 				this.imageUrl = null;
@@ -100,7 +102,6 @@ public class BaseAdComponent{
 			this.yOffset += y;
 						
     	} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -152,20 +153,8 @@ public class BaseAdComponent{
     	
     	if(this.imageUrl != null){
     		if(this.imageUrl.contains(".gif")){
-            	
-//    			try {
-//    				URL url = new URL(this.imageUrl);
-//    				URLConnection conn = url.openConnection();
-//    	            this.gifView = new GifView(this.context);
-//    	            this.gifView.setGifBitmap(BitmapFactory.decodeStream(conn.getInputStream()), conn.getInputStream());
-    				
-    				this.gifWebView = new GifWebView(this.context, this.imageUrl);
-    	            this.handleGifDownload(true);
-//    			} catch (IOException e) {
-    				// TODO Auto-generated catch block
-//    				e.printStackTrace();
-//    	            this.handleGifDownload(false);
-//    			}
+    			this.gifWebView = new GifWebView(this.context, this.imageUrl);
+    	        this.handleGifDownload(true);
             }
             else{
             	
@@ -203,7 +192,6 @@ public class BaseAdComponent{
 
 				@Override
 				public boolean onTouch(View v, MotionEvent event) {
-					// TODO Auto-generated method stub
 					
 					if(event.getAction() == MotionEvent.ACTION_UP){
 						delegate.baseAdComponentOpen();
@@ -255,6 +243,12 @@ public class BaseAdComponent{
     	this.layout.addView(this.imageUI);
     	this.status = AdComponentStatus.adComponentStatusCompleted;
     	this.delegate.baseAdComponentReady();
+    }
+    
+    public void setUpLayoutParameters(){
+    	this.layout = new RelativeLayout(this.context);
+    	this.layout.setLayoutParams(new LayoutParams(this.width, this.height));
+    	
     }
     
     public void addSubComponent(BaseAdComponent subComponent){    	
