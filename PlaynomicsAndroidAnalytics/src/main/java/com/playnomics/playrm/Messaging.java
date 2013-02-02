@@ -99,6 +99,11 @@ public class Messaging {
 //		actionHandlers.put(label, pmi);
 //	}
 	
+	public static void frameRemoveFrame(String key){
+		frames.remove(key);
+		System.out.println(frames.size());
+	}
+	
 	public static Frame initWithFrameID(String frameId){
 		
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
@@ -107,7 +112,7 @@ public class Messaging {
 	
 		caller = element.getMethodName();
 		frame = new Frame(frameId, context);
-		frames.put(frameID, frame);
+		frames.put(frameId, frame);
 		
 		createTask(frame, caller);
 		return frame;
@@ -189,11 +194,12 @@ public class Messaging {
 					PlaynomicsSession.errorReport(detail);
 				}
 				else{
-					
 					if(refresh){
 						Frame refreshFrame = frames.get(frameID);
-						refreshFrame.refreshProperties(jObj);
-						refresh = false;
+						if(refreshFrame != null){
+							refreshFrame.refreshProperties(jObj);
+							refresh = false;
+						}
 					}
 					else{
 						frame.refreshProperties(jObj);

@@ -107,8 +107,10 @@ public class Frame implements BaseAdComponentInterface{
 			if(v.getChildCount()>0){
 				
 				for(int j = 0; j < v.getChildCount(); j++){
-					if(v.getChildAt(j).getTag() != null && v.getChildAt(j).getTag().equals(this.adArea.imageUrl)){
-						v.removeView(v.getChildAt(j));
+					if(v.getChildAt(j) != null && this.adArea != null){
+						if(v.getChildAt(j).getTag() != null && v.getChildAt(j).getTag().equals(this.adArea.imageUrl+""+this.frameID)){
+							v.removeView(v.getChildAt(j));
+						}
 					}
 				}
 			}
@@ -136,7 +138,7 @@ public class Frame implements BaseAdComponentInterface{
 						
 			this.checkForNullInfo();
 			
-			this.background.layout.setTag(this.adArea.imageUrl);	
+			this.background.layout.setTag(this.adArea.imageUrl+""+this.frameID);	
 			
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -145,27 +147,15 @@ public class Frame implements BaseAdComponentInterface{
 	}
 	
 	private void checkForNullInfo(){
-		if(this.background.imageUrl == null || this.background.imageUrl.equals("null")){
-			
+		if(this.background.imageUrl == null || this.background.imageUrl.equals("null")){			
 			this.background.setUpLayoutParameters();
-			
-			System.out.println(this.background.width);
-			System.out.println(this.background.height);
-			
-			System.out.println(this.background.layout.getMeasuredWidth());
-			System.out.println(this.background.layout.getMeasuredHeight());
-			
-			System.out.println(this.adArea.layout.getMeasuredWidth());
-			System.out.println(this.adArea.layout.getMeasuredHeight());
-			
 			this.background.status = AdComponentStatus.adComponentStatusCompleted;
-			System.out.println("background null");
+			System.out.println("No background image");
 		}
 		
 		if(this.closeButton.imageUrl == null || this.closeButton.imageUrl.equals("null")){
 			this.closeButton.status = AdComponentStatus.adComponentStatusCompleted;
-			System.out.println("close null");
-//			this.baseAdComponentReady();
+			System.out.println("No close button");
 		}
 		this.baseAdComponentReady();
 	}
@@ -279,8 +269,9 @@ public class Frame implements BaseAdComponentInterface{
 				
 				for(int j = 0; j < v.getChildCount(); j++){
 					
-					if(v.getChildAt(j).getTag() != null && v.getChildAt(j).getTag().equals(this.adArea.imageUrl)){
+					if(v.getChildAt(j).getTag() != null && v.getChildAt(j).getTag().equals(this.adArea.imageUrl+""+this.frameID)){
 						v.removeViewAt(j);
+						Messaging.frameRemoveFrame(this.frameID);
 						return;
 					}
 				}
