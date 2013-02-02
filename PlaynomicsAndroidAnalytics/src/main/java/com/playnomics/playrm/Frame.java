@@ -1,7 +1,6 @@
 package com.playnomics.playrm;
 
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +25,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -175,9 +173,10 @@ public class Frame implements BaseAdComponentInterface{
 		JSONObject merged = new JSONObject();
 		JSONObject[] objs = new JSONObject[] { adInfo, adLocationInfo };
 		for (JSONObject obj : objs) {
-		    Iterator<String> it = obj.keys();
+		    @SuppressWarnings("unchecked")
+			Iterator<String> it = obj.keys();
 		    while (it.hasNext()) {
-		        String key = (String)it.next();
+		        String key = it.next();
 		        try {
 					merged.put(key, obj.get(key));
 				} catch (JSONException e) {

@@ -1,7 +1,6 @@
 package com.playnomics.playrm;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,19 +20,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.R;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +34,7 @@ public class Messaging {
 	private static Map <String,Frame> frames = null;
 	
 	private static ResourceBundle resourceBundle;
+	@SuppressWarnings("unused")
 	private static int connectionTimeout;
 	private static InputStream is;
 	private static String json = "";
@@ -64,10 +54,7 @@ public class Messaging {
 		if(frames==null){
 			resourceBundle = ResourceBundle.getBundle("playnomicsAndroidAnalytics");
 			connectionTimeout = new Integer(resourceBundle.getString("connectTimeout"));
-			
-			//FIXME : frames, actionhandler need to be cleared
 			frames = new HashMap <String, Frame>();
-//			actionHandlers = new HashMap <String, PlaynomicsMessagingInterface>();
 		}
 		else{
 			
@@ -75,7 +62,8 @@ public class Messaging {
 			
 			Iterator<?> it = frames.entrySet().iterator();
 		    while (it.hasNext()) {
-		        Map.Entry pairs = (Map.Entry)it.next();
+		        @SuppressWarnings("rawtypes")
+				Map.Entry pairs = (Map.Entry)it.next();
 		        Frame frame = (Frame) pairs.getValue();
 		        
 		        if(frame.getActivityName().equals(context.getClass().getName())){
@@ -94,10 +82,6 @@ public class Messaging {
 		    }
 		}
 	}
-	
-//	public static void registerActionHandler(PlaynomicsMessagingInterface pmi, String label){
-//		actionHandlers.put(label, pmi);
-//	}
 	
 	public static void frameRemoveFrame(String key){
 		frames.remove(key);
@@ -167,9 +151,6 @@ public class Messaging {
 				    
 				    json = sb.toString();
 				    
-				    //This is just for test purposes
-//				    json = resourceBundle.getString("sample_JSON");
-				    
 					System.out.println("json :"+json);
 
 					jObj = new JSONObject(json);
@@ -211,12 +192,7 @@ public class Messaging {
 	}
 	
 	public static void performActionForLabel(String actionLabel){
-//		PlaynomicsMessagingInterface pmi = actionHandlers.get(actionLabel);		
-//		if(pmi!=null){
-//			pmi.playnomicsMessagingPerformAction();
-//		}
-//		Toast.makeText(context, "Ad Action has been pressed and action will be performed", Toast.LENGTH_LONG).show();
-	
+
 		actionLabel = actionLabel.substring(3);
 		Method method = null;
 		

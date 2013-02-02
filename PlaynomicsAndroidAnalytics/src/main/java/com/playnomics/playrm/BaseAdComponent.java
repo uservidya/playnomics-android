@@ -217,11 +217,6 @@ public class BaseAdComponent{
     }
     
     public void finishImageSetup(){
-    	/*
-    	 * Setup tap recognizer
-    	 * Call delegate method to say the component loaded
-    	 * If 3 components have loaded - display entire add
-    	 */
     	
     	this.imageUI.setOnClickListener(new ImageView.OnClickListener() {  
     		public void onClick(View v)
