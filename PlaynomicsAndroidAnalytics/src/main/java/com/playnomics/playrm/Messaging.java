@@ -23,6 +23,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
+import android.widget.ListView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,6 +51,7 @@ public class Messaging {
 	public static Frame frame;
 		
 	public static void setup(Context cont){
+		
 		context = cont;
 		
 		if(frames==null){

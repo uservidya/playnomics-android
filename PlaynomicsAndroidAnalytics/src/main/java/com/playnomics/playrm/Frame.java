@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -279,20 +280,20 @@ public class Frame implements BaseAdComponentInterface{
 	}
 
 	@Override
-	public void baseAdComponentOpen() {
-		this.adClicked();
+	public void baseAdComponentOpen(MotionEvent event) {
+		this.adClicked(event);
 	}
 
-	public void adClicked(){
-		int x = this.background.imageUI.getLeft();
-		int y = this.background.imageUI.getTop();
+	public void adClicked(MotionEvent event){
+		int x = (int)event.getX();
+		int y = (int)event.getY();
 		String coordParams = "&x="+x+"&y="+y;
-		String preExectureUrl = null;
+		String preExecuteUrl = null;
 		String postExecuteUrl = null;
 		String clickTarget = null;
 		
 		try {
-			preExectureUrl = this.adArea.properties.getString(this.resourceBundle.getString("frameResponseAd_PreExecuteUrl"))+""+coordParams;
+			preExecuteUrl = this.adArea.properties.getString(this.resourceBundle.getString("frameResponseAd_PreExecuteUrl"))+""+coordParams;
 			postExecuteUrl = this.adArea.properties.getString(this.resourceBundle.getString("frameResponseAd_PostExecuteUrl"))+""+coordParams;
 			clickTarget = this.adArea.properties.getString(this.resourceBundle.getString("frameResponseAd_ClickTarget"));
 			
@@ -302,6 +303,10 @@ public class Frame implements BaseAdComponentInterface{
 		}
 		
 		if(clickTarget != null){
+			
+			String exc;
+			int c;
+			
 			AdAction actionType = this.determineActionType(clickTarget);
 			String actionLabel = this.determineActionLabel(clickTarget);
 			
@@ -311,18 +316,45 @@ public class Frame implements BaseAdComponentInterface{
 			}
 			else if(actionType.equals(AdAction.AdActionDefinedAction)){
 				
-				this.submitImpressionToServer(preExectureUrl);
-				Messaging.performActionForLabel(actionLabel);
-				this.submitImpressionToServer(postExecuteUrl);
+				preExecuteUrl = preExecuteUrl.concat("&x="+x+"&y="+y);
+				this.submitImpressionToServer(preExecuteUrl);
 				
+				try{
+					Messaging.performActionForLabel(actionLabel);
+					c = 2;
+					exc = "";
+				}
+				catch (Exception e) {
+					c = -6;
+					exc = e.toString()+"+"+e.getMessage();
+				}
+				postExecuteUrl = postExecuteUrl.concat("&c="+c+"&e="+exc);
+				this.submitImpressionToServer(postExecuteUrl);
 			}
 			else if(actionType.equals(AdAction.AdActionExecuteCode)){
 				
+				preExecuteUrl = preExecuteUrl.concat("&x="+x+"&y="+y);
+				this.submitImpressionToServer(preExecuteUrl);
+				
 				if(this.adEnabledCode){
-					this.submitImpressionToServer(preExectureUrl);					
-					Messaging.executeActionOnDelegate(actionLabel);
-					this.submitImpressionToServer(postExecuteUrl);
+
+					try{
+						Messaging.executeActionOnDelegate(actionLabel);
+						c = 1;
+						exc = "";
+					}
+					catch (Exception e) {
+						c = -4;
+						exc = e.toString()+"+"+e.getMessage();
+					}
 				}
+				else{
+					c = -3;
+					exc = "";
+				}
+				
+				postExecuteUrl = postExecuteUrl.concat("&c="+c+"&e="+exc);
+				this.submitImpressionToServer(postExecuteUrl);
 			}
 		}
 		this.baseAdComponentClose();
