@@ -59,7 +59,7 @@ public class BaseAdComponent{
 	private Context context;
 	private int orient;
     
-    public BaseAdComponent(JSONObject jObj, Frame frm, Context cont, ImageType imageType, BaseAdComponentInterface delegate){
+    public BaseAdComponent(JSONObject jObj, Frame frm, Context cont, ImageType imageType){
     	this.properties = jObj;
     	this.frame = frm;
     	
@@ -67,7 +67,7 @@ public class BaseAdComponent{
     	this.resourceBundle = ResourceBundle.getBundle("playnomicsAndroidAnalytics");
     	this.context = cont;    	
     	this.imageType = imageType;
-    	this.delegate = delegate;
+    	this.delegate = frm;
     }
     
     public void layoutComponents(int x, int y){

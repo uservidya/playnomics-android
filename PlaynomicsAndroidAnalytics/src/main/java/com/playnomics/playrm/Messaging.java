@@ -118,7 +118,7 @@ public class Messaging {
 					int height = metrics.heightPixels;
 					
 					String queryString = "?a="+PlaynomicsSession.getAppID()+"&u="+PlaynomicsSession.getUserID()+"&p="+caller+
-					"&t="+time+"&b="+PlaynomicsSession.getCookieID()+"&f="+frame.getFrameID()+"&c="+height+"&d="+width+"&esrc=ios&ever=1";
+					"&t="+time+"&b="+PlaynomicsSession.getCookieID()+"&f="+frame.getFrameID()+"&c="+height+"&d="+width+"&ever=1";
 				
 					System.out.println("queryString : "+queryString);
 					

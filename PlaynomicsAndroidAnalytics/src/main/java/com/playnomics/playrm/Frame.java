@@ -125,9 +125,9 @@ public class Frame implements BaseAdComponentInterface{
 	private void initAdComponents(){
 		try {
 			
-			this.background = new BaseAdComponent(this.properties.getJSONObject(resourceBundle.getString("frameResponseBackgroundInfo")), this, context, ImageType.adBackground, this);
-			this.adArea = new BaseAdComponent(this.mergedAdInfoProperties(), this, context, ImageType.adClicked, this);
-			this.closeButton = new BaseAdComponent(this.properties.getJSONObject(resourceBundle.getString("frameResponseCloseButtonInfo")), this, context, ImageType.adClosed, this);
+			this.background = new BaseAdComponent(this.properties.getJSONObject(resourceBundle.getString("frameResponseBackgroundInfo")), this, context, ImageType.adBackground);
+			this.adArea = new BaseAdComponent(this.mergedAdInfoProperties(), this, context, ImageType.adClicked);
+			this.closeButton = new BaseAdComponent(this.properties.getJSONObject(resourceBundle.getString("frameResponseCloseButtonInfo")), this, context, ImageType.adClosed);
 			
 			this.expirationSeconds = this.properties.getInt(this.resourceBundle.getString("frameResponseExpiration"));
 			
