@@ -149,12 +149,10 @@ public class Frame implements BaseAdComponentInterface{
 		if(this.background.imageUrl == null || this.background.imageUrl.equals("null")){			
 			this.background.setUpLayoutParameters();
 			this.background.status = AdComponentStatus.adComponentStatusCompleted;
-			System.out.println("No background image");
 		}
 		
 		if(this.closeButton.imageUrl == null || this.closeButton.imageUrl.equals("null")){
 			this.closeButton.status = AdComponentStatus.adComponentStatusCompleted;
-			System.out.println("No close button");
 		}
 		this.baseAdComponentReady();
 	}
@@ -374,7 +372,6 @@ public class Frame implements BaseAdComponentInterface{
 			return AdAction.AdActionExecuteCode;
 		}
 		else{
-			System.out.println("An unknown protocol was received, can't determine action type: "+protocol);
 			return AdAction.AdActionUnkown;
 		}
 	}
@@ -395,7 +392,6 @@ public class Frame implements BaseAdComponentInterface{
     				HttpClient httpclient = new DefaultHttpClient();
     			 	HttpResponse response = httpclient.execute(new HttpGet(impressionUrl));
     			 	content = response.getEntity().getContent();
-    			  	System.out.println("Impression URL complete: error: "+response.getStatusLine()+" , result: "+content);
     			} catch (Exception e) {
     				System.out.println("Network exception" + e);
     			}

@@ -88,9 +88,7 @@ public class BaseAdComponent{
 			this.imageUrl = this.properties.getString(this.resourceBundle.getString("frameResponseImageUrl"));
 			this.height = this.properties.getInt(this.resourceBundle.getString("frameResponseHeight"));
 			this.width = this.properties.getInt(this.resourceBundle.getString("frameResponseWidth"));
-			
-			System.out.println();
-			
+						
 			// no sense getting image if it has 0 height or width
 			if(this.width == 0 || this.height == 0)
 				this.imageUrl = null;
@@ -112,7 +110,6 @@ public class BaseAdComponent{
     	try {
     		    		
 			if(this.properties.getJSONObject(this.resourceBundle.getString("frameResponseBackground_Landscape")) == null){	
-				System.out.println("landscape null");
 				return jObj;
     		}
 			
@@ -122,13 +119,10 @@ public class BaseAdComponent{
 			
 			switch(orient) {
 	    	case Configuration.ORIENTATION_LANDSCAPE:
-	    		System.out.println("Base Configuration.ORIENTATION_LANDSCAPE");
 	        	return this.properties.getJSONObject(this.resourceBundle.getString("frameResponseBackground_Landscape"));
 	        case Configuration.ORIENTATION_PORTRAIT:
-	        	System.out.println("Base Configuration.ORIENTATION_PORTRAIT");
 	        	return this.properties.getJSONObject(this.resourceBundle.getString("frameResponseBackground_Portrait"));
 	        default:
-	            System.out.println("unknown");
     		}
 			
 		} catch (JSONException e) {
@@ -148,9 +142,7 @@ public class BaseAdComponent{
     }
     
     public void startImageDownload(){
-    	
-    	System.out.println("this.imageUrl : "+this.imageUrl);
-    	
+    	    	
     	if(this.imageUrl != null){
     		if(this.imageUrl.contains(".gif")){
     			this.gifWebView = new GifWebView(this.context, this.imageUrl);
@@ -202,7 +194,6 @@ public class BaseAdComponent{
             });
             
             this.status = AdComponentStatus.adComponentStatusCompleted;
-            System.out.println(this.imageUrl);
             this.gifWebView.setLayoutParams(layoutParams);
         	this.layout.addView(this.gifWebView);
         	this.delegate.baseAdComponentReady();
@@ -243,7 +234,6 @@ public class BaseAdComponent{
     public void setUpLayoutParameters(){
     	this.layout = new RelativeLayout(this.context);
     	this.layout.setLayoutParams(new LayoutParams(this.width, this.height));
-    	
     }
     
     public void addSubComponent(BaseAdComponent subComponent){    	
@@ -251,5 +241,4 @@ public class BaseAdComponent{
     	this.subComponents.add(subComponent);
     	this.layout.addView(subComponent.layout);
     }
-    
 }

@@ -39,7 +39,7 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 	public void onMessageTLClick(View view){
 		this.initMsgFrame("testTL");
 	}
-	
+
 	public void onMessageCCClick(View view){
 		this.initMsgFrame("testCC");
 	}
@@ -68,7 +68,6 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 		frame.setEnableAdCode(true);
 		
 		DisplayResult result = frame.start();
-		System.out.println("Result of calling start: "+result);
 	}
 	
 	public void someRandomExecution(){

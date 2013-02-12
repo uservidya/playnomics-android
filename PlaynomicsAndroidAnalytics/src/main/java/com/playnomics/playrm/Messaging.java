@@ -88,14 +88,12 @@ public class Messaging {
 	
 	public static void frameRemoveFrame(String key){
 		frames.remove(key);
-		System.out.println(frames.size());
 	}
 	
 	public static Frame initWithFrameID(String frameId){
 		
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
 		StackTraceElement element = stElements[3];
-		System.out.println("Method Name :"+element.getMethodName());
 	
 		caller = element.getMethodName();
 		frame = new Frame(frameId, context);
@@ -132,9 +130,7 @@ public class Messaging {
 						serverUrl = resourceBundle.getString("messagingProdUrl");
 					
 					String url = ""+serverUrl+""+queryString;
-					
-					System.out.println("url : "+url);
-										
+															
 					// defaultHttpClient
 				    DefaultHttpClient httpClient = new DefaultHttpClient();
 				    HttpPost httpPost = new HttpPost(url);
@@ -154,8 +150,6 @@ public class Messaging {
 				    
 				    json = sb.toString();
 				    
-					System.out.println("json :"+json);
-
 					jObj = new JSONObject(json);
 					
 				} catch (UnsupportedEncodingException e) {
@@ -210,7 +204,6 @@ public class Messaging {
 		}
 		
 		if(method == null){
-			System.out.println("There is currently no delegate to handle the action: "+actionLabel);
 			return;
 		}
 		else{
@@ -244,7 +237,6 @@ public class Messaging {
 		}
 		
 		if(method == null){
-			System.out.println("There is currently no delegate to handle the action: "+actionLabel);
 			return;
 		}
 		else{
