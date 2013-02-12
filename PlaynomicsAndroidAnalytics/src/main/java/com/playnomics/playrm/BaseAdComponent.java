@@ -79,11 +79,7 @@ public class BaseAdComponent{
     		this.startImageDownload();
     }
     
-    public View getView() {
-    	return imageUI;
-    }
-    
-    public void initCoordinateValues(int x, int y){
+    private void initCoordinateValues(int x, int y){
     	try {
 			this.imageUrl = this.properties.getString(this.resourceBundle.getString("frameResponseImageUrl"));
 			this.height = this.properties.getInt(this.resourceBundle.getString("frameResponseHeight"));
@@ -104,7 +100,7 @@ public class BaseAdComponent{
 		}
     }
     
-    public JSONObject extractCoordinateProps() {
+    private JSONObject extractCoordinateProps() {
     	JSONObject jObj = this.properties;
     	
     	try {
@@ -133,7 +129,7 @@ public class BaseAdComponent{
     	return jObj;
     }
     
-    public void createComponentView(){    	
+    private void createComponentView(){    	
     	if(this.imageUI == null){
     		this.imageUI = new ImageView(this.context);    	
         	this.layout = new RelativeLayout(this.context);
@@ -141,7 +137,7 @@ public class BaseAdComponent{
     	}
     }
     
-    public void startImageDownload(){
+    private void startImageDownload(){
     	    	
     	if(this.imageUrl != null){
     		if(this.imageUrl.contains(".gif")){
@@ -174,7 +170,7 @@ public class BaseAdComponent{
     	}
     }
     
-    public void handleGifDownload(boolean result){
+    private void handleGifDownload(boolean result){
     	if(result){
     		LayoutParams layoutParams = new LayoutParams(this.width, this.height );
             layoutParams.setMargins(this.xOffset, this.yOffset, 0, 0);
@@ -200,14 +196,14 @@ public class BaseAdComponent{
     	}
     }
     
-    public void handleImageDownload(boolean result){
+    private void handleImageDownload(boolean result){
     	if(result){
     		this.imageUI.setImageBitmap(this.image);
     		this.finishImageSetup();
     	}
     }
     
-    public void finishImageSetup(){
+    private void finishImageSetup(){
     	
     	this.imageUI.setOnClickListener(new ImageView.OnClickListener() {  
     		public void onClick(View v)

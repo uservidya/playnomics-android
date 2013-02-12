@@ -58,6 +58,13 @@ public class Frame implements BaseAdComponentInterface{
 	private boolean adEnabledCode;
 	private Map <String, Method> actions = null;
 	
+	private int pnxPostExecuteSuccess = 1;
+	private int pnxPostExecuteException = -4;
+	private int pnxPostExecuteActionsNotEnabled = -3;
+	
+	private int pnaPostExecuteSuccess = 2;
+	private int pnaPostExecuteException = -6;
+	
 	public void registerAction(String name, Method method){
 		if(this.actions == null){
 			this.actions = new HashMap<String, Method>();
@@ -319,11 +326,11 @@ public class Frame implements BaseAdComponentInterface{
 				
 				try{
 					Messaging.performActionForLabel(actionLabel);
-					c = 2;
+					c = pnaPostExecuteSuccess;
 					exc = "";
 				}
 				catch (Exception e) {
-					c = -6;
+					c = pnaPostExecuteException;
 					exc = e.toString()+"+"+e.getMessage();
 				}
 				postExecuteUrl = postExecuteUrl.concat("&c="+c+"&e="+exc);
@@ -338,16 +345,16 @@ public class Frame implements BaseAdComponentInterface{
 
 					try{
 						Messaging.executeActionOnDelegate(actionLabel);
-						c = 1;
+						c = pnxPostExecuteSuccess;
 						exc = "";
 					}
 					catch (Exception e) {
-						c = -4;
+						c = pnxPostExecuteException;
 						exc = e.toString()+"+"+e.getMessage();
 					}
 				}
 				else{
-					c = -3;
+					c = pnxPostExecuteActionsNotEnabled;
 					exc = "";
 				}
 				
