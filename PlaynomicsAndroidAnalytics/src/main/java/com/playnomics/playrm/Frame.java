@@ -355,7 +355,6 @@ public class Frame implements BaseAdComponentInterface{
 				this.submitImpressionToServer(postExecuteUrl);
 			}
 		}
-		this.baseAdComponentClose();
 	}
 	
 	private AdAction determineActionType(String clickTargetUrl){
