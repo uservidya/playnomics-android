@@ -51,81 +51,21 @@ class EventSender {
 			baseUrl = resourceBundle.getString("baseProdUrl");
 	}
 	
-//	protected boolean sendToServer(String eventUrl) {
-//	
-//		try {
-//			// Add version info
-//			eventUrl += "&esrc=aj&ever=" + version;
-//			
-//			// Hack to use JUnit testing w/o emulator
-////			if (useConsoleLogging)
-//			System.out.println("Sending event to server : " + eventUrl);
-////			else
-////				Log.i(TAG, "Sending event to server : " + eventUrl);
-//			
-//			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
-//			// con.setRequestMethod("HEAD");
-//			con.setConnectTimeout(connectTimeout);
-//			
-//			System.out.println("Send Succeeded! : "+ con.getResponseMessage());
-//			
-//			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-//			
-//		}
-//		catch (Exception e) {
-//			
-//			System.out.println("Send failed: " + e.getMessage() + " : " + e.getLocalizedMessage() + " : " + e.toString());
-//						
-//			return false;
-//		}
-//	}
+	protected boolean sendToServer(String eventUrl) {
+	
+		try {
+			// Add version info
+			eventUrl += "&esrc=aj&ever=" + version;		
+			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl).openConnection();
+			con.setConnectTimeout(connectTimeout);		
+			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
 	
 	protected boolean sendToServer(PlaynomicsEvent pe) {
 		return sendToServer(baseUrl + pe.toQueryString());
-	}
-	
-	//Test for doing network calls on background thread
-	protected boolean sendToServer(final String eventUrl){
-		
-		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
-
-			@Override
-			protected Void doInBackground(Void... params) {
-				try {
-					// Add version info
-					String url = eventUrl+"&esrc=aj&ever=" + version;
-					System.out.println("Sending event to server : " + url);
-
-					HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-					con.setConnectTimeout(connectTimeout);
-					
-					System.out.println("Send Succeeded! : "+ con.getResponseMessage());
-					
-//					return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-				}
-				catch (Exception e) {
-					System.out.println("Send failed: " + e.getMessage() + " : " + e.getLocalizedMessage() + " : " + e.toString());
-//					return false;
-				}
-				return null;
-			}
-			
-//			 protected void onPostExecute(boolean result) 
-//			 {     
-//				 
-//			 }
-		};
-//		
-		task.execute((Void)null);
-////		try {
-////			return task.get();
-////		} catch (InterruptedException e) {
-////			// TODO Auto-generated catch block
-////			e.printStackTrace();
-////		} catch (ExecutionException e) {
-////			// TODO Auto-generated catch block
-////			e.printStackTrace();
-////		}
-		return true;
 	}
 }
