@@ -925,10 +925,11 @@ public class PlaynomicsSession {
 					
 					return null;
 				}
-			}.doInBackground();
+			}.execute();
 		} catch (Exception e) {
 			// Do nothing?
 		}
+		
 	}
 	
 	/**
