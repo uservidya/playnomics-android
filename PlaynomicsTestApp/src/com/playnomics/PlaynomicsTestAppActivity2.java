@@ -49,7 +49,7 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 	}
 	
 	public void onMessageNoCloseClick(View view){
-		this.initMsgFrame("testNoClose");
+		this.initMsgFrame("noCloseButton");
 	}
 	
 	public void onMessageMessOnlyClick(View view){

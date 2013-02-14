@@ -104,16 +104,12 @@ class EventSender {
 //					return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 				}
 				catch (Exception e) {
-					System.out.println("Send failed: " + e.getMessage() + " : " + e.getLocalizedMessage() + " : " + e.toString());
+					System.out.println("Send failed: " + e.getMessage() + " : " 
+							+ e.getLocalizedMessage() + " : " + e.toString());
 //					return false;
 				}
 				return null;
 			}
-			
-//			 protected void onPostExecute(boolean result) 
-//			 {     
-//				 
-//			 }
 		};
 //		
 		task.execute((Void)null);
