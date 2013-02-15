@@ -5,6 +5,7 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,6 +19,8 @@ import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
 
 public class PlaynomicsTestAppActivity extends Activity {
+	
+	private String logTag = PlaynomicsTestAppActivity.class.getSimpleName();
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -107,7 +110,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 //				+ PlaynomicsSession.invitationSent(3L, "TEST_RECIPIENT", "TEST_ADDRESS", "TEST_METHOD")
 //					.toString(),
 //			Toast.LENGTH_LONG).show();
-		System.out.println("INVITATION SENT: "
+		Log.d(logTag, "INVITATION SENT: "
 				+ PlaynomicsSession.invitationSent(3L, "TEST_RECIPIENT", "TEST_ADDRESS", "TEST_METHOD")
 				.toString());
 	}
@@ -118,7 +121,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 //			"INVITATION RESPONSE: "
 //				+ PlaynomicsSession.invitationResponse(3L, "TEST_RECIPIENT",ResponseType.accepted).toString(),
 //			Toast.LENGTH_LONG).show();
-		System.out.println("INVITATION RESPONSE: "
+		Log.d(logTag, "INVITATION RESPONSE: "
 				+ PlaynomicsSession.invitationResponse(3L, "TEST_RECIPIENT",ResponseType.accepted).toString());
 	}
 	
@@ -128,6 +131,9 @@ public class PlaynomicsTestAppActivity extends Activity {
 //			"TEST_MILESTONE: "
 //				+ PlaynomicsSession.milestone(3L, "TEST_MILESTONE").toString(),
 //			Toast.LENGTH_LONG).show();
+		Log.d(logTag, "INVITATION RESPONSE: "
+				+ PlaynomicsSession.invitationResponse(3L, "TEST_RECIPIENT",ResponseType.accepted).toString());
+		
 		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(3L, "TEST_MILESTONE").toString());
 	}
 	

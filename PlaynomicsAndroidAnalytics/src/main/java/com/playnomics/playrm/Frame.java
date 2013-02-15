@@ -42,6 +42,8 @@ public class Frame implements BaseAdComponentInterface {
 	};
 
 	private boolean display = false;
+	private boolean hasBeenShown = false;
+
 	public String frameID;
 	private Timer expirationTimer;
 	private JSONObject properties;
@@ -54,8 +56,7 @@ public class Frame implements BaseAdComponentInterface {
 	private String activityName;
 	private boolean adEnabledCode;
 	private Map<String, Method> actions = null;
-
-
+	
 	private static final String TAG = Frame.class.getSimpleName();
 
 	public void registerAction(String name, Method method) {
@@ -94,28 +95,34 @@ public class Frame implements BaseAdComponentInterface {
 	public String getFrameID() {
 		return this.frameID;
 	}
+	
+	private String getTagId(){
+		return this.adArea.imageUrl + this.frameID;
+	}
 
 	public void removeComponent() {
 		Activity parent = (Activity) context;
 		Window window = parent.getWindow();
+		
 		ViewGroup mainView = ((ViewGroup) window.findViewById(
 				android.R.id.content).getParent());
 
 		for (int i = 0; i < mainView.getChildCount(); i++) {
-			ViewGroup v = (ViewGroup) mainView.getChildAt(i);
+			ViewGroup view = (ViewGroup) mainView.getChildAt(i);
 
-			if (v.getChildCount() > 0) {
-
-				for (int j = 0; j < v.getChildCount(); j++) {
-					if (v.getChildAt(j) != null && this.adArea != null) {
-						if (v.getChildAt(j).getTag() != null
-								&& v.getChildAt(j)
-										.getTag()
-										.equals(this.adArea.imageUrl + ""
-												+ this.frameID)) {
-							v.removeView(v.getChildAt(j));
+			if (view.getChildCount() > 0) {
+				for (int j = 0; j < view.getChildCount(); j++) {
+	
+					if (view.getChildAt(j) != null && this.adArea != null) {
+						
+						if (view.getChildAt(j).getTag() != null
+								&& view.getChildAt(j).getTag()
+										.equals(this.getTagId())){
+							
+							view.removeView(view.getChildAt(j));
+						
 						}
-					}
+					}					
 				}
 			}
 		}
@@ -280,10 +287,11 @@ public class Frame implements BaseAdComponentInterface {
 		Window window = parent.getWindow();
 		ViewGroup mainView = ((ViewGroup) window.findViewById(
 				android.R.id.content).getParent());
-
+		
 		// need to do checks and see if there are groups inside groups with
 		// views inside views
-		for (int i = 0; i < mainView.getChildCount(); i++) {
+		for (int i = 0; i < mainView.getChildCount(); i++){
+			
 			ViewGroup v = (ViewGroup) mainView.getChildAt(i);
 
 			if (v.getChildCount() > 0) {
@@ -293,11 +301,12 @@ public class Frame implements BaseAdComponentInterface {
 					if (v.getChildAt(j).getTag() != null
 							&& v.getChildAt(j)
 									.getTag()
-									.equals(this.adArea.imageUrl + ""
-											+ this.frameID)) {
+									.equals(this.getTagId())) {
+						
 						v.removeViewAt(j);
 						Messaging.frameRemoveFrame(this.frameID);
 						return;
+					
 					}
 				}
 			}
@@ -433,7 +442,17 @@ public class Frame implements BaseAdComponentInterface {
 		}
 	}
 
-	public void display() {
+	public void display() {	
+		if(!this.hasBeenShown){
+			try {
+				PlaynomicsSession.impression(this.adArea.properties
+						.getString(this.resourceBundle
+								.getString("frameResponseAd_ImpressionUrl")));
+			} catch (JSONException e) {
+			}
+			this.hasBeenShown = true;
+		}
+		
 		this.startExpiryTimer();
 		Activity parent = (Activity) this.context;
 		Window window = parent.getWindow();

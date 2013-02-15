@@ -13,6 +13,7 @@ class PostExecutionEvent extends PlaynomicsEvent {
 		
 		public static final int PNA_SUCCESS = 2;
 		public static final int PNA_EXCEPTION = -6;
+		
 		public static final int UNKNOWN_ERROR = -1;
 	}
 	

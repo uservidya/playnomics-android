@@ -121,13 +121,13 @@ public class BaseAdComponent {
 			}
 
 			switch (orient) {
-				case Configuration.ORIENTATION_LANDSCAPE:
-					return this.properties.getJSONObject(this.resourceBundle
+			case Configuration.ORIENTATION_LANDSCAPE:
+				return this.properties.getJSONObject(this.resourceBundle
 						.getString("frameResponseBackground_Landscape"));
-				case Configuration.ORIENTATION_PORTRAIT:
-					return this.properties.getJSONObject(this.resourceBundle
+			case Configuration.ORIENTATION_PORTRAIT:
+				return this.properties.getJSONObject(this.resourceBundle
 						.getString("frameResponseBackground_Portrait"));
-				default:
+			default:
 			}
 
 		} catch (JSONException e) {

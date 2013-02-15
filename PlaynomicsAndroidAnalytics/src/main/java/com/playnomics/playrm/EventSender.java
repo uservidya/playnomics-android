@@ -4,6 +4,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.playnomics.playrm.PlaynomicsEvent.EventType;
+
 import android.util.Log;
 
 class EventSender {
@@ -31,9 +33,15 @@ class EventSender {
 			if (event.appendSourceInformation()) {
 				eventUrl += "&esrc=aj&ever=" + version;
 			}
+
+			Log.d(TAG, "Requesting event url: " + eventUrl);
+			
 			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl)
 					.openConnection();
 			con.setConnectTimeout(connectTimeout);
+			
+			Log.d(TAG, "HTTP Response: " + con.getResponseCode());
+			
 			return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
 		} catch (Exception e) {
 			Log.d(TAG, e.getMessage());

@@ -90,16 +90,12 @@ public class Messaging {
 
 			@Override
 			protected JSONObject doInBackground(Void... params) {
-				String serverUrl;
-
-				if (PlaynomicsSession.getTestMode())
-					serverUrl = resourceBundle.getString("messagingTestUrl");
-				else
-					serverUrl = resourceBundle.getString("messagingProdUrl");
-
+				String serverUrl = PlaynomicsSession.getBaseUrl();
+				
 				DisplayMetrics metrics = frame.getContext()
 						.getApplicationContext().getResources()
 						.getDisplayMetrics();
+				
 				int width = metrics.widthPixels;
 				int height = metrics.heightPixels;
 

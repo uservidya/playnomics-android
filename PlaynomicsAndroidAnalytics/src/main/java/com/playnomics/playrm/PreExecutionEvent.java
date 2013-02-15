@@ -1,7 +1,7 @@
 package com.playnomics.playrm;
 
 class PreExecutionEvent extends PlaynomicsEvent {
-	
+	private static final long serialVersionUID = 3877498552909874260L;
 	private int x;
 	private int y;
 	

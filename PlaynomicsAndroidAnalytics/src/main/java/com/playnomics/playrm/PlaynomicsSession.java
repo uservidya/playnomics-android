@@ -141,21 +141,21 @@ public class PlaynomicsSession {
 
 	private static final ResourceBundle resourceBundle = ResourceBundle
 			.getBundle("playnomicsAndroidAnalytics");
-	
-	public static ResourceBundle getResourceBundle(){
+
+	public static ResourceBundle getResourceBundle() {
 		return resourceBundle;
 	}
-			
-	protected static String getBaseUrl(){
-		if (PlaynomicsSession.getTestMode()){
+
+	protected static String getBaseUrl() {
+		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("baseTestUrl");
 		}
 		return resourceBundle.getString("baseProdUrl");
 	}
-	
+
 	private static boolean isConnectionAvailable() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) 
-				application.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivityManager = (ConnectivityManager) application
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
 
@@ -219,7 +219,8 @@ public class PlaynomicsSession {
 
 			if ((manager.checkPermission(permission.INTERNET,
 					application.getPackageName()) != PackageManager.PERMISSION_GRANTED)
-					&& (manager.checkPermission( permission.ACCESS_NETWORK_STATE,
+					&& (manager.checkPermission(
+							permission.ACCESS_NETWORK_STATE,
 							application.getPackageName()) != PackageManager.PERMISSION_GRANTED)) {
 
 				hasInternetPermission = false;
@@ -238,11 +239,9 @@ public class PlaynomicsSession {
 			sessionState = SessionState.STARTED;
 			PlaynomicsSession.applicationId = applicationId;
 
-			
-			
 			// Setup the activity callback function(s)
 			setActivityCallback(activity);
-			
+
 			screenIntentFilter = new IntentFilter();
 			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
 				screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -295,7 +294,7 @@ public class PlaynomicsSession {
 			} else {
 				sessionStartTime = new Date(settings.getLong(
 						SETTING_LAST_SESSION_START_TIME, 0));
-				
+
 				internalSessionId = settings.getString(SETTING_LAST_SESSION_ID,
 						"");
 				instanceId = RandomGenerator.createRandomHex();
@@ -551,9 +550,9 @@ public class PlaynomicsSession {
 				// Restore original callback
 				PlaynomicsSession.activity.getWindow().setCallback(
 						activityCallback);
-				
+
 				setActivityCallback(activity);
-				
+
 				result = APIResult.SWITCHED;
 			} else {
 				result = APIResult.ALREADY_SWITCHED;
@@ -680,10 +679,11 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult sessionStart(long sessionId, String site) {
 
-		GameEvent ge = new GameEvent(EventType.sessionStart, internalSessionId,
-				applicationId, userId, sessionId, site, null, null, null, null);
-		return sendOrQueueEvent(ge);
-
+		GameEvent gameEvent = new GameEvent(EventType.sessionStart,
+				internalSessionId, applicationId, userId, sessionId, site,
+				null, null, null, null);
+		Log.d(TAG, "sessionStart is being queued.");
+		return sendOrQueueEvent(gameEvent);
 	}
 
 	/**
@@ -697,10 +697,11 @@ public class PlaynomicsSession {
 	 */
 	public static APIResult sessionEnd(long sessionId, String reason) {
 
-		GameEvent ge = new GameEvent(EventType.sessionEnd, internalSessionId,
-				applicationId, userId, sessionId, null, null, null, null,
-				reason);
-		return sendOrQueueEvent(ge);
+		GameEvent gameEvent = new GameEvent(EventType.sessionEnd,
+				internalSessionId, applicationId, userId, sessionId, null,
+				null, null, null, reason);
+		Log.d(TAG, "sessionEnd is being queued.");
+		return sendOrQueueEvent(gameEvent);
 	}
 
 	/**
@@ -721,10 +722,11 @@ public class PlaynomicsSession {
 	public static APIResult gameStart(long instanceId, long sessionId,
 			String site, String type, String gameId) {
 
-		GameEvent ge = new GameEvent(EventType.gameStart, internalSessionId,
-				applicationId, userId, sessionId, site, instanceId, type,
-				gameId, null);
-		return sendOrQueueEvent(ge);
+		GameEvent gameStartEvent = new GameEvent(EventType.gameStart,
+				internalSessionId, applicationId, userId, sessionId, site,
+				instanceId, type, gameId, null);
+		Log.d(TAG, "gameStart is being queued.");
+		return sendOrQueueEvent(gameStartEvent);
 	}
 
 	/**
@@ -741,10 +743,11 @@ public class PlaynomicsSession {
 	public static APIResult gameEnd(long instanceId, long sessionId,
 			String reason) {
 
-		GameEvent ge = new GameEvent(EventType.gameEnd, internalSessionId,
+		GameEvent gameEndEvent = new GameEvent(EventType.gameEnd, internalSessionId,
 				applicationId, userId, sessionId, null, instanceId, null, null,
 				reason);
-		return sendOrQueueEvent(ge);
+		Log.d(TAG, "gameEvent is being queued.");
+		return sendOrQueueEvent(gameEndEvent);
 	}
 
 	/**
@@ -772,7 +775,7 @@ public class PlaynomicsSession {
 			double quantity, TransactionType type, String otherUserId,
 			CurrencyType currencyType, double currencyValue,
 			CurrencyCategory currencyCategory) {
-
+		
 		return transaction(transactionId, itemId, quantity, type, otherUserId,
 				currencyType.toString(), currencyValue, currencyCategory);
 	}
@@ -807,11 +810,13 @@ public class PlaynomicsSession {
 		double[] currencyValues = { currencyValue };
 		CurrencyCategory[] currencyCategories = { currencyCategory };
 
-		TransactionEvent te = new TransactionEvent(EventType.transaction,
+		TransactionEvent transEvent = new TransactionEvent(EventType.transaction,
 				internalSessionId, applicationId, userId, transactionId,
 				itemId, quantity, type, otherUserId, currencyTypes,
 				currencyValues, currencyCategories);
-		return sendOrQueueEvent(te);
+		
+		Log.d(TAG, "transaction is being queued.");
+		return sendOrQueueEvent(transEvent);
 	}
 
 	/**
@@ -851,6 +856,7 @@ public class PlaynomicsSession {
 					internalSessionId, applicationId, userId, transactionId,
 					itemId, quantity, type, otherUserId, currencyTypeStrings,
 					currencyValues, currencyCategories);
+			Log.d(TAG, "transaction is being queued.");
 			return sendOrQueueEvent(te);
 		} catch (Exception e) {
 			return APIResult.FAIL_UNKNOWN;
@@ -883,11 +889,12 @@ public class PlaynomicsSession {
 			String[] currencyTypes, double[] currencyValues,
 			CurrencyCategory[] currencyCategories) {
 
-		TransactionEvent te = new TransactionEvent(EventType.transaction,
+		TransactionEvent tranEvent = new TransactionEvent(EventType.transaction,
 				internalSessionId, applicationId, userId, transactionId,
 				itemId, quantity, type, otherUserId, currencyTypes,
 				currencyValues, currencyCategories);
-		return sendOrQueueEvent(te);
+		Log.d(TAG, "transaction is being queued.");
+		return sendOrQueueEvent(tranEvent);
 	}
 
 	/**
@@ -906,10 +913,11 @@ public class PlaynomicsSession {
 	public static APIResult invitationSent(long invitationId,
 			String recipientUserId, String recipientAddress, String method) {
 
-		SocialEvent se = new SocialEvent(EventType.invitationSent,
+		SocialEvent socialEvent = new SocialEvent(EventType.invitationSent,
 				internalSessionId, applicationId, userId, invitationId,
 				recipientUserId, recipientAddress, method, null);
-		return sendOrQueueEvent(se);
+		Log.d(TAG, "invitationSent is being queued.");
+		return sendOrQueueEvent(socialEvent);
 	}
 
 	/**
@@ -924,10 +932,12 @@ public class PlaynomicsSession {
 	public static APIResult invitationResponse(long invitationId,
 			String recipientUserId, ResponseType response) {
 
-		SocialEvent se = new SocialEvent(EventType.invitationResponse,
+		SocialEvent socialEvent = new SocialEvent(EventType.invitationResponse,
 				internalSessionId, applicationId, userId, invitationId,
 				recipientUserId, null, null, response);
-		return sendOrQueueEvent(se);
+		
+		Log.d(TAG, "invitationResponse is being queued.");
+		return sendOrQueueEvent(socialEvent);
 	}
 
 	public static APIResult milestone(long milestoneId, String milestoneName) {
@@ -935,21 +945,25 @@ public class PlaynomicsSession {
 		MilestoneEvent ms = new MilestoneEvent(EventType.milestone,
 				internalSessionId, applicationId, userId, cookieId,
 				milestoneId, milestoneName);
+		Log.d(TAG, "milestone is being queued.");
 		return sendOrQueueEvent(ms);
 	}
 
 	public static void errorReport(ErrorDetail errorDetail) {
 		ErrorEvent error = new ErrorEvent(errorDetail);
+		Log.d(TAG, "error is being queued.");
 		sendEvent(error);
 	}
 
 	public static void impression(String impressionUrl) {
 		ImpressionEvent event = new ImpressionEvent(impressionUrl);
+		Log.d(TAG, "impression is being queued.");
 		sendOrQueueEvent(event);
 	}
 
 	protected static void preExecution(String preExecutionUrl, int x, int y) {
 		PreExecutionEvent event = new PreExecutionEvent(preExecutionUrl, x, y);
+		Log.d(TAG, "preExecution is being queued.");
 		sendOrQueueEvent(event);
 	}
 
@@ -957,6 +971,7 @@ public class PlaynomicsSession {
 			Exception ex) {
 		PostExecutionEvent event = new PostExecutionEvent(postExecutionUrl,
 				code, ex);
+		Log.d(TAG, "postExecution is being queued.");
 		sendOrQueueEvent(event);
 	}
 
@@ -970,7 +985,7 @@ public class PlaynomicsSession {
 			} else if (!hasInternetPermission) {
 				return APIResult.NO_INTERNET_PERMISSION;
 			}
-			
+
 			sendEvent(pe);
 			result = APIResult.SENT;
 		} catch (Exception e) {
@@ -990,7 +1005,7 @@ public class PlaynomicsSession {
 					// Queue event on failure
 					if (!isConnectionAvailable()) {
 						playnomicsEventList.add(pe);
-					}else {
+					} else {
 						eventSender.sendToServer(pe);
 					}
 					return null;
@@ -1031,7 +1046,7 @@ public class PlaynomicsSession {
 				// Exit method if any sendToServer call fails (we'll try again
 				// next time)
 				for (PlaynomicsEvent pe : playnomicsEventList) {
-					if (isConnectionAvailable()){
+					if (isConnectionAvailable()) {
 						eventSender.sendToServer(pe);
 						playnomicsEventList.remove(pe);
 					}
