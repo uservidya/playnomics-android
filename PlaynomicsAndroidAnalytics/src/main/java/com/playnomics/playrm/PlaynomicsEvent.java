@@ -19,11 +19,11 @@ abstract class PlaynomicsEvent implements Serializable {
 	private String internalSessionId;
 
 	protected String baseUrl;
-	
+
 	protected PlaynomicsEvent(EventType eventType, String internalSessionId,
 			Long applicationId, String userId) {
 		super();
-		
+
 		this.baseUrl = PlaynomicsSession.getBaseUrl();
 		this.eventTime = new Date();
 		this.eventType = eventType;
@@ -31,15 +31,15 @@ abstract class PlaynomicsEvent implements Serializable {
 		this.applicationId = applicationId;
 		this.userId = userId;
 	}
-	
-	protected PlaynomicsEvent(String eventUrl){
+
+	protected PlaynomicsEvent(String eventUrl) {
 		this.baseUrl = eventUrl;
 	}
 
 	public PlaynomicsEvent() {
 		this.baseUrl = PlaynomicsSession.getBaseUrl();
-	}	
-	
+	}
+
 	protected String getInternalSessionId() {
 		return this.internalSessionId;
 	}
@@ -103,13 +103,13 @@ abstract class PlaynomicsEvent implements Serializable {
 		return url;
 	}
 
-	public String getEventUrl(){
+	public String getEventUrl() {
 		return baseUrl + toQueryString();
 	}
-	
-	public boolean appendSourceInformation(){
+
+	public boolean appendSourceInformation() {
 		return true;
 	}
-	
+
 	protected abstract String toQueryString();
 }

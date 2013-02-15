@@ -4,6 +4,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import android.util.Log;
+
 class EventSender {
 
 	private static final String TAG = EventSender.class.getSimpleName();
