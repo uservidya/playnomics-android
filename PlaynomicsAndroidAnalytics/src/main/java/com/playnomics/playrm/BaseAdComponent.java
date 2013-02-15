@@ -64,8 +64,7 @@ public class BaseAdComponent {
 		this.frame = frm;
 
 		this.subComponents = new ArrayList<BaseAdComponent>();
-		this.resourceBundle = ResourceBundle
-				.getBundle("playnomicsAndroidAnalytics");
+		this.resourceBundle = PlaynomicsSession.getResourceBundle();
 		this.context = cont;
 		this.imageType = imageType;
 		this.delegate = frm;
