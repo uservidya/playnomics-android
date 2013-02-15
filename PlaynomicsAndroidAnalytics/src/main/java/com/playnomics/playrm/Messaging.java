@@ -36,8 +36,7 @@ public class Messaging {
 		context = cont;
 
 		if (frames == null) {
-			resourceBundle = ResourceBundle
-					.getBundle("playnomicsAndroidAnalytics");
+			resourceBundle = PlaynomicsSession.getResourceBundle();
 			connectionTimeout = new Integer(
 					resourceBundle.getString("connectTimeout"));
 			frames = new HashMap<String, Frame>();
