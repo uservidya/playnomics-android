@@ -114,7 +114,7 @@ public class TransactionEvent extends PlaynomicsEvent {
 	}
 
 	@Override
-	public String toQueryString() {
+	protected String toQueryString() {
 
 		// Set common params
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()

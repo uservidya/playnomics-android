@@ -28,7 +28,7 @@ public class MilestoneEvent extends PlaynomicsEvent {
 	}
 
 	@Override
-	public String toQueryString() {
+	protected String toQueryString() {
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
 				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&jsh="
 				+ getSessionId() + "&mi=" + getMilestoneId() + "&mn="

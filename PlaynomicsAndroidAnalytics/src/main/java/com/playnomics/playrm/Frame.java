@@ -55,12 +55,6 @@ public class Frame implements BaseAdComponentInterface {
 	private boolean adEnabledCode;
 	private Map<String, Method> actions = null;
 
-	private final int pnxPostExecuteSuccess = 1;
-	private final int pnxPostExecuteException = -4;
-	private final int pnxPostExecuteActionsNotEnabled = -3;
-
-	private final int pnaPostExecuteSuccess = 2;
-	private final int pnaPostExecuteException = -6;
 
 	private static final String TAG = Frame.class.getSimpleName();
 
@@ -73,8 +67,7 @@ public class Frame implements BaseAdComponentInterface {
 
 	public Frame(String frmId, Context cont) {
 		this.frameID = frmId;
-		this.resourceBundle = ResourceBundle
-				.getBundle("playnomicsAndroidAnalytics");
+		this.resourceBundle = PlaynomicsSession.getResourceBundle();
 		this.context = cont;
 		this.activityName = context.getClass().getName();
 		this.adEnabledCode = false;
@@ -234,7 +227,7 @@ public class Frame implements BaseAdComponentInterface {
 
 		if (this.properties != null) {
 			try {
-				this.submitImpressionToServer(this.adArea.properties
+				PlaynomicsSession.impression(this.adArea.properties
 						.getString(this.resourceBundle
 								.getString("frameResponseAd_ImpressionUrl")));
 			} catch (JSONException e) {
@@ -319,22 +312,17 @@ public class Frame implements BaseAdComponentInterface {
 	private void adClicked(MotionEvent event) {
 		int x = (int) event.getX();
 		int y = (int) event.getY();
-		String coordParams = "&x=" + x + "&y=" + y;
 		String preExecuteUrl = null;
 		String postExecuteUrl = null;
 		String clickTarget = null;
 
 		try {
-			
 			if( this.adArea.properties.has(this.resourceBundle
 							.getString("frameResponseAd_PreExecuteUrl")))
 			{
 				preExecuteUrl = this.adArea.properties
 						.getString(this.resourceBundle
 								.getString("frameResponseAd_PreExecuteUrl"));
-				
-				if(preExecuteUrl != null)
-					preExecuteUrl += coordParams;
 			}
 			
 			if( this.adArea.properties.has(this.resourceBundle
@@ -343,9 +331,6 @@ public class Frame implements BaseAdComponentInterface {
 				postExecuteUrl = this.adArea.properties
 						.getString(this.resourceBundle
 						.getString("frameResponseAd_PostExecuteUrl"));
-		
-				if(postExecuteUrl != null)
-					postExecuteUrl += coordParams;
 			}
 			
 			clickTarget = this.adArea.properties.getString(this.resourceBundle
@@ -358,57 +343,50 @@ public class Frame implements BaseAdComponentInterface {
 
 		if (clickTarget != null) {
 
-			String exc;
-			int c;
+			Exception exec = null;
+			int statusCode;
 
 			AdAction actionType = this.determineActionType(clickTarget);
 			String actionLabel = this.determineActionLabel(clickTarget);
-
+			
 			if (actionType.equals(AdAction.AdActionHTTP)) {
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW,
 						Uri.parse(clickTarget));
 				this.context.startActivity(browserIntent);
-			} else if (actionType.equals(AdAction.AdActionDefinedAction)) {
+			} else if (actionType.equals(AdAction.AdActionDefinedAction) || 
+					actionType.equals(AdAction.AdActionExecuteCode)) {
 
 				if(preExecuteUrl != null)
-					this.submitImpressionToServer(preExecuteUrl);
-
-				try {
-					Messaging.performActionForLabel(actionLabel);
-					c = pnaPostExecuteSuccess;
-					exc = "";
-				} catch (Exception e) {
-					c = pnaPostExecuteException;
-					exc = e.toString() + "+" + e.getMessage();
-				}
-				
-				if(postExecuteUrl != null){	
-					postExecuteUrl = postExecuteUrl.concat("&c=" + c + "&e=" + exc);
-					this.submitImpressionToServer(postExecuteUrl);
-				}
-			} else if (actionType.equals(AdAction.AdActionExecuteCode)) {
-				if(preExecuteUrl != null)
-					this.submitImpressionToServer(preExecuteUrl);
-
-				if (this.adEnabledCode) {
-
+					PlaynomicsSession.preExecution(preExecuteUrl, x, y);
+			
+				if(actionType.equals(AdAction.AdActionDefinedAction)){
 					try {
-						Messaging.executeActionOnDelegate(actionLabel);
-						c = pnxPostExecuteSuccess;
-						exc = "";
+						Messaging.performActionForLabel(actionLabel);
+						statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
 					} catch (Exception e) {
-						c = pnxPostExecuteException;
-						exc = e.toString() + "+" + e.getMessage();
+						statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
+						exec = e;
 					}
 				} else {
-					c = pnxPostExecuteActionsNotEnabled;
-					exc = "";
+					if (this.adEnabledCode) {
+						try {
+							Messaging.executeActionOnDelegate(actionLabel);
+							statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
+						} catch (Exception e) {
+							statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+							exec = e;
+						}
+					} else {
+						statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
+					}
 				}
 				
 				if(postExecuteUrl != null){	
-					postExecuteUrl = postExecuteUrl.concat("&c=" + c + "&e=" + exc);
-					this.submitImpressionToServer(postExecuteUrl);
+					PlaynomicsSession.postExecution(postExecuteUrl, 
+							statusCode, exec);
 				}
+			} else {
+				//log error 
 			}
 		}
 	}
@@ -439,32 +417,6 @@ public class Frame implements BaseAdComponentInterface {
 		return resource;
 	}
 	
-	private void submitImpressionToServer(){
-		
-	}
-
-	private void submitImpressionToServer(final String impressionUrl) {
-		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-
-			@Override
-			protected Void doInBackground(Void... params) {
-				Log.d(TAG, "Impression Url: " + impressionUrl);
-				InputStream content = null;
-				try {
-					HttpClient httpclient = new DefaultHttpClient();
-					HttpResponse response = httpclient.execute(new HttpGet(
-							impressionUrl));
-					content = response.getEntity().getContent();
-				} catch (Exception e) {
-					Log.d("com.playnomics.playrm.Frame",
-							"Exception: " + e.getMessage());
-				}
-				return null;
-			}
-		};
-		task.execute((Void) null);
-	}
-
 	public void notifyDelegate() {
 		Messaging.refreshWithId(this.frameID);
 	}

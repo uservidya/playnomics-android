@@ -10,10 +10,16 @@ import java.sql.Date;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.R.string;
+import android.os.AsyncTask;
+import android.util.Log;
 
 public class MessagingServiceClient {
 	
@@ -21,6 +27,8 @@ public class MessagingServiceClient {
 	private final long appId;
 	private final String userId;
 	private final String cookieId;
+	
+	private final String TAG = MessagingServiceClient.class.getSimpleName();
 	
 	public MessagingServiceClient (String baseUrl, long appId, String userId, 
 			String cookieId){

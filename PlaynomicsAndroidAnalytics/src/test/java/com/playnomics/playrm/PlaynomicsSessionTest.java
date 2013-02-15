@@ -29,8 +29,10 @@ public class PlaynomicsSessionTest {
 	
 	@Test
 	public void testEvents() {
-	
-		EventSender es = new EventSender(true, true);
+		
+		PlaynomicsSession.setTestMode(true);
+		
+		EventSender es = new EventSender();
 		List<PlaynomicsEvent> eventList = new ArrayList<PlaynomicsEvent>();
 		EventType eventType = EventType.appStart;
 		Long applicationId = 3L;

@@ -2,6 +2,7 @@ package com.playnomics.playrm;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 abstract class PlaynomicsEvent implements Serializable {
 
@@ -17,37 +18,41 @@ abstract class PlaynomicsEvent implements Serializable {
 	private String userId;
 	private String internalSessionId;
 
+	protected String baseUrl;
+	
 	protected PlaynomicsEvent(EventType eventType, String internalSessionId,
 			Long applicationId, String userId) {
-
 		super();
-		eventTime = new Date();
+		
+		this.baseUrl = PlaynomicsSession.getBaseUrl();
+		this.eventTime = new Date();
 		this.eventType = eventType;
 		this.internalSessionId = internalSessionId;
 		this.applicationId = applicationId;
 		this.userId = userId;
 	}
-
-	public PlaynomicsEvent() {
-
+	
+	protected PlaynomicsEvent(String eventUrl){
+		this.baseUrl = eventUrl;
 	}
 
+	public PlaynomicsEvent() {
+		this.baseUrl = PlaynomicsSession.getBaseUrl();
+	}	
+	
 	protected String getInternalSessionId() {
 		return this.internalSessionId;
 	}
 
 	protected EventType getEventType() {
-
 		return eventType;
 	}
 
 	protected void setEventType(EventType eventType) {
-
 		this.eventType = eventType;
 	}
 
 	protected Date getEventTime() {
-
 		return eventTime;
 	}
 
@@ -92,13 +97,19 @@ abstract class PlaynomicsEvent implements Serializable {
 	}
 
 	protected String addOptionalParam(String url, String param, Object value) {
-
 		if (value != null) {
 			url += "&" + param + "=" + value.toString();
 		}
-
 		return url;
 	}
 
-	public abstract String toQueryString();
+	public String getEventUrl(){
+		return baseUrl + toQueryString();
+	}
+	
+	public boolean appendSourceInformation(){
+		return true;
+	}
+	
+	protected abstract String toQueryString();
 }

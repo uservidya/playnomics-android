@@ -17,7 +17,6 @@ import android.util.DisplayMetrics;
 import com.playnomics.playrm.ErrorDetail.PlaynomicsErrorType;
 
 public class Messaging {
-
 	private static Map<String, Frame> frames = null;
 
 	private static ResourceBundle resourceBundle;
