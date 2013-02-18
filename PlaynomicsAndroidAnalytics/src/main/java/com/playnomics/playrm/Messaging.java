@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.json.JSONObject;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -16,85 +15,77 @@ import android.util.DisplayMetrics;
 
 import com.playnomics.playrm.ErrorDetail.PlaynomicsErrorType;
 
+
 public class Messaging {
-	private static Map<String, Frame> frames = null;
-
-	private static ResourceBundle resourceBundle;
-	@SuppressWarnings("unused")
-	private static int connectionTimeout;
-	private static Context context;
-
-	private static boolean refresh = false;
-
-	private static String caller;
-	private static String frameID;
-
-	public static Frame frame;
-
+	private static Map<String,ConcurrentHashMap<String,Frame>> contextFrames 
+		= new HashMap<String,ConcurrentHashMap<String,Frame>>();
+	
 	public static void setup(Context cont) {
-
-		context = cont;
-
-		if (frames == null) {
-			resourceBundle = PlaynomicsSession.getResourceBundle();
-			connectionTimeout = new Integer(
-					resourceBundle.getString("connectTimeout"));
-			frames = new HashMap<String, Frame>();
-		} else {
-
-			ArrayList<String> oldFrames = new ArrayList<String>();
-
-			Iterator<?> it = frames.entrySet().iterator();
-			while (it.hasNext()) {
-				@SuppressWarnings("rawtypes")
-				Map.Entry pairs = (Map.Entry) it.next();
-				Frame frame = (Frame) pairs.getValue();
-
-				if (frame.getActivityName()
-						.equals(context.getClass().getName())) {
-					frame.updateContext(context);
-				} else {
-					oldFrames.add((String) pairs.getKey());
-				}
-			}
-
-			// loop to remove old frames
-			if (oldFrames.size() > 0) {
-				for (String key : oldFrames) {
-					frames.remove(frames.get(key));
-				}
-			}
+		//possible do update code here
+	}
+	
+	protected static void clearFramesInContext(Context context){
+		String key = getKeyForContext(context);
+		contextFrames.remove(key);
+	}
+	
+	protected static void clearFrameFromContext(Context context, String frameId){
+		String key = getKeyForContext(context);
+		if(contextFrames.containsKey(key)){
+			ConcurrentHashMap<String, Frame> framesById = contextFrames.get(key);
+			framesById.remove(frameId);
 		}
 	}
 
-	public static void frameRemoveFrame(String key) {
-		frames.remove(key);
+	private static ConcurrentHashMap<String, Frame> getFramesForActivity(
+			Context context){
+		String key = getKeyForContext(context);
+		if(contextFrames.containsKey(key)){
+			return contextFrames.get(key);
+		}
+		return null;
+	}
+	
+	protected static String getKeyForContext(Context context){
+		return context.getClass().getName();
 	}
 
-	public static Frame initWithFrameID(String frameId) {
+	public static Frame initWithFrameID(String frameId, Context context) {
 
 		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
 		StackTraceElement element = stElements[3];
 
-		caller = element.getMethodName();
-		frame = new Frame(frameId, context);
-		frames.put(frameId, frame);
-
-		createTask(frame, caller);
+		String caller = element.getMethodName();
+		Frame frame = new Frame(frameId, context);
+		
+		ConcurrentHashMap<String, Frame> framesById = getFramesForActivity(context);
+		boolean framesAreNew = framesById == null;
+	
+		if(framesAreNew){
+			framesById = new ConcurrentHashMap<String, Frame>();
+		}
+		
+		framesById.put(frameId, frame);
+		
+		String contextKey = getKeyForContext(context);
+		
+		if(framesAreNew){
+			contextFrames.put(contextKey, framesById);
+		}
+		
+		fetchDataAsync(context, contextKey, frameId, caller);
 		return frame;
 	}
 
-	private static void createTask(final Frame frame, final String caller) {
+	private static void fetchDataAsync(final Context context, final String contextKey, 
+			final String frameId,  final String caller) {
 
-		AsyncTask<Void, Void, JSONObject> task = new AsyncTask<Void, Void, JSONObject>() {
+		AsyncTask<Void, Void, AdResponse> task = new AsyncTask<Void, Void, AdResponse>() {
 
 			@Override
-			protected JSONObject doInBackground(Void... params) {
-				String serverUrl = PlaynomicsSession.getBaseUrl();
-				
-				DisplayMetrics metrics = frame.getContext()
-						.getApplicationContext().getResources()
-						.getDisplayMetrics();
+			protected AdResponse doInBackground(Void... params) {	
+				DisplayMetrics metrics = context.getApplicationContext()
+						.getResources().getDisplayMetrics();
 				
 				int width = metrics.widthPixels;
 				int height = metrics.heightPixels;
@@ -104,37 +95,32 @@ public class Messaging {
 //						PlaynomicsSession.getUserID(),
 //						PlaynomicsSession.getCookieID());
 				
-				MessagingServiceClientTest client = new MessagingServiceClientTest(serverUrl, 
+				MessagingServiceClientTest client = new MessagingServiceClientTest
+						(PlaynomicsSession.getResourceBundle(),
+						PlaynomicsSession.getBaseUrl(), 
 						PlaynomicsSession.getAppID(), 
 						PlaynomicsSession.getUserID(),
 						PlaynomicsSession.getCookieID());
-				return client.requestAd(frame.getFrameID(), caller, width,
+				
+				return client.requestAd(frameId, caller, width,
 						height);
 			}
 
-			protected void onPostExecute(JSONObject jObj) {
+			protected void onPostExecute(AdResponse response) {
 
-				if (jObj == null) {
-					ErrorDetail detail = new ErrorDetail(
-							PlaynomicsErrorType.errorTypeInvalidJson);
+				if (response == null) {
+					ErrorDetail detail = new ErrorDetail(PlaynomicsErrorType.errorTypeInvalidJson);
 					PlaynomicsSession.errorReport(detail);
 				} else {
-					if (refresh) {
-						Frame refreshFrame = frames.get(frameID);
-						if (refreshFrame != null) {
-							refreshFrame.refreshProperties(jObj);
-							refresh = false;
-						}
-					} else {
-						frame.refreshProperties(jObj);
-					}
+					Frame frame = contextFrames.get(contextKey).get(frameId);
+					frame.refreshData(response);
 				}
 			}
 		};
 		task.execute((Void) null);
 	}
 
-	public static void performActionForLabel(String actionLabel) {
+	public static void performActionForLabel(Context context, String actionLabel) {
 
 		actionLabel = actionLabel.substring(3);
 		Method method = null;
@@ -167,7 +153,7 @@ public class Messaging {
 		}
 	}
 
-	public static void executeActionOnDelegate(String actionLabel) {
+	public static void executeActionOnDelegate(Context context, String actionLabel) {
 		actionLabel = actionLabel.substring(3);
 		Method method = null;
 
@@ -199,12 +185,8 @@ public class Messaging {
 		}
 	}
 
-	public static void refreshWithId(String frameId) {
-		Frame frame = frames.get(frameId);
-		if (frame != null) {
-			// referesh entire frame
-			refresh = true;
-			createTask(frame, caller);
-		}
+	public static void refreshWithId(Context context, String frameId) {
+		String contextKey = getKeyForContext(context);
+		fetchDataAsync(context, contextKey, frameId, "REFRESH CALLER" );
 	}
 }

@@ -1,62 +1,61 @@
 package com.playnomics.playrm;
 
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.playnomics.playrm.BaseAdComponent.AdComponentStatus;
-import com.playnomics.playrm.BaseAdComponent.ImageType;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.RelativeLayout;
 
-public class Frame implements BaseAdComponentInterface {
+import com.playnomics.playrm.AdView.ImageType;
+import com.playnomics.playrm.AdView.ViewStatus;
+import com.playnomics.playrm.Background.Orientation;
 
+public class Frame implements AdEventHandler {
+	
+	
 	public enum DisplayResult {
-		displayResultNoInternetPermission, displayResultStartNotCalled, displayResultUnableToConnect, displayResultFailUnkown, displayResultDisplayPending, displayResultDisplayed
+		NO_INTERNET_PERMISSION, START_NOT_CALLED, UNABLE_TO_CONNECT, FAIL_UNKNOWN, DISPLAY_PENDING, DISPLAYED
 	};
 
-	protected enum AdAction {
-		AdActionHTTP, AdActionDefinedAction, AdActionExecuteCode, AdActionUnkown
-	};
+	// should we draw/re-draw the frame?
+	private boolean shouldDisplay = false;
+	// have we already drawn this frame?
+	private boolean shown = false;
 
-	private boolean display = false;
-	private boolean hasBeenShown = false;
+	private boolean receivedData = false;
 
-	public String frameID;
+	private final String frameID;
+
 	private Timer expirationTimer;
-	private JSONObject properties;
-	private BaseAdComponent background;
-	private BaseAdComponent adArea;
-	private BaseAdComponent closeButton;
+
+	private Background background;
+	private Ad ad;
+	private Location location;
+	private CloseButton button;
+
+	private AdView backgroundView;
+	private AdView adAreaView;
+	private AdView closeButtonView;
+
 	private int expirationSeconds;
-	private ResourceBundle resourceBundle;
 	private Context context;
 	private String activityName;
-	private boolean adEnabledCode;
+
+	private boolean adEnabledCode = false;
+	private int currentOrientation; 
 	private Map<String, Method> actions = null;
-	
+
 	private static final String TAG = Frame.class.getSimpleName();
 
 	public void registerAction(String name, Method method) {
@@ -66,12 +65,10 @@ public class Frame implements BaseAdComponentInterface {
 		this.actions.put(name, method);
 	}
 
-	public Frame(String frmId, Context cont) {
-		this.frameID = frmId;
-		this.resourceBundle = PlaynomicsSession.getResourceBundle();
-		this.context = cont;
-		this.activityName = context.getClass().getName();
-		this.adEnabledCode = false;
+	public Frame(String frameId, Context context) {
+		this.frameID = frameId;
+		this.context = context;
+		this.activityName = this.context.getClass().getName();
 	}
 
 	public void updateContext(Context cont) {
@@ -95,15 +92,15 @@ public class Frame implements BaseAdComponentInterface {
 	public String getFrameID() {
 		return this.frameID;
 	}
-	
-	private String getTagId(){
-		return this.adArea.imageUrl + this.frameID;
+
+	private String getTagId() {
+		return this.ad.getImageUrl() + this.frameID;
 	}
 
 	public void removeComponent() {
 		Activity parent = (Activity) context;
 		Window window = parent.getWindow();
-		
+
 		ViewGroup mainView = ((ViewGroup) window.findViewById(
 				android.R.id.content).getParent());
 
@@ -112,153 +109,104 @@ public class Frame implements BaseAdComponentInterface {
 
 			if (view.getChildCount() > 0) {
 				for (int j = 0; j < view.getChildCount(); j++) {
-	
-					if (view.getChildAt(j) != null && this.adArea != null) {
-						
+
+					if (view.getChildAt(j) != null && this.adAreaView != null) {
+
 						if (view.getChildAt(j).getTag() != null
 								&& view.getChildAt(j).getTag()
-										.equals(this.getTagId())){
-							
+										.equals(this.getTagId())) {
+
 							view.removeView(view.getChildAt(j));
-						
+
 						}
-					}					
+					}
 				}
 			}
 		}
 	}
 
-	public void refreshProperties(JSONObject properties) {
+	public void refreshData(AdResponse data) {
 		this.removeComponent();
-		this.properties = properties;
+		this.background = data.getBackground();
+		this.button = data.getCloseButton();
+		this.location = data.getLocation();
+		this.ad = data.getAds().iterator().next();
+		this.expirationSeconds = data.getExpirationSeconds();
+
+		this.receivedData = true;
+
 		this.initAdComponents();
 	}
 
 	private void initAdComponents() {
-		try {
+		Coordinates coordinates = getBackgroundOrientation(background);
+		
+		this.backgroundView = new AdView(coordinates.getX(),
+				coordinates.getY(), background.getHeight(),
+				background.getWidth(), background.getImageUrl(), this, context,
+				ImageType.AD_BACKGROUND);
 
-			this.background = new BaseAdComponent(
-					this.properties.getJSONObject(resourceBundle
-							.getString("frameResponseBackgroundInfo")), this,
-					context, ImageType.adBackground);
-			this.adArea = new BaseAdComponent(this.mergedAdInfoProperties(),
-					this, context, ImageType.adClicked);
-			this.closeButton = new BaseAdComponent(
-					this.properties.getJSONObject(resourceBundle
-							.getString("frameResponseCloseButtonInfo")), this,
-					context, ImageType.adClosed);
+		int adX = coordinates.getX() + this.location.getX();
+		int adY = coordinates.getY() + this.location.getY();
 
-			this.expirationSeconds = this.properties.getInt(this.resourceBundle
-					.getString("frameResponseExpiration"));
+		this.adAreaView = new AdView(adX, adY, location.getHeight(),
+				location.getWidth(), ad.getImageUrl(), this, context,
+				ImageType.AD_CLICKED);
 
-			this.background.layoutComponents(0, 0);
-			this.adArea.layoutComponents(this.background.xOffset,
-					this.background.yOffset);
-			this.closeButton.layoutComponents(this.background.xOffset,
-					this.background.yOffset);
+		if (button.hasImage()) {
+			int closeX = coordinates.getX() + button.getX();
+			int closeY = coordinates.getY() + button.getY();
 
-			this.checkForNullInfo();
-
-			this.background.layout.setTag(this.adArea.imageUrl + ""
-					+ this.frameID);
-
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.closeButtonView = new AdView(closeX, closeY,
+					button.getHeight(), button.getWidth(), button.getImage(),
+					this, context, ImageType.AD_CLOSED);
+		} else {
+			this.closeButtonView = null;
 		}
+
+		this.backgroundView.getLayout().setTag(this.getTagId());
 	}
 
-	private void checkForNullInfo() {
-		if (this.background.imageUrl == null
-				|| this.background.imageUrl.equals("null")) {
-			this.background.setUpLayoutParameters();
-			this.background.status = AdComponentStatus.adComponentStatusCompleted;
-		}
-
-		if (this.closeButton.imageUrl == null
-				|| this.closeButton.imageUrl.equals("null")) {
-			this.closeButton.status = AdComponentStatus.adComponentStatusCompleted;
-		}
-		this.baseAdComponentReady();
-	}
-
-	private JSONObject mergedAdInfoProperties() {
-
-		JSONObject adInfo = this.determineAdInfoToUse();
-		JSONObject adLocationInfo = new JSONObject();
-
-		try {
-			adLocationInfo = this.properties.getJSONObject(this.resourceBundle
-					.getString("frameResponseAdLocationInfo"));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		JSONObject merged = new JSONObject();
-		JSONObject[] objs = new JSONObject[] { adInfo, adLocationInfo };
-		for (JSONObject obj : objs) {
-			@SuppressWarnings("unchecked")
-			Iterator<String> it = obj.keys();
-			while (it.hasNext()) {
-				String key = it.next();
-				try {
-					merged.put(key, obj.get(key));
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-
-		return merged;
-	}
-
-	private JSONObject determineAdInfoToUse() {
-		try {
-
-			return this.properties.getJSONArray(
-					this.resourceBundle.getString("frameResponseAds"))
-					.getJSONObject(0);
-
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+	private Coordinates getBackgroundOrientation(Background background) {
+		
+		if(background.getOrientation() == Orientation.LANDSCAPE)
+			return background.getLandscape();
+		
+		if(background.getOrientation() == Orientation.PORTRAIT)
+			return background.getPortrait();
+		
+		Configuration config = context.getResources().getConfiguration();
+		if(config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+			return background.getLandscape();
+		return background.getPortrait();
 	}
 
 	public DisplayResult start() {
-
-		this.display = true;
-
-		if (this.properties != null) {
-			try {
-				PlaynomicsSession.impression(this.adArea.properties
-						.getString(this.resourceBundle
-								.getString("frameResponseAd_ImpressionUrl")));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
+		this.shouldDisplay = true;
 		if (this.allComponentsLoaded()) {
 			this.display();
-			return DisplayResult.displayResultDisplayed;
+			return DisplayResult.DISPLAYED;
 		} else {
-			return DisplayResult.displayResultDisplayPending;
+			return DisplayResult.DISPLAY_PENDING;
 		}
 	}
 
 	public boolean allComponentsLoaded() {
-		if (this.properties == null) {
+		if(!this.receivedData) {
 			return false;
-		} else {
-			return (this.background.status == AdComponentStatus.adComponentStatusCompleted
-					&& this.adArea.status == AdComponentStatus.adComponentStatusCompleted 
-					&& this.closeButton.status == AdComponentStatus.adComponentStatusCompleted);
 		}
+		
+		boolean backgroundReady = this.backgroundView != null
+				&& this.backgroundView.getStatus() == ViewStatus.COMPLETED;
+		
+		boolean closeReady =  !this.button.hasImage()
+				|| (this.closeButtonView != null && this.closeButtonView
+						.getStatus() == ViewStatus.COMPLETED);
+		
+		boolean adReady = this.adAreaView != null
+				&& this.adAreaView.getStatus() == ViewStatus.COMPLETED;
+
+		return backgroundReady && adReady && closeReady;
 	}
 
 	public void startExpiryTimer() {
@@ -287,26 +235,21 @@ public class Frame implements BaseAdComponentInterface {
 		Window window = parent.getWindow();
 		ViewGroup mainView = ((ViewGroup) window.findViewById(
 				android.R.id.content).getParent());
-		
+
 		// need to do checks and see if there are groups inside groups with
 		// views inside views
-		for (int i = 0; i < mainView.getChildCount(); i++){
-			
+		for (int i = 0; i < mainView.getChildCount(); i++) {
 			ViewGroup v = (ViewGroup) mainView.getChildAt(i);
-
 			if (v.getChildCount() > 0) {
-
 				for (int j = 0; j < v.getChildCount(); j++) {
 
 					if (v.getChildAt(j).getTag() != null
-							&& v.getChildAt(j)
-									.getTag()
-									.equals(this.getTagId())) {
-						
+							&& v.getChildAt(j).getTag().equals(this.getTagId())) {
+
 						v.removeViewAt(j);
-						Messaging.frameRemoveFrame(this.frameID);
+						Messaging.clearFrameFromContext(context, frameID);
 						return;
-					
+
 					}
 				}
 			}
@@ -321,143 +264,90 @@ public class Frame implements BaseAdComponentInterface {
 	private void adClicked(MotionEvent event) {
 		int x = (int) event.getX();
 		int y = (int) event.getY();
-		String preExecuteUrl = null;
-		String postExecuteUrl = null;
-		String clickTarget = null;
+		String preExecuteUrl = this.ad.getPreExecutionUrl();
+		String postExecuteUrl = this.ad.getPostExecutionUrl();
+		String clickTarget = this.ad.getTargetUrlForClick();
+		Ad.AdTargetType targetType = this.ad.getTargetType();
 
-		try {
-			if( this.adArea.properties.has(this.resourceBundle
-							.getString("frameResponseAd_PreExecuteUrl")))
-			{
-				preExecuteUrl = this.adArea.properties
-						.getString(this.resourceBundle
-								.getString("frameResponseAd_PreExecuteUrl"));
-			}
-			
-			if( this.adArea.properties.has(this.resourceBundle
-					.getString("frameResponseAd_PreExecuteUrl")))
-			{
-				postExecuteUrl = this.adArea.properties
-						.getString(this.resourceBundle
-						.getString("frameResponseAd_PostExecuteUrl"));
-			}
-			
-			clickTarget = this.adArea.properties.getString(this.resourceBundle
-					.getString("frameResponseAd_ClickTarget"));
-
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (clickTarget == null) {
+			return;
 		}
 
-		if (clickTarget != null) {
+		Exception exec = null;
+		int statusCode;
 
-			Exception exec = null;
-			int statusCode;
+		if (targetType == Ad.AdTargetType.WEB) {
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse(clickTarget));
+			this.context.startActivity(browserIntent);
 
-			AdAction actionType = this.determineActionType(clickTarget);
-			String actionLabel = this.determineActionLabel(clickTarget);
-			
-			if (actionType.equals(AdAction.AdActionHTTP)) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-						Uri.parse(clickTarget));
-				this.context.startActivity(browserIntent);
-			} else if (actionType.equals(AdAction.AdActionDefinedAction) || 
-					actionType.equals(AdAction.AdActionExecuteCode)) {
+		} else if (targetType == Ad.AdTargetType.PNA
+				|| targetType == Ad.AdTargetType.PNX) {
 
-				if(preExecuteUrl != null)
-					PlaynomicsSession.preExecution(preExecuteUrl, x, y);
-			
-				if(actionType.equals(AdAction.AdActionDefinedAction)){
+			if (preExecuteUrl != null)
+				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
+
+			if (targetType == Ad.AdTargetType.PNA) {
+				try {
+					Messaging.performActionForLabel(context, clickTarget);
+					statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
+				} catch (Exception e) {
+					statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
+					exec = e;
+				}
+			} else {
+				if (this.adEnabledCode) {
 					try {
-						Messaging.performActionForLabel(actionLabel);
+						Messaging.executeActionOnDelegate(context, clickTarget);
 						statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
 					} catch (Exception e) {
-						statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
+						statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
 						exec = e;
 					}
 				} else {
-					if (this.adEnabledCode) {
-						try {
-							Messaging.executeActionOnDelegate(actionLabel);
-							statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
-						} catch (Exception e) {
-							statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
-							exec = e;
-						}
-					} else {
-						statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
-					}
+					statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
 				}
-				
-				if(postExecuteUrl != null){	
-					PlaynomicsSession.postExecution(postExecuteUrl, 
-							statusCode, exec);
-				}
-			} else {
-				//log error 
 			}
-		}
-	}
 
-	private AdAction determineActionType(String clickTargetUrl) {
-		String protocol = clickTargetUrl.substring(0,
-				clickTargetUrl.indexOf(":"));
-
-		if (protocol
-				.equals(this.resourceBundle.getString("HTTP_ACTION_PREFIX"))
-				|| protocol.equals(this.resourceBundle
-						.getString("HTTPS_ACTION_PREFIX"))) {
-			return AdAction.AdActionHTTP;
-		} else if (protocol.equals(this.resourceBundle
-				.getString("PNACTION_ACTION_PREFIX"))) {
-			return AdAction.AdActionDefinedAction;
-		} else if (protocol.equals(this.resourceBundle
-				.getString("PNEXECUTE_ACTION_PREFIX"))) {
-			return AdAction.AdActionExecuteCode;
+			if (postExecuteUrl != null) {
+				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
+						exec);
+			}
 		} else {
-			return AdAction.AdActionUnkown;
+			// log error
 		}
 	}
 
-	private String determineActionLabel(String clickTargetUrl) {
-		String resource = clickTargetUrl.substring(clickTargetUrl.indexOf(":"));
-		resource.replaceAll("/", "");
-		return resource;
-	}
-	
 	public void notifyDelegate() {
-		Messaging.refreshWithId(this.frameID);
+		Messaging.refreshWithId(context, this.frameID);
 	}
 
 	@Override
 	public void baseAdComponentReady() {
 		if (this.allComponentsLoaded()) {
-			this.background.addSubComponent(this.adArea);
-			this.background.addSubComponent(this.closeButton);
+			this.backgroundView.addChildView(this.adAreaView);
+			if (closeButtonView != null) {
+				this.backgroundView.addChildView(this.closeButtonView);
+			}
 
-			if (this.display) {
+			if (this.shouldDisplay) {
 				this.display();
 			}
 		}
 	}
 
-	public void display() {	
-		if(!this.hasBeenShown){
-			try {
-				PlaynomicsSession.impression(this.adArea.properties
-						.getString(this.resourceBundle
-								.getString("frameResponseAd_ImpressionUrl")));
-			} catch (JSONException e) {
-			}
-			this.hasBeenShown = true;
+	public void display() {
+		if (!this.shown) {
+			PlaynomicsSession.impression(this.ad.getImpressionUrl());
+			this.shown = true;
 		}
-		
+
 		this.startExpiryTimer();
+		
 		Activity parent = (Activity) this.context;
 		Window window = parent.getWindow();
-		window.addContentView(this.background.layout, new LayoutParams(
-				RelativeLayout.LayoutParams.WRAP_CONTENT,
-				RelativeLayout.LayoutParams.WRAP_CONTENT));
+		window.addContentView(this.backgroundView.getLayout(),
+				new LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+						RelativeLayout.LayoutParams.WRAP_CONTENT));
 	}
 }

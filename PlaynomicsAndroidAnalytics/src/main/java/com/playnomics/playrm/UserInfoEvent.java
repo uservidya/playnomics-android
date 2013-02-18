@@ -46,47 +46,38 @@ class UserInfoEvent extends PlaynomicsEvent {
 	}
 
 	public void setType(UserInfoType type) {
-
 		this.type = type;
 	}
 
 	public String getCountry() {
-
 		return country;
 	}
 
 	public void setCountry(String country) {
-
 		this.country = country;
 	}
 
 	public String getSubdivision() {
-
 		return subdivision;
 	}
 
 	public void setSubdivision(String subdivision) {
-
 		this.subdivision = subdivision;
 	}
 
 	public UserInfoSex getSex() {
-
 		return sex;
 	}
 
 	public void setSex(UserInfoSex sex) {
-
 		this.sex = sex;
 	}
 
 	public Date getBirthday() {
-
 		return birthday;
 	}
 
 	public void setBirthday(Date birthday) {
-
 		this.birthday = birthday;
 	}
 
@@ -96,22 +87,18 @@ class UserInfoEvent extends PlaynomicsEvent {
 	}
 
 	public void setSource(String source) {
-
 		this.source = source;
 	}
 
 	public String getSourceCampaign() {
-
 		return sourceCampaign;
 	}
 
 	public void setSourceCampaign(String sourceCampaign) {
-
 		this.sourceCampaign = sourceCampaign;
 	}
 
 	public Date getInstallTime() {
-
 		return installTime;
 	}
 

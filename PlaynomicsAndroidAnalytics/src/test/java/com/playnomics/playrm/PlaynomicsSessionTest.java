@@ -6,17 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.playnomics.playrm.BasicEvent;
-import com.playnomics.playrm.ErrorEvent;
-import com.playnomics.playrm.EventSender;
-import com.playnomics.playrm.GameEvent;
-import com.playnomics.playrm.PlaynomicsEvent;
-import com.playnomics.playrm.RandomGenerator;
-import com.playnomics.playrm.SocialEvent;
-import com.playnomics.playrm.TransactionEvent;
-import com.playnomics.playrm.UserInfoEvent;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
 import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
@@ -27,10 +19,14 @@ import com.playnomics.playrm.PlaynomicsEvent.EventType;
 
 public class PlaynomicsSessionTest {
 	
+	@BeforeClass 
+	public static void setUp(){
+		PlaynomicsSession.setTestMode(true);
+		PlaynomicsLogger.setEnabled(false);
+	}
+	
 	@Test
 	public void testEvents() {
-		
-		PlaynomicsSession.setTestMode(true);
 		
 		EventSender es = new EventSender();
 		List<PlaynomicsEvent> eventList = new ArrayList<PlaynomicsEvent>();

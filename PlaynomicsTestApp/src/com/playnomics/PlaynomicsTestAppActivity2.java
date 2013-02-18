@@ -64,7 +64,7 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 	public void initMsgFrame(String frameId){
 		// Retrieve the ad frame you need using the provided Frame ID and start it.  Once all of the assets are loaded
 	    // the frame will display itself.
-		frame = Messaging.initWithFrameID(frameId);
+		frame = Messaging.initWithFrameID(frameId, this);
 		frame.setEnableAdCode(true);
 		
 		DisplayResult result = frame.start();
