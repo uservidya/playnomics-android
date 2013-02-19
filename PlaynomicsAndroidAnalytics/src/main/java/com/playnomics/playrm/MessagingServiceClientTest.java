@@ -47,7 +47,7 @@ public class MessagingServiceClientTest extends MessagingServiceClient {
 			AdResponse responseData = null;
 
 			if (frameId == "noCloseButton") {
-				Location location = new Location(0, 0, 270, 320);
+				Location location = new Location(10, 10, 300, 250);
 
 				Ad adToShow = new Ad(adImage, targetWebUrl, impressionUrl,
 						null, null, null);

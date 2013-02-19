@@ -4,10 +4,10 @@ import android.view.MotionEvent;
 
 public interface AdEventHandler {
 
-	public void baseAdComponentClose();
+	public void adViewClose();
 
-	public void baseAdComponentOpen(MotionEvent event);
+	public void adViewClicked(MotionEvent event);
 
-	public void baseAdComponentReady();
+	public void onAdViewLoaded();
 
 }

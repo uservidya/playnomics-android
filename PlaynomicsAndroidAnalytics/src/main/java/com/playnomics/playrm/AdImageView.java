@@ -6,6 +6,7 @@ import java.net.URL;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.view.MotionEvent;
@@ -16,38 +17,28 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
-public class AdView {
+public class AdImageView extends ImageView {
 	public enum ViewStatus {
 		PENDING, COMPLETED, ERROR
 	};
 
 	public enum ImageType {
-		AD_CLICKED, AD_CLOSED, AD_BACKGROUND
+		CREATIVE, CLOSE_BUTTON, BACKGROUND
 	};
 
-	private FrameLayout layout;
-	public FrameLayout getLayout() {
-		return layout;
-	}
+	private String imageUrl;
+	private AdImageView.ViewStatus status = ViewStatus.PENDING;
 
-	public View view;
-
-	private String imageUrl = null;
-	private AdView.ViewStatus status = ViewStatus.PENDING;
-
-	public AdView.ViewStatus getStatus() {
+	public AdImageView.ViewStatus getStatus() {
 		return this.status;
 	}
 
 	private void setStatus(ViewStatus value) {
 		this.status = value;
 		if (this.status == ViewStatus.COMPLETED) {
-			this.delegate.baseAdComponentReady();
+			this.delegate.onAdViewLoaded();
 		}
 	}
-	
-	private int height;
-	private int width;
 
 	private ImageType imageType;
 
@@ -56,45 +47,24 @@ public class AdView {
 	}
 	
 	private AdEventHandler delegate;
-	private ImageView imageView;
-	
-	public ImageView getImageView(){
-		return this.imageView;
-	}
-	
-	private Context context;
 
-	public AdView(int topX, int topY, int height, int width, String imageUrl,
-			Frame parentFrame, Context cont, ImageType imageType) {
-		
-		this.context = cont;
-		this.height = height;
-		this.width = width;
-		this.layout = new FrameLayout(this.context);	
+	public AdImageView(int x, int y, int height, int width, String imageUrl, 
+			AdEventHandler handler, Context cont, ImageType imageType) {
+		super(cont);
 		this.imageType = imageType;
-		
-		//set the height and width all of the time
-		setLayout(topX, topY);
-		this.delegate = parentFrame;
+		this.delegate = handler;
 		this.imageUrl = imageUrl;
-		if (this.imageUrl == null && this.imageUrl.length() > 0 && 
-				this.width > 0 && this.height > 0) {
+		if (this.imageUrl == null || this.imageUrl.length() < 0 || 
+				!(width > 0 && height > 0)) {
 			// no image to load so we'll just that say
 			// that is ready to go
 			setStatus(ViewStatus.COMPLETED);
 		} else {
-			this.startImageDownload();
+			this.startImageDownload(x, y, width, height);
 		}
 	}
 	
-	public void setLayout(int x, int y){
-		LayoutParams params = new LayoutParams(width, height);
-		params.setMargins(x, y, 0, 0);
-		this.layout.setLayoutParams(params);
-	}
-
-	
-	private void startImageDownload() {
+	private void startImageDownload(final int x, final int y, final int width, final int height) {
 		AsyncTask<Void, Void, Drawable> task = new AsyncTask<Void, Void, Drawable>() {
 			@Override
 			protected Drawable doInBackground(Void... params) {
@@ -109,7 +79,7 @@ public class AdView {
 			}
 
 			protected void onPostExecute(Drawable result) {
-				handleImageDownload(result);
+				handleImageDownload(result, x, y, width, height);
 			}
 		};
 		task.execute((Void) null);
@@ -134,39 +104,52 @@ public class AdView {
 //		this.setStatus(ViewStatus.COMPLETED);
 //	}
 
-	private void handleImageDownload(Drawable result) {
+	private void handleImageDownload(Drawable result, int x, int y, 
+			int width, int height) {
 		if (result != null) {
-			this.imageView = new ImageView(this.context);
-			this.imageView.setImageDrawable(result);
-			this.imageView.setMaxHeight(height);
-			this.imageView.setMinimumHeight(height);
-			this.imageView.setMaxWidth(width);
-			this.imageView.setMinimumWidth(width);
+//			setMaxHeight(height);
+//			setMinimumHeight(height);
+//			setMaxWidth(width);
+//			setMinimumWidth(width);
+			LayoutParams layoutParams = new LayoutParams(width, height);
+			layoutParams.leftMargin = x;
+			layoutParams.topMargin = y;
+			setLayoutParams(layoutParams);
 			
-			this.imageView.setOnClickListener(new ImageView.OnClickListener() {
-				public void onClick(View v) {
-					if (imageType == ImageType.AD_CLOSED) {
+			//just for debugging
+//			if(this.imageType == ImageType.BACKGROUND){
+//				setBackgroundColor(Color.BLUE);
+//			} else if (this.imageType == ImageType.CREATIVE) {
+//				setBackgroundColor(Color.WHITE);
+//			} else {
+//				setBackgroundColor(Color.RED);
+//			}
+			
+			setImageDrawable(result);
+			
+			if (imageType == ImageType.CLOSE_BUTTON) {
+				setOnClickListener(new ImageView.OnClickListener() {
+					public void onClick(View v) {
 						// Close button has been clicked, should remove the ad
 						// here
-						delegate.baseAdComponentClose();
+						delegate.adViewClose();
 					}
-				}
-			});
-
-			LayoutParams layoutParams = new LayoutParams(
-					RelativeLayout.LayoutParams.WRAP_CONTENT,
-					RelativeLayout.LayoutParams.WRAP_CONTENT);
-
-			this.imageView.setLayoutParams(layoutParams);
-			this.layout.addView(imageView);
-
+				});
+			}
+			
+			if(imageType == ImageType.CREATIVE){
+				setOnTouchListener(new OnTouchListener() {
+					@Override
+					public boolean onTouch(View view, MotionEvent e) {
+						delegate.adViewClicked(e);
+						return false;
+					}
+				});
+			}
+			
 			this.setStatus(ViewStatus.COMPLETED);
 		} else {
 			this.setStatus(ViewStatus.ERROR);
 		}
-	}
-
-	public void addChildView(AdView cildView) {
-		this.layout.addView(cildView.getLayout());
 	}
 }

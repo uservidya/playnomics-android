@@ -5,11 +5,11 @@ class Location extends Coordinates {
 	private int height;
 
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 
 	public int getHeight() {
-		return height;
+		return this.height;
 	}
 
 	public Location(int x, int y, int width, int height) {

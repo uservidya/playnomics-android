@@ -15,7 +15,7 @@ class Background {
 		this.imageUrl = image;
 		this.orientation = orientation;
 		this.landscape = new Coordinates(landscapeX, landscapeY);
-		this.portrait = new Coordinates(landscapeX, landscapeY);
+		this.portrait = new Coordinates(portraitX, portraitY);
 	}
 
 	private Coordinates landscape;
