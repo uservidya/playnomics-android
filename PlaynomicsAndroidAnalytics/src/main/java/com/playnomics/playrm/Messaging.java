@@ -16,16 +16,14 @@ public class Messaging {
 	private static Map<String,ConcurrentHashMap<String,Frame>> activityFrames 
 		= new HashMap<String,ConcurrentHashMap<String,Frame>>();
 	
-	public static void setup(Activity activity) {
+	public static void setup(final Activity activity) {
 		String key = getKeyForActivity(activity);
-		
 		if(activityFrames.containsKey(key)){
 			ConcurrentHashMap<String,Frame> framesById = activityFrames.get(key);
 			for(String frameIdKey : framesById.keySet()){
 				Frame frame = framesById.get(frameIdKey);
 				if(frame != null){
-					String caller = getCaller();
-					fetchDataAsync(activity, key, frameIdKey, caller);
+					frame.updateContext(activity);
 				}
 			}
 		}
@@ -83,25 +81,24 @@ public class Messaging {
 			activityFrames.put(contextKey, framesById);
 		}
 		
-		fetchDataAsync(context, contextKey, frameId, caller);
+		startDataFetchAsync(context, contextKey, frameId, caller);
 		return frame;
 	}
 
-	private static void fetchDataAsync(final Activity activity, final String contextKey, 
+	private static void startDataFetchAsync(final Activity activity, final String contextKey, 
 			final String frameId,  final String caller) {
-		AsyncTask<Void, Void, AdResponse> task = new AsyncTask<Void, Void, AdResponse>() {
-			@Override
-			protected AdResponse doInBackground(Void... params) {	
+		new Thread(new Runnable(){
+			public void run(){
 				DisplayMetrics metrics = activity.getApplicationContext()
 						.getResources().getDisplayMetrics();
 				
 				int width = metrics.widthPixels;
 				int height = metrics.heightPixels;
-
+				
 //				MessagingServiceClient client = new MessagingServiceClient(
-//						serverUrl, PlaynomicsSession.getAppID(),
-//						PlaynomicsSession.getUserID(),
-//						PlaynomicsSession.getCookieID());
+//				serverUrl, PlaynomicsSession.getAppID(),
+//				PlaynomicsSession.getUserID(),
+//				PlaynomicsSession.getCookieID());
 				
 				MessagingServiceClientTest client = new MessagingServiceClientTest
 						(PlaynomicsSession.getResourceBundle(),
@@ -110,21 +107,25 @@ public class Messaging {
 						PlaynomicsSession.getUserID(),
 						PlaynomicsSession.getCookieID());
 				
-				return client.requestAd(frameId, caller, width,
-						height);
-			}
-
-			protected void onPostExecute(AdResponse response) {
+				AdResponse response = client.requestAd(frameId, 
+						caller, width, height);
+				
 				if (response == null) {
 				 	ErrorDetail detail = new ErrorDetail(PlaynomicsErrorType.errorTypeInvalidJson);
 					PlaynomicsSession.errorReport(detail);
 				} else {
-					Frame frame = activityFrames.get(contextKey).get(frameId);
-					frame.refreshData(response, activity);
+					final AdRenderData renderData = new AdRenderData(response);
+					renderData.loadAllImages();
+	
+					final Frame frame = activityFrames.get(contextKey).get(frameId);
+					activity.runOnUiThread(new Runnable(){
+						public void run(){
+							frame.refreshData(renderData);
+						}
+					});
 				}
 			}
-		};
-		task.execute((Void) null);
+		}).start();
 	}
 
 	public static void performActionForLabel(Activity activity, String actionLabel) {
@@ -194,6 +195,6 @@ public class Messaging {
 
 	public static void refreshWithId(Activity activity, String frameId) {
 		String activityKey = getKeyForActivity(activity);
-		fetchDataAsync(activity, activityKey, frameId, "REFRESH CALLER" );
+		startDataFetchAsync(activity, activityKey, frameId, "REFRESH CALLER");
 	}
 }

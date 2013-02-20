@@ -3,7 +3,7 @@ package com.playnomics.playrm;
 class CloseButton extends Location {
 	private String imageUrl;
 
-	public String getImage() {
+	public String getImageUrl() {
 		return imageUrl;
 	}
 	

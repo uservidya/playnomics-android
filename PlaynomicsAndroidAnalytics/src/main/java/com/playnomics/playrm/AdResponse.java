@@ -28,10 +28,20 @@ class AdResponse {
 		return this.closeButton;
 	}
 
+	public boolean hasCloseButtonImage(){
+		return this.closeButton != null &&
+				this.closeButton.getImageUrl() != null;
+	}
+	
 	public Background getBackground() {
 		return this.background;
 	}
 
+	public boolean hasBackgroundImage(){
+		return this.background != null &&
+			this.background.getImageUrl() != null;
+	}
+	
 	public Location getLocation() {
 		return this.location;
 	}
@@ -42,6 +52,11 @@ class AdResponse {
 	
 	public Iterable<Ad> getAds(){
 		return ads;
+	}
+	
+	public Ad getFirstAd(){
+		return ads.size() == 0
+				? null : ads.get(0);
 	}
 
 	public int getExpirationSeconds() {

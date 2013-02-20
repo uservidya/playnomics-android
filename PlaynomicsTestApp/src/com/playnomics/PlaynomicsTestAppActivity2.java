@@ -22,7 +22,6 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 		
 		setContentView(R.layout.main2);
 		text = (EditText)findViewById(R.id.Input_Text);
-		
 		Messaging.setup(this);
 	}
 

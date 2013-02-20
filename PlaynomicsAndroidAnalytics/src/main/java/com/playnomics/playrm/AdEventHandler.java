@@ -3,11 +3,8 @@ package com.playnomics.playrm;
 import android.view.MotionEvent;
 
 public interface AdEventHandler {
+	
+	public void onAdViewClose();
 
-	public void adViewClose();
-
-	public void adViewClicked(MotionEvent event);
-
-	public void onAdViewLoaded();
-
+	public void onAdViewClicked(MotionEvent event);
 }
