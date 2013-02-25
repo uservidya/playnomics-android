@@ -3,68 +3,25 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center"
-    android:orientation="vertical" 
-    android:id="@+id/mainLayout"
-    android:background="@android:color/transparent">
-
-    <TextView
+    android:orientation="vertical">
+   <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Activity 2" />
+   <LinearLayout  
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content">
+       <Spinner
+           android:id="@+id/spnTests"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="left" />
 
-    <Button
-        android:id="@+id/Test_Message_TL"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageTLClick"
-        android:text="Test Message TL" />
-    
-    <Button
-        android:id="@+id/Test_Message_CC"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageCCClick"
-        android:text="Test Message CC" />
-    
-    <Button
-        android:id="@+id/Test_Message_BR"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageBRClick"
-        android:text="Test Message BR" />
-    
-    <Button
-        android:id="@+id/Test_Message_No_Close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageNoCloseClick"
-        android:text="Test Message No Close" />
-    
-    <Button
-        android:id="@+id/Test_Message_Mess_Only"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageMessOnlyClick"
-        android:text="Test Message Mess Only" />
-    
-    <Button 
-        android:id= "@+id/Test_Message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onMessageClick"
-        android:text="Test Message"/>
-    
-    <EditText 
-        android:id="@+id/Input_Text"
-        android:layout_width="100dp"
-        android:layout_height="40dp"
-        android:inputType="text"/>
-    
-    <Button
-        android:id="@+id/switchActivityButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onSwitchActivityClick"
-        android:text="Switch Activity" />
-
-</LinearLayout>
+       <Button 
+           android:id="@+id/btnRunTest"
+           android:text="Run!"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="right" />
+   </LinearLayout>
+ </LinearLayout>

@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.provider.ContactsContract.Contacts.Data;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +40,7 @@ public class Frame implements AdEventHandler {
 	private boolean receivedData = false;
 	// are we currently updating this frame?
 	private AtomicBoolean updatingComponent = new AtomicBoolean(false);
-	
+
 	private final String frameID;
 
 	private Timer expirationTimer;
@@ -56,8 +57,6 @@ public class Frame implements AdEventHandler {
 	private Activity activity;
 	private boolean adEnabledCode = false;
 	private Map<String, Method> actions = null;
-
-	private Map<String, Drawable> imagesByUrl = new HashMap<String, Drawable>();
 
 	private static final String TAG = Frame.class.getSimpleName();
 
@@ -92,15 +91,15 @@ public class Frame implements AdEventHandler {
 	private String getTagId() {
 		return this.frameUUID.toString();
 	}
-	
-	public UUID getFrameCacheKey(){
+
+	public UUID getFrameCacheKey() {
 		return this.frameUUID;
 	}
 
 	public void removeComponent() {
 		if (this.imageContainer == null || this.frameWrapper == null
 				|| this.adAreaView == null) {
-			//nothing to remove so just exit
+			// nothing to remove so just exit
 			return;
 		}
 
@@ -150,6 +149,7 @@ public class Frame implements AdEventHandler {
 				this.removeComponent();
 				this.receivedData = true;
 				this.initAdComponents();
+				this.shown = false;
 				this.render(true);
 			}
 			updatingComponent.set(false);
@@ -165,7 +165,7 @@ public class Frame implements AdEventHandler {
 			updatingComponent.set(false);
 		}
 	}
-	
+
 	private void createImageContainers() {
 		Background background = renderData.getAdResponse().getBackground();
 
@@ -212,24 +212,23 @@ public class Frame implements AdEventHandler {
 	private void initAdComponents() {
 		Background background = renderData.getAdResponse().getBackground();
 		Drawable backgroundImage = renderData.getBackgroundImage();
-		
 		this.backgroundView = new AdImageView(0, 0, background.getHeight(),
 				background.getWidth(), backgroundImage, this, activity,
 				ImageType.BACKGROUND);
 
 		Location location = renderData.getAdResponse().getLocation();
 		Drawable adImage = renderData.getAdImage();
-		
+
 		this.adAreaView = new AdImageView(location.getX(), location.getY(),
-				location.getHeight(), location.getWidth(), adImage, this, activity,
-				ImageType.CREATIVE);
+				location.getHeight(), location.getWidth(), adImage, this,
+				activity, ImageType.CREATIVE);
 
 		Drawable buttonImage = renderData.getCloseButtonImage();
 		if (buttonImage != null) {
 			CloseButton button = renderData.getAdResponse().getCloseButton();
-			this.closeButtonView = new AdImageView(button.getX(), button.getY(),
-					button.getHeight(), button.getWidth(), buttonImage, this,
-					activity, ImageType.CLOSE_BUTTON);
+			this.closeButtonView = new AdImageView(button.getX(),
+					button.getY(), button.getHeight(), button.getWidth(),
+					buttonImage, this, activity, ImageType.CLOSE_BUTTON);
 		} else {
 			this.closeButtonView = null;
 		}
@@ -292,6 +291,12 @@ public class Frame implements AdEventHandler {
 	@Override
 	public void onAdViewClose() {
 		this.stopExpiryTimer();
+		
+		String closeUrl = renderData.getAdResponse().getFirstAd().getCloseUrl();
+		if(closeUrl != null){
+			PlaynomicsSession.closeFrame(closeUrl);
+		}
+		
 		removeComponent();
 		Messaging.clearFrameFromActivity(activity, frameID);
 	}
@@ -365,7 +370,7 @@ public class Frame implements AdEventHandler {
 	public void notifyDelegate() {
 		Messaging.refreshWithId(activity, this.frameID);
 	}
-	
+
 	private void render(boolean resetUpdateTimer) {
 		if (!(this.allComponentsLoaded() && this.shouldDisplay)) {
 			return;
@@ -378,7 +383,7 @@ public class Frame implements AdEventHandler {
 		if (closeButtonView != null) {
 			this.imageContainer.addView(this.closeButtonView);
 		}
-		
+
 		if (!this.shown) {
 			Ad ad = renderData.getAdResponse().getFirstAd();
 			// only log an impression once
@@ -386,13 +391,13 @@ public class Frame implements AdEventHandler {
 			this.shown = true;
 		}
 
-		if(resetUpdateTimer){
+		if (resetUpdateTimer) {
 			this.startExpiryTimer();
 		}
-	
+
 		Activity parent = this.activity;
 		Window window = parent.getWindow();
 		window.addContentView(this.frameWrapper, new LayoutParams(
-					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+				LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 	}
 }

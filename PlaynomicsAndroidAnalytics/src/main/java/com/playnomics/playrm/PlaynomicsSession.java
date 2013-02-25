@@ -986,6 +986,12 @@ public class PlaynomicsSession {
 		PlaynomicsLogger.d(TAG, "postExecution is being queued.");
 		sendOrQueueEvent(event);
 	}
+	
+	protected static void closeFrame(String closeUrl){
+		CloseFrameEvent event = new CloseFrameEvent(closeUrl);
+		PlaynomicsLogger.d(TAG, "postExecution is being queued.");
+		sendOrQueueEvent(event);
+	}
 
 	private static APIResult sendOrQueueEvent(PlaynomicsEvent pe) {
 

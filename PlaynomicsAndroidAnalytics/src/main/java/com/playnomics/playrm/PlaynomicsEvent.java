@@ -8,7 +8,9 @@ abstract class PlaynomicsEvent implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	protected enum EventType {
-		appStart, appPage, appRunning, appPause, appResume, appStop, userInfo, sessionStart, sessionEnd, gameStart, gameEnd, transaction, invitationSent, invitationResponse, milestone
+		appStart, appPage, appRunning, appPause, appResume, appStop, 
+		userInfo, sessionStart, sessionEnd, gameStart, gameEnd, transaction,
+		invitationSent, invitationResponse, milestone, 
 	};
 
 	private EventType eventType;
