@@ -1,10 +1,10 @@
 package com.playnomics.playrm;
 
 class Ad {
-	private final String pnxPrefix = "pnx://";
-	private final String pnaPrefix = "pna://";
-	private final String httpPrefix = "http://";
-	private final String httpsPrefix = "https://";
+	private final String PNX_PREFIX = "pnx://";
+	private final String PNA_PREFIX = "pna://";
+	private final String HTTP_PREFIX = "http://";
+	private final String HTTPS_PREFIX = "https://";
 
 	public enum AdTargetType {
 		WEB, PNX, PNA, UNKNOWN
@@ -23,20 +23,21 @@ class Ad {
 		this.imageUrl = imageUrl;
 		this.targetUrl = target;
 		this.impressionUrl = impression;
-
-		if (targetUrl.startsWith(httpPrefix)
-				|| targetUrl.startsWith(httpsPrefix)) {
+		this.preExecutionUrl = preExecute;
+		this.postExecutionUrl = postExecute;
+		this.closeUrl = closeUrl;
+		
+		if (targetUrl.startsWith(HTTP_PREFIX)
+				|| targetUrl.startsWith(HTTPS_PREFIX)) {
 			this.targetType = AdTargetType.WEB;
-		} else if (targetUrl.startsWith(pnaPrefix)) {
+		} else if (targetUrl.startsWith(PNA_PREFIX)) {
 			this.targetType = AdTargetType.PNA;
-		} else if (targetUrl.startsWith(pnxPrefix)) {
+		} else if (targetUrl.startsWith(PNX_PREFIX)) {
 			this.targetType = AdTargetType.PNX;
 		} else {
 			this.targetType = AdTargetType.UNKNOWN;
 		}
-		this.closeUrl = closeUrl;
 	}
-
 
 	public AdTargetType getTargetType() {
 		return targetType;
@@ -52,13 +53,12 @@ class Ad {
 		}
 
 		if (targetType == AdTargetType.PNA) {
-			return this.targetUrl.replace(pnaPrefix, "");
+			return this.targetUrl.replace(PNA_PREFIX, "");
 		}
 
 		if (targetType == AdTargetType.PNX) {
-			return this.targetUrl.replace(pnxPrefix, "");
+			return this.targetUrl.replace(PNX_PREFIX, "");
 		}
-
 		return null;
 	}
 

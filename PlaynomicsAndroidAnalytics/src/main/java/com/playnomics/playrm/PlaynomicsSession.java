@@ -989,7 +989,7 @@ public class PlaynomicsSession {
 	
 	protected static void closeFrame(String closeUrl){
 		CloseFrameEvent event = new CloseFrameEvent(closeUrl);
-		PlaynomicsLogger.d(TAG, "postExecution is being queued.");
+		PlaynomicsLogger.d(TAG, "closeFrameEvent is being queued.");
 		sendOrQueueEvent(event);
 	}
 

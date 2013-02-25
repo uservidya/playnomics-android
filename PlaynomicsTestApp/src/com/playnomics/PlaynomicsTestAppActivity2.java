@@ -42,13 +42,14 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 		adapter.add("CloseButton");
 		adapter.add("NoBackground");
 		adapter.add("BadData");
-		adapter.add("NoReception");
 		adapter.add("BadBackgroundImage");
 		adapter.add("GoodPNA");
 		adapter.add("BadPNA");
 		adapter.add("GoodPNX");
 		adapter.add("BadPNX");
-
+		adapter.add("FixedLandscape");
+		adapter.add("FixedPortrait");
+		
 		spin.setAdapter(adapter);
 		Button btnTest = (Button) findViewById(R.id.btnRunTest);
 		btnTest.setOnClickListener(btnTestClickListener);
@@ -82,15 +83,6 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 		frame.setEnableAdCode(true);
 
 		DisplayResult result = frame.start();
-	}
-
-	public void someRandomExecution() {
-		Toast.makeText(this, "PNX called!", Toast.LENGTH_LONG).show();
-		Log.d(logTag, "PNX:// someRandomExecution() is being performed!!!");
-	}
-
-	public static void sampleMethod() {
-		Log.d(logTag, "PNA:// someRandomExecution() is being performed!!!");
 	}
 	
 	public void myGoodMethod(){

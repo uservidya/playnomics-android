@@ -332,9 +332,10 @@ public class Frame implements AdEventHandler {
 		} else if (targetType == Ad.AdTargetType.PNA
 				|| targetType == Ad.AdTargetType.PNX) {
 
-			if (preExecuteUrl != null)
+			if (preExecuteUrl != null){
 				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
-
+			}
+			
 			if (targetType == Ad.AdTargetType.PNA) {
 				try {
 					Messaging.performActionForLabel(activity, clickTarget);
@@ -359,8 +360,8 @@ public class Frame implements AdEventHandler {
 			}
 
 			if (postExecuteUrl != null) {
-				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
-						exec);
+				PlaynomicsSession.postExecution(postExecuteUrl,
+						statusCode, exec);
 			}
 		} else {
 			// log error

@@ -19,13 +19,15 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		public static final String NoBackground = "NoBackground";
 		public static final String BadData = "BadData";
 		public static final String BadBackgroundImage = "BadBackgroundImage";
-		public static final String NoReception = "NoReception";
 		public static final String BadAdImage = "BadAdImage";
 		public static final String BadCloseButtonImage = "BadCloseButtonImage";
 		public static final String GoodPNA = "GoodPNA";
 		public static final String BadPNA = "BadPNA";
 		public static final String GoodPNX = "GoodPNX";
 		public static final String BadPNX = "BadPNX";
+
+		public static final String FixedPortrait = "FixedPortrait";
+		public static final String FixedLandscape = "FixedLandscape";
 	}
 
 	@Override
@@ -42,9 +44,9 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 
 		final String adImage = getRotatedAdImage(true);
 		final String preExecuteUrl = "http://www.google.com";
-		final String postExecureUrl = "http://www.nytimes.com"; 
-		
-		Background background = getBackground(Orientation.DETECT, true);	
+		final String postExecureUrl = "http://www.nytimes.com";
+
+		Background background = getBackground(Orientation.DETECT, true, width, height);
 		CloseButton button = getCloseButton(true);
 		// should never shown
 		Ad secondAd = new Ad("", "http://www.google.com", impressionUrl, null,
@@ -52,12 +54,15 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 
 		Location location = new Location(10, 10, 300, 250);
 
-
 		Ad adToShow;
 		adToShow = new Ad(adImage, targetWebUrl, impressionUrl, null, null,
 				closeUrl);
-		
-		if (frameId == testCases.NoCloseButton) {
+
+		if (frameId == testCases.FixedPortrait) {
+			background = getBackground(Orientation.PORTRAIT, true, width, height);
+		} else if (frameId == testCases.FixedLandscape) {
+			background = getBackground(Orientation.LANDSCAPE, true, width, height);
+		} else if (frameId == testCases.NoCloseButton) {
 			button = getCloseButtonNoImage();
 		} else if (frameId == testCases.NoBackground) {
 			background = getBackgroundNoImage(Orientation.DETECT);
@@ -65,19 +70,17 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 			adToShow = new Ad(getRotatedAdImage(false), targetWebUrl,
 					impressionUrl, null, null, closeUrl);
 		} else if (frameId == testCases.BadBackgroundImage) {
-			background = getBackground(Orientation.DETECT, false);
+			background = getBackground(Orientation.DETECT, false, width, height);
 		} else if (frameId == testCases.BadCloseButtonImage) {
-			button = getCloseButton(false); 
+			button = getCloseButton(false);
 		} else if (frameId == testCases.BadData) {
-			//not sure how to test this just yet
-		} else if (frameId == testCases.BadPNA) {
-			
+			// not sure how to test this just yet
 		} else if (frameId == testCases.GoodPNA) {
 			adToShow = new Ad(getRotatedAdImage(true), goodPNA, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl); 
+					preExecuteUrl, postExecureUrl, closeUrl);
 		} else if (frameId == testCases.BadPNA) {
 			adToShow = new Ad(getRotatedAdImage(true), badPNA, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl); 
+					preExecuteUrl, postExecureUrl, closeUrl);
 		} else if (frameId == testCases.GoodPNX) {
 			adToShow = new Ad(getRotatedAdImage(true), goodPNX, impressionUrl,
 					preExecuteUrl, postExecureUrl, closeUrl);
@@ -93,12 +96,20 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		return responseData;
 	}
 
-	private Background getBackground(Orientation orientation, boolean validImage) {
+	private Background getBackground(Orientation orientation,
+			boolean validImage, int screenWidth, int screenHeight) {
 		final String backgroundImage = validImage ? "http://pn-assets-development.s3.amazonaws.com/manual/mBack.png"
 				: "http://pn-assets-development.s3.amazonaws.com/manual/invalidImage.png";
 
-		return new Background(backgroundImage, orientation, 270, 320, 10, 10,
-				40, 20);
+		int width = 320;
+		int height = 270;
+		int landscapeX = (int) (Math.random() * (screenWidth - width));
+		int portraitX = (int) (Math.random() * (screenWidth - width));
+		int landscapteY = (int) (Math.random() * (screenHeight - height));
+		int portraitY = (int) (Math.random() * (screenHeight - height));
+
+		return new Background(backgroundImage, orientation, 270, 320,
+				landscapeX, landscapteY, portraitX, portraitY);
 	}
 
 	private Background getBackgroundNoImage(Orientation orientation) {
@@ -112,16 +123,15 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		return (requestCount++) % 2 == 0 ? "https://pn-assets-development.s3.amazonaws.com/manual/m3p.gif"
 				: "https://pn-assets-development.s3.amazonaws.com/manual/m3r.gif";
 	}
-	
-	private CloseButton getCloseButton(boolean validImage){
-		String imageUrl = validImage ? 
-				"http://pn-assets-development.s3.amazonaws.com/manual/mClose.png" : 
-				"http://pn-assets-development.s3.amazonaws.com/manual/brokenClose.png";
-		
+
+	private CloseButton getCloseButton(boolean validImage) {
+		String imageUrl = validImage ? "http://pn-assets-development.s3.amazonaws.com/manual/mClose.png"
+				: "http://pn-assets-development.s3.amazonaws.com/manual/brokenClose.png";
+
 		return new CloseButton(210, 10, 10, 10, imageUrl);
 	}
-	
-	private CloseButton getCloseButtonNoImage(){
+
+	private CloseButton getCloseButtonNoImage() {
 		return new CloseButton(210, 10, 10, 10, null);
 	}
 }

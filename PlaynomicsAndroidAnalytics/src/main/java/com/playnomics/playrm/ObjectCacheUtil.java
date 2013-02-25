@@ -49,7 +49,6 @@ class ObjectCacheUtil {
 		Object simpleClass = null;
 		FileInputStream fis = null;
 		ObjectInputStream is = null;
-		// boolean keep = true;
 
 		try {
 

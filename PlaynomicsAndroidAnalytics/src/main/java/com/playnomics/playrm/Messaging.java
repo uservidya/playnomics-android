@@ -148,8 +148,6 @@ public class Messaging {
 
 	public static void performActionForLabel(Activity activity,
 			String actionLabel) {
-
-		actionLabel = actionLabel.substring(3);
 		Method method = null;
 
 		try {
@@ -182,35 +180,7 @@ public class Messaging {
 
 	public static void executeActionOnDelegate(Activity activity,
 			String actionLabel) {
-		actionLabel = actionLabel.substring(3);
-		Method method = null;
-
-		try {
-			method = activity.getClass().getMethod(actionLabel, null);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (method == null) {
-			return;
-		} else {
-			try {
-				method.invoke(activity.getClass().cast(activity));
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		performActionForLabel(activity, actionLabel);
 	}
 
 	public static void refreshWithId(Activity activity, String frameId) {
