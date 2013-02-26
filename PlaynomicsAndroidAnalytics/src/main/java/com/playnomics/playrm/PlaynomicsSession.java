@@ -242,7 +242,6 @@ public class PlaynomicsSession {
 					&& (manager.checkPermission(
 							permission.ACCESS_NETWORK_STATE,
 							application.getPackageName()) != PackageManager.PERMISSION_GRANTED)) {
-
 				hasInternetPermission = false;
 				return APIResult.NO_INTERNET_PERMISSION;
 			}
@@ -260,7 +259,7 @@ public class PlaynomicsSession {
 			PlaynomicsSession.applicationId = applicationId;
 
 			// Setup the activity callback function(s)
-			setActivityCallback(activity);
+			observeActivityEvents(activity);
 
 			screenIntentFilter = new IntentFilter();
 			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
@@ -268,11 +267,9 @@ public class PlaynomicsSession {
 			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
 				screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
 
-			if (screenReceiver == null) {
-				screenReceiver = new ScreenReceiver();
-				activity.registerReceiver(screenReceiver, screenIntentFilter);
-			}
-
+			screenReceiver = new ScreenReceiver();
+			activity.registerReceiver(screenReceiver, screenIntentFilter);
+	
 			sequence.set(1);
 			clicks = new AtomicInteger(0);
 			totalClicks = new AtomicInteger(0);
@@ -367,26 +364,42 @@ public class PlaynomicsSession {
 	 * @param activity
 	 *            the new activity callback
 	 */
-	private static void setActivityCallback(Activity activity) {
-
+	private static void observeActivityEvents(Activity activity) {
 		try {
+			
+			if(PlaynomicsSession.activity == activity){
+				return;
+			}
+			
+			//clean up resource
+			if(screenReceiver != null){
+				PlaynomicsSession.activity.unregisterReceiver(screenReceiver);
+			}
+			
+			if(PlaynomicsSession.activity != null){
+				//reset the previous callback
+				PlaynomicsSession.activity.getWindow().setCallback(
+						activityCallback);
+			}
+			
+			//set this activity as the current activity in the session
 			PlaynomicsSession.activity = activity;
+			//save the current callback
 			activityCallback = activity.getWindow().getCallback();
-
 			activity.getWindow().setCallback(new Callback() {
-
 				@Override
 				public void onWindowFocusChanged(boolean hasFocus) {
 					activityCallback.onWindowFocusChanged(hasFocus);
-
 					// Get out of here is we are finishing the activity
-					if (PlaynomicsSession.activity.isFinishing())
+					if (PlaynomicsSession.activity.isFinishing()){
 						return;
-
+					}
 					// Are we pausing?
 					if (hasFocus) {
+						//we're in focus so resume
 						resume();
 					} else {
+						//we're out of focus so pause
 						pause();
 					}
 				}
@@ -447,7 +460,6 @@ public class PlaynomicsSession {
 
 				@Override
 				public void onAttachedToWindow() {
-
 					activityCallback.onAttachedToWindow();
 				}
 
@@ -567,12 +579,8 @@ public class PlaynomicsSession {
 			}
 
 			if (PlaynomicsSession.activity != activity) {
-				// Restore original callback
-				PlaynomicsSession.activity.getWindow().setCallback(
-						activityCallback);
-
-				setActivityCallback(activity);
-
+				//reset the previous activity's callback
+				observeActivityEvents(activity);
 				result = APIResult.SWITCHED;
 			} else {
 				result = APIResult.ALREADY_SWITCHED;

@@ -52,7 +52,7 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		Ad secondAd = new Ad("", "http://www.google.com", impressionUrl, null,
 				null, null);
 
-		Location location = new Location(10, 10, 300, 250);
+		Location location = new Location(10, 20, 300, 240);
 
 		Ad adToShow;
 		adToShow = new Ad(adImage, targetWebUrl, impressionUrl, null, null,
@@ -103,12 +103,11 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 
 		int width = 320;
 		int height = 270;
-		int landscapeX = (int) (Math.random() * (screenWidth - width));
-		int portraitX = (int) (Math.random() * (screenWidth - width));
-		int landscapteY = (int) (Math.random() * (screenHeight - height));
-		int portraitY = (int) (Math.random() * (screenHeight - height));
-
-		return new Background(backgroundImage, orientation, 270, 320,
+		int landscapeX = 10; // (int) (Math.random() * (screenWidth - width));
+		int landscapteY = 10; //(int) (Math.random() * (screenHeight - height));
+		int portraitX = 50; // (int) (Math.random() * (screenWidth - width));
+		int portraitY = 50; //(int) (Math.random() * (screenHeight - height));
+		return new Background(backgroundImage, orientation, height, width,
 				landscapeX, landscapteY, portraitX, portraitY);
 	}
 
@@ -128,10 +127,10 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		String imageUrl = validImage ? "http://pn-assets-development.s3.amazonaws.com/manual/mClose.png"
 				: "http://pn-assets-development.s3.amazonaws.com/manual/brokenClose.png";
 
-		return new CloseButton(210, 10, 10, 10, imageUrl);
+		return new CloseButton(260, 5, 20, 20, imageUrl);
 	}
 
 	private CloseButton getCloseButtonNoImage() {
-		return new CloseButton(210, 10, 10, 10, null);
+		return new CloseButton(260, 5, 20, 20, null);
 	}
 }

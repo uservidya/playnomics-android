@@ -88,7 +88,7 @@ class AdImageView extends ImageView {
 				@Override
 				public boolean onTouch(View view, MotionEvent e) {
 					frame.onAdViewClicked(e);
-					return false;
+					return true;
 				}
 			});
 		}
