@@ -58,27 +58,22 @@ abstract class PlaynomicsEvent implements Serializable {
 	}
 
 	protected void setEventTime(Date eventTime) {
-
 		this.eventTime = eventTime;
 	}
 
 	protected String getSessionId() {
-
 		return internalSessionId;
 	}
 
 	protected void setSessionId(String sessionId) {
-
 		this.internalSessionId = sessionId;
 	}
 
 	protected Long getApplicationId() {
-
 		return applicationId;
 	}
 
 	protected void setApplicationId(Long applicationId) {
-
 		this.applicationId = applicationId;
 	}
 
@@ -88,12 +83,10 @@ abstract class PlaynomicsEvent implements Serializable {
 	}
 
 	protected void setUserId(String userId) {
-
 		this.userId = userId;
 	}
 
 	public String toString() {
-
 		return eventTime.toString() + ": " + eventType.toString();
 	}
 

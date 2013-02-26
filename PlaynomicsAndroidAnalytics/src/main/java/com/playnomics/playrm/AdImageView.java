@@ -87,7 +87,9 @@ class AdImageView extends ImageView {
 			setOnTouchListener(new OnTouchListener() {
 				@Override
 				public boolean onTouch(View view, MotionEvent e) {
-					frame.onAdViewClicked(e);
+					if(e.getAction() == MotionEvent.ACTION_DOWN){
+						frame.onAdViewClicked(e);
+					}
 					return true;
 				}
 			});

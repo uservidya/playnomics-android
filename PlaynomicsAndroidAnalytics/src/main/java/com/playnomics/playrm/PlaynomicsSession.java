@@ -246,9 +246,10 @@ public class PlaynomicsSession {
 				return APIResult.NO_INTERNET_PERMISSION;
 			}
 
-			if (sessionState == SessionState.STARTED)
+			if (sessionState == SessionState.STARTED){
 				return APIResult.ALREADY_STARTED;
-
+			}
+				
 			// If paused, resume and get out of here
 			if (sessionState == SessionState.PAUSED) {
 				resume();
@@ -260,16 +261,7 @@ public class PlaynomicsSession {
 
 			// Setup the activity callback function(s)
 			observeActivityEvents(activity);
-
-			screenIntentFilter = new IntentFilter();
-			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
-				screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
-				screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
-
-			screenReceiver = new ScreenReceiver();
-			activity.registerReceiver(screenReceiver, screenIntentFilter);
-	
+			
 			sequence.set(1);
 			clicks = new AtomicInteger(0);
 			totalClicks = new AtomicInteger(0);
@@ -371,9 +363,10 @@ public class PlaynomicsSession {
 				return;
 			}
 			
-			//clean up resource
 			if(screenReceiver != null){
+				//unbind the previous broadcast receiver
 				PlaynomicsSession.activity.unregisterReceiver(screenReceiver);
+				screenReceiver = null;
 			}
 			
 			if(PlaynomicsSession.activity != null){
@@ -384,6 +377,15 @@ public class PlaynomicsSession {
 			
 			//set this activity as the current activity in the session
 			PlaynomicsSession.activity = activity;
+			
+			screenIntentFilter = new IntentFilter();
+			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
+				screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_ON))
+				screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
+			screenReceiver = new ScreenReceiver();
+			activity.registerReceiver(screenReceiver, screenIntentFilter);
+			
 			//save the current callback
 			activityCallback = activity.getWindow().getCallback();
 			activity.getWindow().setCallback(new Callback() {
