@@ -24,6 +24,13 @@ class AdResponse {
 		this.message = message;
 	}
 	
+	public AdResponse(List<Ad> ads, CloseButton close, Background background,
+			Location location, int expirationSeconds, String status,
+			String message) {
+		this(close, background, location, expirationSeconds, status, message);
+		this.ads = ads;
+	}
+	
 	public CloseButton getCloseButton() {
 		return this.closeButton;
 	}

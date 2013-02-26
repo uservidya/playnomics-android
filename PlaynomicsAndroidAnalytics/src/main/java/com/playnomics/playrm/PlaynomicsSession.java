@@ -166,13 +166,26 @@ public class PlaynomicsSession {
 	}
 	
 
-	protected static String getBaseUrl() {
+	protected static String getBaseEventUrl() {
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("baseTestUrl");
 		}
 		return resourceBundle.getString("baseProdUrl");
 	}
-
+	
+	protected static String getBaseMessagingUrl(){
+		if(PlaynomicsSession.getTestMode()){
+			return resourceBundle.getString("messagingTestUrl");
+		}
+		return resourceBundle.getString("messagingProdUrl");
+	}
+	
+	private static final String httpEncoding = "ISO-8859-1";
+	protected static String getEncoding(){
+		return httpEncoding;
+	}
+	
+	
 	protected static boolean isConnectionAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) application
 				.getSystemService(Context.CONNECTIVITY_SERVICE);

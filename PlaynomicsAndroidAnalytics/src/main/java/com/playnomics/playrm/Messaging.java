@@ -14,20 +14,19 @@ import com.playnomics.playrm.ErrorDetail.PlaynomicsErrorType;
 
 public class Messaging {
 
-//	private enum WorkerStatus {
-//		NOT_STARTED, STARTED, PAUSED, STOPPED
-//	}
-
-//	private static WorkerStatus status = WorkerStatus.NOT_STARTED;
-
-//	private static Thread backgroundWorker;
-
 	private final static String TAG = Message.class.getSimpleName();
 
-	private static Map<String, ConcurrentHashMap<String, Frame>> activityFrames 
-			= new HashMap<String, ConcurrentHashMap<String,Frame>>();
+	private static Map<String, ConcurrentHashMap<String, Frame>> activityFrames = new HashMap<String, ConcurrentHashMap<String, Frame>>();
+
+	private Messaging() {
+
+	}
 
 	public static void setup(final Activity activity) {
+		if(activity.isFinishing()){
+			return;
+		}
+		
 		String key = getKeyForActivity(activity);
 		if (activityFrames.containsKey(key)) {
 			ConcurrentHashMap<String, Frame> framesById = activityFrames
@@ -109,17 +108,20 @@ public class Messaging {
 				int width = metrics.widthPixels;
 				int height = metrics.heightPixels;
 
-				// MessagingServiceClient client = new MessagingServiceClient(
-				// serverUrl, PlaynomicsSession.getAppID(),
-				// PlaynomicsSession.getUserID(),
-				// PlaynomicsSession.getCookieID());
-
-				MessagingServiceClientTest client = new MessagingServiceClientTest(
+				MessagingServiceClient client = new MessagingServiceClient(
 						PlaynomicsSession.getResourceBundle(),
-						PlaynomicsSession.getBaseUrl(),
+						PlaynomicsSession.getBaseMessagingUrl(),
 						PlaynomicsSession.getAppID(),
 						PlaynomicsSession.getUserID(),
 						PlaynomicsSession.getCookieID());
+
+				// MessagingServiceClientTest client = new
+				// MessagingServiceClientTest(
+				// PlaynomicsSession.getResourceBundle(),
+				// PlaynomicsSession.getBaseUrl(),
+				// PlaynomicsSession.getAppID(),
+				// PlaynomicsSession.getUserID(),
+				// PlaynomicsSession.getCookieID());
 
 				AdResponse response = client.requestAd(frameId, caller, width,
 						height);
@@ -145,55 +147,30 @@ public class Messaging {
 	}
 
 	protected static void performActionForLabel(Activity activity,
-			String actionLabel) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+			String actionLabel) throws SecurityException,
+			NoSuchMethodException, IllegalArgumentException,
+			IllegalAccessException, InvocationTargetException {
 		Method method = activity.getClass().getMethod(actionLabel, null);
-		method.invoke(activity.getClass().cast(activity));	
+		method.invoke(activity.getClass().cast(activity));
 	}
 
 	protected static void executeActionOnDelegate(Activity activity,
-			String actionLabel) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+			String actionLabel) throws SecurityException,
+			IllegalArgumentException, NoSuchMethodException,
+			IllegalAccessException, InvocationTargetException {
 		performActionForLabel(activity, actionLabel);
 	}
 
 	public static void refreshWithId(Activity activity, String frameId) {
+		if(activity.isFinishing()){
+			return;
+		}
+		
 		PlaynomicsLogger.d(TAG, "Starting refresh data call for frameId: "
 				+ frameId);
+		
 		String activityKey = getKeyForActivity(activity);
-		startDataFetchAsync(activity, activityKey, frameId, "REFRESH CALLER");
+		startDataFetchAsync(activity, activityKey, frameId,
+				"Messaging.refreshWithId");
 	}
-
-//	private static AtomicBoolean isStopping = new AtomicBoolean(false);
-//
-//	private final static Object startSync = new Object();
-//
-//	protected static void start() {
-//		if (status == WorkerStatus.STARTED) {
-//			return;
-//		}
-//
-//		if (status == WorkerStatus.NOT_STARTED) {
-//			activityFrames = new HashMap<String, ConcurrentHashMap<String, Frame>>();
-//			backgroundWorker = new Thread(new Runnable() {
-//				public void run() {
-//
-//				}
-//			});
-//			backgroundWorker.start();
-//		}
-//	}
-//
-//	protected static void stop() {
-//		isStopping.set(true);
-//	}
-//
-//	public static void pause() {
-//
-//	}
-//
-//	private static void produce() {
-//		while (!isStopping.get()) {
-//			// for each frame in the activity
-//		}
-//
-//	}
 }

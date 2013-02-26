@@ -202,7 +202,7 @@ public class Frame {
 		Drawable buttonImage = data.getCloseButtonImage();
 
 		boolean buttonIsValid = (button.getImageUrl() == null
-				&& button.getHeight() > 0 && button.getWidth() > 0)
+				|| (button.getHeight() == 0 && button.getWidth() == 0))
 				|| buttonImage != null;
 
 		return buttonIsValid && backgroundIsValid && adIsValid;

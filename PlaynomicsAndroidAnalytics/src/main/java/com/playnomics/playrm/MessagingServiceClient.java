@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -27,7 +28,8 @@ class MessagingServiceClient {
 	private final long appId;
 	private final String userId;
 	private final String cookieId;
-	
+
+
 	private final String TAG = MessagingServiceClient.class.getSimpleName();
 
 	public MessagingServiceClient(ResourceBundle bundle, String baseUrl,
@@ -49,18 +51,20 @@ class MessagingServiceClient {
 			String url = baseUrl + "?a=" + this.appId + "&u=" + this.userId
 					+ "&p=" + caller + "&t=" + time + "&b=" + this.cookieId
 					+ "&f=" + frameId + "&c=" + height + "&d=" + width
-					+ "&esrc=aj&ever=1";
+					+ "&esrc=aj&ever=" + PlaynomicsSession.getVersion();
+			url = URLEncoder.encode(url, PlaynomicsSession.getEncoding());
+			
+			PlaynomicsLogger.d(TAG, "Fetching ad...");
+			PlaynomicsLogger.d(TAG, url);
 
-			// defaultHttpClient
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(url);
 			HttpResponse httpResponse = httpClient.execute(httpPost);
 			HttpEntity httpEntity = httpResponse.getEntity();
 			InputStream is = httpEntity.getContent();
 
-			// FIXME: byte buffer(java) and check to see if activity is killed
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					is, "iso-8859-1"), 8);
+					is, PlaynomicsSession.getEncoding()), 8);
 
 			StringBuilder sb = new StringBuilder();
 			String line = null;
@@ -68,7 +72,9 @@ class MessagingServiceClient {
 				sb.append(line + "\n");
 			}
 			is.close();
-			jObj = new JSONObject(sb.toString());
+
+			String jsonString = sb.toString();
+			jObj = new JSONObject(jsonString);
 			return parseResponse(jObj);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -89,39 +95,29 @@ class MessagingServiceClient {
 		final String statusKey = "s";
 
 		try {
-			String status = responseData.getString(statusKey);
+			String status = cleanJSONString(responseData, statusKey);
 			int expirationSeconds = responseData.getInt(expirationKey);
-			String message = responseData.getString(messageKey);
+			String message = cleanJSONString(responseData, messageKey);
 
 			Background background = getBackgroundFromData(responseData);
-			if (background == null) {
-				return null;
-			}
-
 			Location location = getLocationFromData(responseData);
-			if (location == null) {
-				return null;
-			}
-
 			CloseButton button = getCloseButtonFromData(responseData);
-			if (button == null) {
-				return null;
-			}
 
 			List<Ad> ads = getAdFromData(responseData);
 			if (ads == null || ads.size() == 0) {
 				return null;
 			}
 
-			return new AdResponse(button, background, location,
+			return new AdResponse(ads, button, background, location,
 					expirationSeconds, status, message);
-
 		} catch (JSONException e) {
-			return null;
+			PlaynomicsLogger.d(TAG, "Failed to parse ad response: ", e);
 		}
+		return null;
 	}
 
-	private Background getBackgroundFromData(JSONObject responseData) {
+	private Background getBackgroundFromData(JSONObject responseData)
+			throws JSONException {
 		final String backgroundKey = "b";
 		final String landscapeKey = "l";
 		final String portraitKey = "p";
@@ -132,31 +128,26 @@ class MessagingServiceClient {
 		final String orientationKey = "o";
 		final String imageKey = "i";
 
-		try {
-			JSONObject backgroundData = responseData
-					.getJSONObject(backgroundKey);
+		JSONObject backgroundData = responseData.getJSONObject(backgroundKey);
 
-			String imageUrl = backgroundData.getString(imageKey);
-			int height = backgroundData.getInt(heightKey);
-			int width = backgroundData.getInt(widthKey);
+		String imageUrl = cleanJSONString(backgroundData, imageKey);
+		int height = backgroundData.getInt(heightKey);
+		int width = backgroundData.getInt(widthKey);
 
-			Orientation orientation = getOrientation(backgroundData
-					.getString(orientationKey));
+		Orientation orientation = getOrientation(backgroundData
+				.getString(orientationKey));
 
-			JSONObject landscapeData = backgroundData
-					.getJSONObject(landscapeKey);
-			int landscapeX = landscapeData.getInt(xKey);
-			int landscapeY = landscapeData.getInt(yKey);
+		JSONObject landscapeData = backgroundData.getJSONObject(landscapeKey);
+		int landscapeX = landscapeData.getInt(xKey);
+		int landscapeY = landscapeData.getInt(yKey);
 
-			JSONObject portraitData = backgroundData.getJSONObject(portraitKey);
-			int portraitX = portraitData.getInt(xKey);
-			int portraitY = portraitData.getInt(yKey);
+		JSONObject portraitData = backgroundData.getJSONObject(portraitKey);
+		int portraitX = portraitData.getInt(xKey);
+		int portraitY = portraitData.getInt(yKey);
 
-			return new Background(imageUrl, orientation, height, width,
-					landscapeX, landscapeY, portraitX, portraitY);
-		} catch (JSONException ex) {
-		}
-		return null;
+		return new Background(imageUrl, orientation, height, width, landscapeX,
+				landscapeY, portraitX, portraitY);
+
 	}
 
 	private Orientation getOrientation(String orientation) {
@@ -169,26 +160,24 @@ class MessagingServiceClient {
 		return Orientation.DETECT;
 	}
 
-	private Location getLocationFromData(JSONObject responseData) {
+	private Location getLocationFromData(JSONObject responseData)
+			throws JSONException {
 		final String xKey = "x";
 		final String yKey = "y";
 		final String widthKey = "w";
 		final String heightKey = "h";
 		final String locationKey = "l";
 
-		try {
-			JSONObject locationData = responseData.getJSONObject(locationKey);
-			int x = locationData.getInt(xKey);
-			int y = locationData.getInt(yKey);
-			int width = locationData.getInt(widthKey);
-			int height = locationData.getInt(heightKey);
-			return new Location(x, y, width, height);
-		} catch (JSONException ex) {
-		}
-		return null;
+		JSONObject locationData = responseData.getJSONObject(locationKey);
+		int x = locationData.getInt(xKey);
+		int y = locationData.getInt(yKey);
+		int width = locationData.getInt(widthKey);
+		int height = locationData.getInt(heightKey);
+		return new Location(x, y, width, height);
 	}
 
-	private CloseButton getCloseButtonFromData(JSONObject responseData) {
+	private CloseButton getCloseButtonFromData(JSONObject responseData)
+			throws JSONException {
 		final String xKey = "x";
 		final String yKey = "y";
 		final String widthKey = "w";
@@ -196,21 +185,17 @@ class MessagingServiceClient {
 		final String imageKey = "i";
 		final String closeButtonKey = "c";
 
-		try {
-			JSONObject closeButtonData = responseData
-					.getJSONObject(closeButtonKey);
-			int x = closeButtonData.getInt(xKey);
-			int y = closeButtonData.getInt(yKey);
-			int width = closeButtonData.getInt(widthKey);
-			int height = closeButtonData.getInt(heightKey);
-			String imageUrl = closeButtonData.getString(imageKey);
-			return new CloseButton(x, y, width, height, imageUrl);
-		} catch (JSONException ex) {
-		}
-		return null;
+		JSONObject closeButtonData = responseData.getJSONObject(closeButtonKey);
+		int x = closeButtonData.getInt(xKey);
+		int y = closeButtonData.getInt(yKey);
+		int width = closeButtonData.getInt(widthKey);
+		int height = closeButtonData.getInt(heightKey);
+		String imageUrl = cleanJSONString(closeButtonData, imageKey);
+		return new CloseButton(x, y, width, height, imageUrl);
 	}
 
-	private List<Ad> getAdFromData(JSONObject responseData) {
+	private List<Ad> getAdFromData(JSONObject responseData)
+			throws JSONException {
 		final String imageKey = "i";
 		final String targetKey = "t";
 		final String impressionKey = "s";
@@ -221,31 +206,30 @@ class MessagingServiceClient {
 
 		List<Ad> ads = new ArrayList<Ad>();
 
-		try {
-			JSONArray adsData = responseData.getJSONArray(adsKey);
-			if (adsData.length() == 0) {
-				return null;
-			}
-
-			for (int i = 0; i < adsData.length(); i++) {
-				JSONObject adData = adsData.getJSONObject(i);
-				String imageUrl = adData.getString(imageKey);
-				String targetUrl = adData.getString(targetKey);
-				String impressionUrl = adData.getString(impressionKey);
-				String preExecute = adData.has(preExecuteKey) ? adData
-						.getString(preExecuteKey) : null;
-				String postExecute = adData.has(postExecuteKey) ? adData
-						.getString(postExecuteKey) : null;
-				String closeUrl = adData.has(closeUrlKey) ? adData
-						.getString(closeUrlKey) : null;
-				Ad ad = new Ad(imageUrl, targetUrl, impressionUrl, preExecute,
-						postExecute, closeUrl);
-
-				ads.add(ad);
-			}
-			return ads;
-		} catch (JSONException ex) {
+		JSONArray adsData = responseData.getJSONArray(adsKey);
+		if (adsData.length() == 0) {
+			return null;
 		}
-		return null;
+
+		for (int i = 0; i < adsData.length(); i++) {
+			JSONObject adData = adsData.getJSONObject(i);
+			String imageUrl = cleanJSONString(adData, imageKey);
+			String targetUrl = cleanJSONString(adData, targetKey);
+			String impressionUrl = cleanJSONString(adData, impressionKey);
+			String preExecute = cleanJSONString(adData, preExecuteKey);
+			String postExecute = cleanJSONString(adData, postExecuteKey);
+			String closeUrl = cleanJSONString(adData, closeUrlKey);
+			Ad ad = new Ad(imageUrl, targetUrl, impressionUrl, preExecute,
+					postExecute, closeUrl);
+
+			ads.add(ad);
+		}
+		return ads;
+	}
+
+	private String cleanJSONString(JSONObject obj, String key)
+			throws JSONException {
+		return (!obj.has(key) || obj.getString(key).equals("null")) ? null
+				: obj.getString(key);
 	}
 }
