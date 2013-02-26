@@ -100,7 +100,7 @@ public class PlaynomicsSession {
 	private static Date pauseTime;
 	private static boolean testMode;
 
-	private enum SessionState {
+	protected enum SessionState {
 		UNKNOWN, STARTED, PAUSED, STOPPED
 	}
 
@@ -144,6 +144,14 @@ public class PlaynomicsSession {
 	protected static String getSource(){
 		return "aj";
 	}
+	
+	protected static SessionState getSessionState(){
+		return sessionState;
+	}
+	
+	protected static boolean hasInternetPermission(){
+		return hasInternetPermission;
+	}
 
 	protected static int getConnectionTimeout(){
 		return new Integer(
@@ -165,7 +173,7 @@ public class PlaynomicsSession {
 		return resourceBundle.getString("baseProdUrl");
 	}
 
-	private static boolean isConnectionAvailable() {
+	protected static boolean isConnectionAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) application
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager

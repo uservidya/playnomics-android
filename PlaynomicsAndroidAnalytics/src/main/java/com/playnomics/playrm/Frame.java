@@ -14,9 +14,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.provider.ContactsContract.Contacts.Data;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
@@ -24,8 +22,9 @@ import android.widget.RelativeLayout;
 
 import com.playnomics.playrm.AdImageView.ImageType;
 import com.playnomics.playrm.Background.Orientation;
+import com.playnomics.playrm.PlaynomicsSession.SessionState;
 
-public class Frame implements AdEventHandler {
+public class Frame {
 	public enum DisplayResult {
 		NO_INTERNET_PERMISSION, START_NOT_CALLED, UNABLE_TO_CONNECT, FAIL_UNKNOWN, DISPLAY_PENDING, DISPLAYED
 	};
@@ -76,11 +75,11 @@ public class Frame implements AdEventHandler {
 		this.adEnabledCode = enable;
 	}
 
-	public Context getContext() {
+	protected Context getContext() {
 		return this.activity;
 	}
 
-	public String getActivityName() {
+	protected String getActivityName() {
 		return this.activity.getClass().getName();
 	}
 
@@ -92,11 +91,11 @@ public class Frame implements AdEventHandler {
 		return this.frameUUID.toString();
 	}
 
-	public UUID getFrameCacheKey() {
+	protected UUID getFrameCacheKey() {
 		return this.frameUUID;
 	}
 
-	public void removeComponent() {
+	protected void removeComponent() {
 		if (this.imageContainer == null || this.frameWrapper == null
 				|| this.adAreaView == null) {
 			// nothing to remove so just exit
@@ -138,7 +137,7 @@ public class Frame implements AdEventHandler {
 		}
 	}
 
-	public void refreshData(AdRenderData data) {
+	protected void refreshData(AdRenderData data) {
 		if (updatingComponent.compareAndSet(false, true)) {
 			// only update the activity
 			// when the data is valid
@@ -156,7 +155,7 @@ public class Frame implements AdEventHandler {
 		}
 	}
 
-	public void updateContext(Activity activity) {
+	protected void updateContext(Activity activity) {
 		if (updatingComponent.compareAndSet(false, true)) {
 			removeComponent();
 			this.activity = activity;
@@ -249,7 +248,16 @@ public class Frame implements AdEventHandler {
 	}
 
 	public DisplayResult start() {
+		if(!PlaynomicsSession.hasInternetPermission()){
+			return DisplayResult.NO_INTERNET_PERMISSION;
+		}
+		
+		if(PlaynomicsSession.getSessionState() != SessionState.STARTED){
+			return DisplayResult.START_NOT_CALLED;
+		}
+	
 		this.shouldDisplay = true;
+		
 		if (this.allComponentsLoaded()) {
 			this.render(true);
 			return DisplayResult.DISPLAYED;
@@ -258,7 +266,7 @@ public class Frame implements AdEventHandler {
 		}
 	}
 
-	public boolean allComponentsLoaded() {
+	private boolean allComponentsLoaded() {
 		if (!this.receivedData) {
 			return false;
 		}
@@ -271,7 +279,7 @@ public class Frame implements AdEventHandler {
 		return backgroundReady && adReady && closeReady;
 	}
 
-	public void startExpiryTimer() {
+	private void startExpiryTimer() {
 		this.stopExpiryTimer();
 		this.expirationTimer = new Timer();
 		this.expirationTimer.schedule(new TimerTask() {
@@ -282,27 +290,31 @@ public class Frame implements AdEventHandler {
 		}, this.expirationSeconds * 1000);
 	}
 
-	public void stopExpiryTimer() {
+	private void stopExpiryTimer() {
 		if (this.expirationTimer != null) {
 			this.expirationTimer.cancel();
 		}
 	}
 
-	@Override
-	public void onAdViewClose() {
+	protected void onAdViewClose() {
+		closeFrame(true);
+	}
+
+	private void closeFrame(boolean logCloseAction) {
 		this.stopExpiryTimer();
-		
-		String closeUrl = renderData.getAdResponse().getFirstAd().getCloseUrl();
-		if(closeUrl != null){
-			PlaynomicsSession.closeFrame(closeUrl);
+
+		if (logCloseAction) {
+			String closeUrl = renderData.getAdResponse().getFirstAd()
+					.getCloseUrl();
+			if (closeUrl != null) {
+				PlaynomicsSession.closeFrame(closeUrl);
+			}
 		}
-		
 		removeComponent();
 		Messaging.clearFrameFromActivity(activity, frameID);
 	}
 
-	@Override
-	public void onAdViewClicked(MotionEvent event) {
+	protected void onAdViewClicked(MotionEvent event) {
 		this.adClicked(event);
 	}
 
@@ -332,10 +344,10 @@ public class Frame implements AdEventHandler {
 		} else if (targetType == Ad.AdTargetType.PNA
 				|| targetType == Ad.AdTargetType.PNX) {
 
-			if (preExecuteUrl != null){
+			if (preExecuteUrl != null) {
 				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
 			}
-			
+
 			if (targetType == Ad.AdTargetType.PNA) {
 				try {
 					Messaging.performActionForLabel(activity, clickTarget);
@@ -360,15 +372,19 @@ public class Frame implements AdEventHandler {
 			}
 
 			if (postExecuteUrl != null) {
-				PlaynomicsSession.postExecution(postExecuteUrl,
-						statusCode, exec);
+				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
+						exec);
 			}
 		} else {
 			// log error
 		}
+
+		if (closeButtonView != null) {
+			closeFrame(false);
+		}
 	}
 
-	public void notifyDelegate() {
+	protected void notifyDelegate() {
 		Messaging.refreshWithId(activity, this.frameID);
 	}
 

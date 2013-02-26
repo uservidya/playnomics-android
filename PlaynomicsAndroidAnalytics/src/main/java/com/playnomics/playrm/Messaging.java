@@ -146,7 +146,7 @@ public class Messaging {
 		}).start();
 	}
 
-	public static void performActionForLabel(Activity activity,
+	protected static void performActionForLabel(Activity activity,
 			String actionLabel) {
 		Method method = null;
 
@@ -178,7 +178,7 @@ public class Messaging {
 		}
 	}
 
-	public static void executeActionOnDelegate(Activity activity,
+	protected static void executeActionOnDelegate(Activity activity,
 			String actionLabel) {
 		performActionForLabel(activity, actionLabel);
 	}

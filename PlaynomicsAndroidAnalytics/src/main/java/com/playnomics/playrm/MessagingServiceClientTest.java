@@ -90,7 +90,7 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 		}
 
 		AdResponse responseData = new AdResponse(button, background, location,
-				60, "Ok", null);
+				30, "Ok", null);
 		responseData.insertAd(adToShow);
 		responseData.insertAd(secondAd);
 		return responseData;

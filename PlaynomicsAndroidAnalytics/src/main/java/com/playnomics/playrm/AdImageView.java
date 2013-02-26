@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout.LayoutParams;
 
-public class AdImageView extends ImageView {
+class AdImageView extends ImageView {
 
 	public enum ImageType {
 		CREATIVE, CLOSE_BUTTON, BACKGROUND
@@ -19,12 +19,12 @@ public class AdImageView extends ImageView {
 		return this.imageType;
 	}
 	
-	private AdEventHandler handler;
+	private Frame frame;
 
 	public AdImageView(int x, int y, int height, int width, Drawable image, 
-			AdEventHandler handler, Context cont, ImageType imageType) {
+			Frame frame, Context cont, ImageType imageType) {
 		super(cont);
-		this.handler = handler;
+		this.frame = frame;
 		this.imageType = imageType;
 		if (image != null) {
 			this.setupImage(image, x, y, width, height);
@@ -78,7 +78,7 @@ public class AdImageView extends ImageView {
 				public void onClick(View v) {
 					// Close button has been clicked, should remove the ad
 					// here
-					handler.onAdViewClose();
+					frame.onAdViewClose();
 				}
 			});
 		}
@@ -87,7 +87,7 @@ public class AdImageView extends ImageView {
 			setOnTouchListener(new OnTouchListener() {
 				@Override
 				public boolean onTouch(View view, MotionEvent e) {
-					handler.onAdViewClicked(e);
+					frame.onAdViewClicked(e);
 					return false;
 				}
 			});
