@@ -201,8 +201,8 @@ public class Frame {
 		CloseButton button = data.getAdResponse().getCloseButton();
 		Drawable buttonImage = data.getCloseButtonImage();
 
-		boolean buttonIsValid = (button.getImageUrl() == null
-				|| (button.getHeight() == 0 && button.getWidth() == 0))
+		boolean buttonIsValid = (button.getImageUrl() == null || (button
+				.getHeight() == 0 && button.getWidth() == 0))
 				|| buttonImage != null;
 
 		return buttonIsValid && backgroundIsValid && adIsValid;
@@ -248,16 +248,16 @@ public class Frame {
 	}
 
 	public DisplayResult start() {
-		if(!PlaynomicsSession.hasInternetPermission()){
+		if (!PlaynomicsSession.hasInternetPermission()) {
 			return DisplayResult.NO_INTERNET_PERMISSION;
 		}
-		
-		if(PlaynomicsSession.getSessionState() != SessionState.STARTED){
+
+		if (PlaynomicsSession.getSessionState() != SessionState.STARTED) {
 			return DisplayResult.START_NOT_CALLED;
 		}
-	
+
 		this.shouldDisplay = true;
-		
+
 		if (this.allComponentsLoaded()) {
 			this.render(true);
 			return DisplayResult.DISPLAYED;

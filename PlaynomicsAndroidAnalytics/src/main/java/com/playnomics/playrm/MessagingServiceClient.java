@@ -29,7 +29,6 @@ class MessagingServiceClient {
 	private final String userId;
 	private final String cookieId;
 
-
 	private final String TAG = MessagingServiceClient.class.getSimpleName();
 
 	public MessagingServiceClient(ResourceBundle bundle, String baseUrl,
@@ -48,12 +47,18 @@ class MessagingServiceClient {
 			Date date = new Date(0);
 			Long time = date.getTime();
 
-			String url = baseUrl + "?a=" + this.appId + "&u=" + this.userId
-					+ "&p=" + caller + "&t=" + time + "&b=" + this.cookieId
-					+ "&f=" + frameId + "&c=" + height + "&d=" + width
-					+ "&esrc=aj&ever=" + PlaynomicsSession.getVersion();
-			url = URLEncoder.encode(url, PlaynomicsSession.getEncoding());
-			
+			String url = baseUrl
+					+ "?a="
+					+ this.appId
+					+ "&u="
+					+ this.userId
+					+ "&p="
+					+ URLEncoder
+							.encode(caller, PlaynomicsSession.getEncoding())
+					+ "&t=" + time + "&b=" + this.cookieId + "&f=" + frameId
+					+ "&c=" + height + "&d=" + width + "&esrc=aj&ever="
+					+ PlaynomicsSession.getVersion();
+
 			PlaynomicsLogger.d(TAG, "Fetching ad...");
 			PlaynomicsLogger.d(TAG, url);
 

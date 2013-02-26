@@ -7,7 +7,7 @@ import android.util.Log;
 
 class ScreenReceiver extends BroadcastReceiver {
 	private static String TAG = ScreenReceiver.class.getSimpleName();
-	
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {

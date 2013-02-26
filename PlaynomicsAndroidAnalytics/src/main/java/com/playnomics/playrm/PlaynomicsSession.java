@@ -136,35 +136,33 @@ public class PlaynomicsSession {
 	protected static String getCookieID() {
 		return cookieId;
 	}
-	
-	protected static String getVersion(){
+
+	protected static String getVersion() {
 		return resourceBundle.getString("version");
 	}
-	
-	protected static String getSource(){
+
+	protected static String getSource() {
 		return "aj";
 	}
-	
-	protected static SessionState getSessionState(){
+
+	protected static SessionState getSessionState() {
 		return sessionState;
 	}
-	
-	protected static boolean hasInternetPermission(){
+
+	protected static boolean hasInternetPermission() {
 		return hasInternetPermission;
 	}
 
-	protected static int getConnectionTimeout(){
-		return new Integer(
-				resourceBundle.getString("connectTimeout"));
+	protected static int getConnectionTimeout() {
+		return new Integer(resourceBundle.getString("connectTimeout"));
 	}
-	
+
 	private static final ResourceBundle resourceBundle = ResourceBundle
 			.getBundle("playnomicsAndroidAnalytics");
 
 	protected static ResourceBundle getResourceBundle() {
 		return resourceBundle;
 	}
-	
 
 	protected static String getBaseEventUrl() {
 		if (PlaynomicsSession.getTestMode()) {
@@ -172,20 +170,20 @@ public class PlaynomicsSession {
 		}
 		return resourceBundle.getString("baseProdUrl");
 	}
-	
-	protected static String getBaseMessagingUrl(){
-		if(PlaynomicsSession.getTestMode()){
+
+	protected static String getBaseMessagingUrl() {
+		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("messagingTestUrl");
 		}
 		return resourceBundle.getString("messagingProdUrl");
 	}
-	
+
 	private static final String httpEncoding = "ISO-8859-1";
-	protected static String getEncoding(){
+
+	protected static String getEncoding() {
 		return httpEncoding;
 	}
-	
-	
+
 	protected static boolean isConnectionAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) application
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -259,10 +257,10 @@ public class PlaynomicsSession {
 				return APIResult.NO_INTERNET_PERMISSION;
 			}
 
-			if (sessionState == SessionState.STARTED){
+			if (sessionState == SessionState.STARTED) {
 				return APIResult.ALREADY_STARTED;
 			}
-				
+
 			// If paused, resume and get out of here
 			if (sessionState == SessionState.PAUSED) {
 				resume();
@@ -274,7 +272,7 @@ public class PlaynomicsSession {
 
 			// Setup the activity callback function(s)
 			observeActivityEvents(activity);
-			
+
 			sequence.set(1);
 			clicks = new AtomicInteger(0);
 			totalClicks = new AtomicInteger(0);
@@ -371,26 +369,26 @@ public class PlaynomicsSession {
 	 */
 	private static void observeActivityEvents(Activity activity) {
 		try {
-			
-			if(PlaynomicsSession.activity == activity){
+
+			if (PlaynomicsSession.activity == activity) {
 				return;
 			}
-			
-			if(screenReceiver != null){
-				//unbind the previous broadcast receiver
+
+			if (screenReceiver != null) {
+				// unbind the previous broadcast receiver
 				PlaynomicsSession.activity.unregisterReceiver(screenReceiver);
 				screenReceiver = null;
 			}
-			
-			if(PlaynomicsSession.activity != null){
-				//reset the previous callback
+
+			if (PlaynomicsSession.activity != null) {
+				// reset the previous callback
 				PlaynomicsSession.activity.getWindow().setCallback(
 						activityCallback);
 			}
-			
-			//set this activity as the current activity in the session
+
+			// set this activity as the current activity in the session
 			PlaynomicsSession.activity = activity;
-			
+
 			screenIntentFilter = new IntentFilter();
 			if (!screenIntentFilter.hasAction(Intent.ACTION_SCREEN_OFF))
 				screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
@@ -398,23 +396,23 @@ public class PlaynomicsSession {
 				screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
 			screenReceiver = new ScreenReceiver();
 			activity.registerReceiver(screenReceiver, screenIntentFilter);
-			
-			//save the current callback
+
+			// save the current callback
 			activityCallback = activity.getWindow().getCallback();
 			activity.getWindow().setCallback(new Callback() {
 				@Override
 				public void onWindowFocusChanged(boolean hasFocus) {
 					activityCallback.onWindowFocusChanged(hasFocus);
 					// Get out of here is we are finishing the activity
-					if (PlaynomicsSession.activity.isFinishing()){
+					if (PlaynomicsSession.activity.isFinishing()) {
 						return;
 					}
 					// Are we pausing?
 					if (hasFocus) {
-						//we're in focus so resume
+						// we're in focus so resume
 						resume();
 					} else {
-						//we're out of focus so pause
+						// we're out of focus so pause
 						pause();
 					}
 				}
@@ -594,7 +592,7 @@ public class PlaynomicsSession {
 			}
 
 			if (PlaynomicsSession.activity != activity) {
-				//reset the previous activity's callback
+				// reset the previous activity's callback
 				observeActivityEvents(activity);
 				result = APIResult.SWITCHED;
 			} else {
@@ -786,9 +784,9 @@ public class PlaynomicsSession {
 	public static APIResult gameEnd(long instanceId, long sessionId,
 			String reason) {
 
-		GameEvent gameEndEvent = new GameEvent(EventType.gameEnd, internalSessionId,
-				applicationId, userId, sessionId, null, instanceId, null, null,
-				reason);
+		GameEvent gameEndEvent = new GameEvent(EventType.gameEnd,
+				internalSessionId, applicationId, userId, sessionId, null,
+				instanceId, null, null, reason);
 		PlaynomicsLogger.d(TAG, "gameEvent is being queued.");
 		return sendOrQueueEvent(gameEndEvent);
 	}
@@ -818,7 +816,7 @@ public class PlaynomicsSession {
 			double quantity, TransactionType type, String otherUserId,
 			CurrencyType currencyType, double currencyValue,
 			CurrencyCategory currencyCategory) {
-		
+
 		return transaction(transactionId, itemId, quantity, type, otherUserId,
 				currencyType.toString(), currencyValue, currencyCategory);
 	}
@@ -853,11 +851,11 @@ public class PlaynomicsSession {
 		double[] currencyValues = { currencyValue };
 		CurrencyCategory[] currencyCategories = { currencyCategory };
 
-		TransactionEvent transEvent = new TransactionEvent(EventType.transaction,
-				internalSessionId, applicationId, userId, transactionId,
-				itemId, quantity, type, otherUserId, currencyTypes,
-				currencyValues, currencyCategories);
-		
+		TransactionEvent transEvent = new TransactionEvent(
+				EventType.transaction, internalSessionId, applicationId,
+				userId, transactionId, itemId, quantity, type, otherUserId,
+				currencyTypes, currencyValues, currencyCategories);
+
 		PlaynomicsLogger.d(TAG, "transaction is being queued.");
 		return sendOrQueueEvent(transEvent);
 	}
@@ -932,10 +930,10 @@ public class PlaynomicsSession {
 			String[] currencyTypes, double[] currencyValues,
 			CurrencyCategory[] currencyCategories) {
 
-		TransactionEvent tranEvent = new TransactionEvent(EventType.transaction,
-				internalSessionId, applicationId, userId, transactionId,
-				itemId, quantity, type, otherUserId, currencyTypes,
-				currencyValues, currencyCategories);
+		TransactionEvent tranEvent = new TransactionEvent(
+				EventType.transaction, internalSessionId, applicationId,
+				userId, transactionId, itemId, quantity, type, otherUserId,
+				currencyTypes, currencyValues, currencyCategories);
 		PlaynomicsLogger.d(TAG, "transaction is being queued.");
 		return sendOrQueueEvent(tranEvent);
 	}
@@ -978,7 +976,7 @@ public class PlaynomicsSession {
 		SocialEvent socialEvent = new SocialEvent(EventType.invitationResponse,
 				internalSessionId, applicationId, userId, invitationId,
 				recipientUserId, null, null, response);
-		
+
 		PlaynomicsLogger.d(TAG, "invitationResponse is being queued.");
 		return sendOrQueueEvent(socialEvent);
 	}
@@ -1017,8 +1015,8 @@ public class PlaynomicsSession {
 		PlaynomicsLogger.d(TAG, "postExecution is being queued.");
 		sendOrQueueEvent(event);
 	}
-	
-	protected static void closeFrame(String closeUrl){
+
+	protected static void closeFrame(String closeUrl) {
 		CloseFrameEvent event = new CloseFrameEvent(closeUrl);
 		PlaynomicsLogger.d(TAG, "closeFrameEvent is being queued.");
 		sendOrQueueEvent(event);

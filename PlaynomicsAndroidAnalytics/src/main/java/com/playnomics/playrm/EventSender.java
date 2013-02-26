@@ -2,7 +2,6 @@ package com.playnomics.playrm;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 class EventSender {
 
@@ -11,12 +10,11 @@ class EventSender {
 	protected boolean sendToServer(PlaynomicsEvent event) {
 		try {
 			String eventUrl = event.getEventUrl();
+			// Add version info
 			if (event.appendSourceInformation()) {
 				eventUrl += "&esrc=aj&ever=" + PlaynomicsSession.getVersion();
 			}
-			eventUrl = URLEncoder.encode(eventUrl,
-					PlaynomicsSession.getEncoding());
-
+			
 			PlaynomicsLogger.d(TAG, "Requesting event url: " + eventUrl);
 
 			HttpURLConnection con = (HttpURLConnection) new URL(eventUrl)

@@ -44,7 +44,7 @@ public class ErrorEvent extends PlaynomicsEvent {
 				e.printStackTrace(pw);
 
 				queryString = "jslog?m="
-						+ URLEncoder.encode(sw.toString(), "US-ASCII");
+						+ URLEncoder.encode(sw.toString(), PlaynomicsSession.getEncoding());
 			}
 
 		} catch (UnsupportedEncodingException e) {
