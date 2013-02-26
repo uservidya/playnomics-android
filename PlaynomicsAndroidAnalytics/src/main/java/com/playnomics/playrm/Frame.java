@@ -361,7 +361,7 @@ public class Frame {
 					try {
 						Messaging
 								.executeActionOnDelegate(activity, clickTarget);
-						statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
+						statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
 					} catch (Exception e) {
 						statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
 						exec = e;

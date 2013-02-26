@@ -5,10 +5,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
@@ -147,39 +145,13 @@ public class Messaging {
 	}
 
 	protected static void performActionForLabel(Activity activity,
-			String actionLabel) {
-		Method method = null;
-
-		try {
-			method = activity.getClass().getMethod(actionLabel, null);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (method == null) {
-			return;
-		} else {
-			try {
-				method.invoke(activity.getClass().cast(activity));
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+			String actionLabel) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+		Method method = activity.getClass().getMethod(actionLabel, null);
+		method.invoke(activity.getClass().cast(activity));	
 	}
 
 	protected static void executeActionOnDelegate(Activity activity,
-			String actionLabel) {
+			String actionLabel) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		performActionForLabel(activity, actionLabel);
 	}
 
