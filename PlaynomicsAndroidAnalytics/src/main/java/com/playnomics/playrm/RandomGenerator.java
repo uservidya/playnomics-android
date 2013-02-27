@@ -29,7 +29,7 @@ package com.playnomics.playrm;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class RandomGenerator {
+class RandomGenerator {
 
 	private static final String SHA1_PRNG = "SHA1PRNG";
 

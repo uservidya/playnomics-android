@@ -161,7 +161,7 @@ public class Messaging {
 		performActionForLabel(activity, actionLabel);
 	}
 
-	public static void refreshWithId(Activity activity, String frameId) {
+	protected static void refreshWithId(Activity activity, String frameId) {
 		if(activity.isFinishing()){
 			return;
 		}

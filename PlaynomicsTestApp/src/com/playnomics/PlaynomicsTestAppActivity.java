@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import com.playnomics.playrm.PlaynomicsSession;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
 import com.playnomics.playrm.PlaynomicsConstants.ResponseType;
@@ -17,6 +15,7 @@ import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
+import com.playnomics.playrm.PlaynomicsSession;
 
 public class PlaynomicsTestAppActivity extends Activity {
 	
@@ -37,7 +36,6 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 	@Override
 	protected void onStart() {
-	
 		super.onStart();
 //		Toast.makeText(this, "SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this), Toast.LENGTH_LONG).show();
 		System.out.println("SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this));

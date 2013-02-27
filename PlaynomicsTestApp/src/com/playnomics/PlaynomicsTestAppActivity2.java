@@ -1,12 +1,15 @@
 package com.playnomics;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -68,6 +71,9 @@ public class PlaynomicsTestAppActivity2 extends Activity {
 		spinnerIntegrationTests.setAdapter(adapterIntegration);
 		btnRunIntegrationTests = (Button) findViewById(R.id.btnRunIntegrationTest);
 		btnRunIntegrationTests.setOnClickListener(btnTestClickListener);
+		
+		ImageView image = (ImageView) findViewById(R.id.imageFiller);
+		image.setBackgroundColor(Color.CYAN);
 	}
 
 	@Override

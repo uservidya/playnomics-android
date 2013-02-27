@@ -1,6 +1,6 @@
 package com.playnomics.playrm;
 
-public class MilestoneEvent extends PlaynomicsEvent {
+class MilestoneEvent extends PlaynomicsEvent {
 
 	/**
 	 * 

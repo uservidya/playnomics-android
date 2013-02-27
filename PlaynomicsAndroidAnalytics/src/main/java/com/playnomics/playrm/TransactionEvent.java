@@ -3,7 +3,7 @@ package com.playnomics.playrm;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
 import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
 
-public class TransactionEvent extends PlaynomicsEvent {
+class TransactionEvent extends PlaynomicsEvent {
 
 	private static final long serialVersionUID = 1L;
 

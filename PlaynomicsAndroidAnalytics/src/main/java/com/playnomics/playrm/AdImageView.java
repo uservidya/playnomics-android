@@ -53,10 +53,6 @@ class AdImageView extends ImageView {
 	private void setupImage(Drawable result, int x, int y, 
 			int width, int height) {
 		
-//			setMaxHeight(height);
-//			setMinimumHeight(height);
-//			setMaxWidth(width);
-//			setMinimumWidth(width);
 		LayoutParams layoutParams = new LayoutParams(width, height);
 		layoutParams.leftMargin = x;
 		layoutParams.topMargin = y;

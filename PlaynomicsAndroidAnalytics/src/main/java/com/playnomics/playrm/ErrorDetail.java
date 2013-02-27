@@ -1,6 +1,6 @@
 package com.playnomics.playrm;
 
-public class ErrorDetail {
+class ErrorDetail {
 
 	protected enum PlaynomicsErrorType {
 		errorTypeUndefined, errorTypeInvalidJson

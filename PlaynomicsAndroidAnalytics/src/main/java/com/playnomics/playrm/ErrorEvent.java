@@ -7,7 +7,7 @@ import java.net.URLEncoder;
 
 import com.playnomics.playrm.ErrorDetail.PlaynomicsErrorType;
 
-public class ErrorEvent extends PlaynomicsEvent {
+class ErrorEvent extends PlaynomicsEvent {
 
 	private static final long serialVersionUID = 1L;
 
