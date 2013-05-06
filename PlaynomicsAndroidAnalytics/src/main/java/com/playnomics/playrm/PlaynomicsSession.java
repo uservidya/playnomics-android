@@ -1053,7 +1053,11 @@ public class PlaynomicsSession {
 					if (!isConnectionAvailable()) {
 						playnomicsEventList.add(pe);
 					} else {
-						eventSender.sendToServer(pe);
+						try {
+						    eventSender.sendToServer(pe);
+						} catch (Exception e) {
+							playnomicsEventList.add(new ErrorEvent(e));
+						}
 					}
 					return null;
 				}
@@ -1094,18 +1098,13 @@ public class PlaynomicsSession {
 				// next time)
 				for (PlaynomicsEvent pe : playnomicsEventList) {
 					if (isConnectionAvailable()) {
-						eventSender.sendToServer(pe);
-						playnomicsEventList.remove(pe);
+						if (eventSender.sendToServer(pe)) {  // If success then remove it.
+						    playnomicsEventList.remove(pe);
+                        }
 					}
 				}
 			} catch (Exception e) {
-				ErrorEvent errorEvent = new ErrorEvent(e);
-				// Not sure if we should try to send immediately, but whatever
-				if (!isConnectionAvailable()) {
-					playnomicsEventList.add(errorEvent);
-				} else {
-					eventSender.sendToServer(errorEvent);
-				}
+				playnomicsEventList.add(new ErrorEvent(e));
 			}
 		}
 	}
