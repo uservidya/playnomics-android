@@ -9,7 +9,7 @@ class TransactionEvent extends PlaynomicsEvent {
 
 	private long transactionId;
 	private String itemId;
-	private double quantity;
+	private Double quantity;
 	private TransactionType type;
 	private String otherUserId;
 	private String[] currencyTypes;
@@ -18,7 +18,7 @@ class TransactionEvent extends PlaynomicsEvent {
 
 	public TransactionEvent(EventType eventType, String internalSessionId,
 			Long applicationId, String userId, long transactionId,
-			String itemId, double quantity, TransactionType type,
+			String itemId, Double quantity, TransactionType type,
 			String otherUserId, String[] currencyTypes,
 			double[] currencyValues, CurrencyCategory[] currencyCategories) {
 
@@ -53,8 +53,7 @@ class TransactionEvent extends PlaynomicsEvent {
 		this.itemId = itemId;
 	}
 
-	public double getQuantity() {
-
+	public Double getQuantity() {
 		return quantity;
 	}
 

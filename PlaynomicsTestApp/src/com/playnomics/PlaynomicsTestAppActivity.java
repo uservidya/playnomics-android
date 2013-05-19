@@ -97,7 +97,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 //				currencyTypes, currencyValues, currencyCategories).toString(),
 //			Toast.LENGTH_LONG).show();
 		System.out.println("TRANSACTION: " +
-				PlaynomicsSession.transaction(1234567890L, "TEST_ITEM_ID", 1, TransactionType.BuyItem, "TEST_USER_ID",
+				PlaynomicsSession.transaction(1234567890L, "TEST_ITEM_ID", null, TransactionType.BuyItem, "TEST_USER_ID",
 						currencyTypes, currencyValues, currencyCategories).toString());
 	}
 	

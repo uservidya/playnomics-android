@@ -813,7 +813,7 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult transaction(long transactionId, String itemId,
-			double quantity, TransactionType type, String otherUserId,
+			Double quantity, TransactionType type, String otherUserId,
 			CurrencyType currencyType, double currencyValue,
 			CurrencyCategory currencyCategory) {
 
@@ -843,7 +843,7 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult transaction(long transactionId, String itemId,
-			double quantity, TransactionType type, String otherUserId,
+			Double quantity, TransactionType type, String otherUserId,
 			String currencyType, double currencyValue,
 			CurrencyCategory currencyCategory) {
 
@@ -882,7 +882,7 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult transaction(long transactionId, String itemId,
-			double quantity, TransactionType type, String otherUserId,
+			Double quantity, TransactionType type, String otherUserId,
 			CurrencyType[] currencyTypes, double[] currencyValues,
 			CurrencyCategory[] currencyCategories) {
 
@@ -926,7 +926,7 @@ public class PlaynomicsSession {
 	 * @return the API Result
 	 */
 	public static APIResult transaction(long transactionId, String itemId,
-			double quantity, TransactionType type, String otherUserId,
+			Double quantity, TransactionType type, String otherUserId,
 			String[] currencyTypes, double[] currencyValues,
 			CurrencyCategory[] currencyCategories) {
 
