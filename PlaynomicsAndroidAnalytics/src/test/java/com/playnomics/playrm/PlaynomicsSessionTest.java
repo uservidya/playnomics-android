@@ -2,6 +2,7 @@ package com.playnomics.playrm;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +27,7 @@ public class PlaynomicsSessionTest {
 	}
 	
 	@Test
-	public void testEvents() {
+	public void testEvents() throws IOException {
 		
 		EventSender es = new EventSender();
 		List<PlaynomicsEvent> eventList = new ArrayList<PlaynomicsEvent>();
@@ -52,8 +53,10 @@ public class PlaynomicsSessionTest {
 		String[] currencyTypes = {CurrencyType.USD.toString(), CurrencyType.OFF.toString()};
 		double[] currencyValues = {1,2};
 		CurrencyCategory[] currencyCategories = {CurrencyCategory.Real, CurrencyCategory.Virtual};
+		
+		Double quantity = new Double(1);
 		TransactionEvent transactionEvent = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId, 123456,
-			"testItemId", 1, TransactionType.SellItem, null, currencyTypes, currencyValues, currencyCategories);
+			"testItemId", quantity, TransactionType.SellItem, null, currencyTypes, currencyValues, currencyCategories);
 
 		eventList.add(transactionEvent);
 		
