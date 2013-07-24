@@ -14,9 +14,9 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 	private String reason;
 	
 	public GameEvent(EventType eventType, String internalSessionId, Long applicationId, String userId, Long sessionId, String site,
-		Long instanceId, String type, String gameId, String reason) {
+		Long instanceId, String type, String gameId, String reason, String deviceId) {
 	
-		super(eventType, internalSessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId, deviceId);
 		this.sessionId = sessionId;
 		this.site = site;
 		this.instanceId = instanceId;
@@ -94,8 +94,8 @@ class GameEvent extends PlaynomicsEvent  implements Serializable {
 			+ "?t=" + getEventTime().getTime()
 			+ "&a=" + getApplicationId()
 			+ "&u=" + getUserId()
-			+ "&jsh=" + getSessionId();
-			
+			+ "&jsh=" + getSessionId()
+			+ "&b=" + getDeviceId();
 		// sessionId is optional for game events
 		if (getEventType() == EventType.gameStart || getEventType() == EventType.gameEnd)
 			queryString = addOptionalParam(queryString, "s", getGameSessionId());

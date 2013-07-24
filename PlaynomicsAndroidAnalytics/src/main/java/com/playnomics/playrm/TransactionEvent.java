@@ -20,9 +20,10 @@ class TransactionEvent extends PlaynomicsEvent {
 			Long applicationId, String userId, long transactionId,
 			String itemId, Double quantity, TransactionType type,
 			String otherUserId, String[] currencyTypes,
-			double[] currencyValues, CurrencyCategory[] currencyCategories) {
+			double[] currencyValues, CurrencyCategory[] currencyCategories
+			, String deviceId) {
 
-		super(eventType, internalSessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId, deviceId);
 		this.transactionId = transactionId;
 		this.itemId = itemId;
 		this.quantity = quantity;
@@ -118,7 +119,8 @@ class TransactionEvent extends PlaynomicsEvent {
 		// Set common params
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
 				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&tt="
-				+ getType() + "&jsh=" + getSessionId();
+				+ getType() + "&jsh=" + getSessionId() + "&b=" +
+				getDeviceId();
 
 		for (int i = 0; i < getCurrencyTypes().length; i++) {
 

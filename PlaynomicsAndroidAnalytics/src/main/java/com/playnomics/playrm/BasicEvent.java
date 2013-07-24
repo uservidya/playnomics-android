@@ -7,7 +7,6 @@ class BasicEvent extends PlaynomicsEvent {
 	private static final long serialVersionUID = 1L;
 	private static final int UPDATE_INTERVAL = 60000;
 
-	private String cookieId;
 	private String instanceId;
 	private Date sessionStartTime;
 	private Date pauseTime;
@@ -20,12 +19,11 @@ class BasicEvent extends PlaynomicsEvent {
 	private int collectMode;
 
 	protected BasicEvent(EventType eventType, Long applicationId,
-			String userId, String cookieId, String internalSessionId,
+			String userId, String deviceId, String internalSessionId,
 			String instanceId, Date sessionStartTime, int sequence, int clicks,
 			int totalClicks, int keys, int totalKeys, int collectMode) {
 
-		super(eventType, internalSessionId, applicationId, userId);
-		this.cookieId = cookieId;
+		super(eventType, internalSessionId, applicationId, userId, deviceId);
 		this.instanceId = instanceId;
 		this.sessionStartTime = sessionStartTime;
 		this.sequence = sequence;
@@ -37,28 +35,20 @@ class BasicEvent extends PlaynomicsEvent {
 	}
 
 	protected BasicEvent(EventType eventType, Long applicationId,
-			String userId, String cookieId, String sessionId,
+			String userId, String deviceId, String sessionId,
 			String instanceId, int timeZoneOffset) {
 
-		super(eventType, sessionId, applicationId, userId);
-		this.cookieId = cookieId;
+		super(eventType, sessionId, applicationId, userId, deviceId);
 		this.instanceId = instanceId;
 		this.timeZoneOffset = timeZoneOffset;
 	}
 
-	protected String getCookieId() {
-
-		return cookieId;
-	}
-
 	protected String getInstanceId() {
-
 		return instanceId;
 	}
 
 
 	protected Date getSessionStartTime() {
-
 		return sessionStartTime;
 	}
 
@@ -152,7 +142,7 @@ class BasicEvent extends PlaynomicsEvent {
 
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
 				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&b="
-				+ getCookieId() + "&s=" + getSessionId() + "&i="
+				+ getDeviceId() + "&s=" + getSessionId() + "&i="
 				+ getInstanceId();
 
 		switch (getEventType()) {

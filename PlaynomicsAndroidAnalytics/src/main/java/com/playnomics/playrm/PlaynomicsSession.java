@@ -43,7 +43,6 @@ import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
 import com.playnomics.playrm.PlaynomicsEvent.EventType;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class PlaynomicsSession.
  */
@@ -84,7 +83,7 @@ public class PlaynomicsSession {
 	// Tracking values
 	private static int collectMode = 7;
 	private static Long applicationId;
-	private static String cookieId;
+	private static String deviceId;
 	private static String internalSessionId;
 	private static String instanceId;
 	private static Date sessionStartTime;
@@ -134,7 +133,7 @@ public class PlaynomicsSession {
 	}
 
 	protected static String getCookieID() {
-		return cookieId;
+		return deviceId;
 	}
 
 	protected static String getVersion() {
@@ -326,24 +325,24 @@ public class PlaynomicsSession {
 			editor.commit();
 
 			// Get unique ID for device; may be null on emulator
-			cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
+			deviceId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
 			
-			PlaynomicsLogger.i(TAG, "Device ID is " + cookieId);
+			PlaynomicsLogger.i(TAG, "Device ID is " + deviceId);
 			
-			if (cookieId == null){
-				cookieId = "UNKNOWN_DEVICE_ID";
+			if (deviceId == null){
+				deviceId = "UNKNOWN_DEVICE_ID";
 			}
 			
 			if (userId == null){
 				// Set userId to cookieId if it isn't present
 				PlaynomicsLogger.i(TAG, "User ID is null, setting to Device ID");
-				userId = cookieId;
+				userId = deviceId;
 			}
 
 			PlaynomicsLogger.i(TAG,  "User ID " + userId );
 			
 			BasicEvent be = new BasicEvent(eventType, applicationId, userId,
-					cookieId, internalSessionId, instanceId, timeZoneOffset);
+					deviceId, internalSessionId, instanceId, timeZoneOffset);
 
 			// Try to send and queue if unsuccessful
 			sendEvent(be);
@@ -532,7 +531,7 @@ public class PlaynomicsSession {
 			sessionState = SessionState.PAUSED;
 
 			BasicEvent be = new BasicEvent(EventType.appPause, applicationId,
-					userId, cookieId, internalSessionId, instanceId,
+					userId, deviceId, internalSessionId, instanceId,
 					sessionStartTime, sequence.get(), clicks.get(),
 					totalClicks.get(), keys.get(), totalKeys.get(), collectMode);
 			pauseTime = new Date();
@@ -566,7 +565,7 @@ public class PlaynomicsSession {
 					UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
 
 			BasicEvent be = new BasicEvent(EventType.appResume, applicationId,
-					userId, cookieId, internalSessionId, instanceId,
+					userId, deviceId, internalSessionId, instanceId,
 					sessionStartTime, sequence.get(), clicks.get(),
 					totalClicks.get(), keys.get(), totalKeys.get(), collectMode);
 			be.setPauseTime(pauseTime);
@@ -711,7 +710,7 @@ public class PlaynomicsSession {
 
 		UserInfoEvent uie = new UserInfoEvent(internalSessionId, applicationId,
 				userId, type, country, subdivision, sex, birthyear, source,
-				sourceCampaign, installTime);
+				sourceCampaign, installTime, deviceId);
 		return sendOrQueueEvent(uie);
 	}
 
@@ -728,7 +727,7 @@ public class PlaynomicsSession {
 
 		GameEvent gameEvent = new GameEvent(EventType.sessionStart,
 				internalSessionId, applicationId, userId, sessionId, site,
-				null, null, null, null);
+				null, null, null, null, deviceId);
 		PlaynomicsLogger.d(TAG, "sessionStart is being queued.");
 		return sendOrQueueEvent(gameEvent);
 	}
@@ -746,7 +745,7 @@ public class PlaynomicsSession {
 
 		GameEvent gameEvent = new GameEvent(EventType.sessionEnd,
 				internalSessionId, applicationId, userId, sessionId, null,
-				null, null, null, reason);
+				null, null, null, reason, deviceId);
 		PlaynomicsLogger.d(TAG, "sessionEnd is being queued.");
 		return sendOrQueueEvent(gameEvent);
 	}
@@ -771,7 +770,7 @@ public class PlaynomicsSession {
 
 		GameEvent gameStartEvent = new GameEvent(EventType.gameStart,
 				internalSessionId, applicationId, userId, sessionId, site,
-				instanceId, type, gameId, null);
+				instanceId, type, gameId, null, deviceId);
 		PlaynomicsLogger.d(TAG, "gameStart is being queued.");
 		return sendOrQueueEvent(gameStartEvent);
 	}
@@ -792,7 +791,7 @@ public class PlaynomicsSession {
 
 		GameEvent gameEndEvent = new GameEvent(EventType.gameEnd,
 				internalSessionId, applicationId, userId, sessionId, null,
-				instanceId, null, null, reason);
+				instanceId, null, null, reason, deviceId);
 		PlaynomicsLogger.d(TAG, "gameEvent is being queued.");
 		return sendOrQueueEvent(gameEndEvent);
 	}
@@ -860,7 +859,7 @@ public class PlaynomicsSession {
 		TransactionEvent transEvent = new TransactionEvent(
 				EventType.transaction, internalSessionId, applicationId,
 				userId, transactionId, itemId, quantity, type, otherUserId,
-				currencyTypes, currencyValues, currencyCategories);
+				currencyTypes, currencyValues, currencyCategories, deviceId);
 
 		PlaynomicsLogger.d(TAG, "transaction is being queued.");
 		return sendOrQueueEvent(transEvent);
@@ -902,7 +901,7 @@ public class PlaynomicsSession {
 			TransactionEvent te = new TransactionEvent(EventType.transaction,
 					internalSessionId, applicationId, userId, transactionId,
 					itemId, quantity, type, otherUserId, currencyTypeStrings,
-					currencyValues, currencyCategories);
+					currencyValues, currencyCategories, deviceId);
 			PlaynomicsLogger.d(TAG, "transaction is being queued.");
 			return sendOrQueueEvent(te);
 		} catch (Exception e) {
@@ -939,7 +938,7 @@ public class PlaynomicsSession {
 		TransactionEvent tranEvent = new TransactionEvent(
 				EventType.transaction, internalSessionId, applicationId,
 				userId, transactionId, itemId, quantity, type, otherUserId,
-				currencyTypes, currencyValues, currencyCategories);
+				currencyTypes, currencyValues, currencyCategories, deviceId);
 		PlaynomicsLogger.d(TAG, "transaction is being queued.");
 		return sendOrQueueEvent(tranEvent);
 	}
@@ -962,7 +961,7 @@ public class PlaynomicsSession {
 
 		SocialEvent socialEvent = new SocialEvent(EventType.invitationSent,
 				internalSessionId, applicationId, userId, invitationId,
-				recipientUserId, recipientAddress, method, null);
+				recipientUserId, recipientAddress, method, null, deviceId);
 		PlaynomicsLogger.d(TAG, "invitationSent is being queued.");
 		return sendOrQueueEvent(socialEvent);
 	}
@@ -981,7 +980,7 @@ public class PlaynomicsSession {
 
 		SocialEvent socialEvent = new SocialEvent(EventType.invitationResponse,
 				internalSessionId, applicationId, userId, invitationId,
-				recipientUserId, null, null, response);
+				recipientUserId, null, null, response, deviceId);
 
 		PlaynomicsLogger.d(TAG, "invitationResponse is being queued.");
 		return sendOrQueueEvent(socialEvent);
@@ -990,7 +989,7 @@ public class PlaynomicsSession {
 	public static APIResult milestone(long milestoneId, String milestoneName) {
 
 		MilestoneEvent ms = new MilestoneEvent(EventType.milestone,
-				internalSessionId, applicationId, userId, cookieId,
+				internalSessionId, applicationId, userId, deviceId,
 				milestoneId, milestoneName);
 		PlaynomicsLogger.d(TAG, "milestone is being queued.");
 		return sendOrQueueEvent(ms);
@@ -1089,7 +1088,7 @@ public class PlaynomicsSession {
 				if (sessionState == SessionState.STARTED) {
 					sequence.addAndGet(1);
 					BasicEvent runningBE = new BasicEvent(EventType.appRunning,
-							applicationId, userId, cookieId, internalSessionId,
+							applicationId, userId, deviceId, internalSessionId,
 							instanceId, sessionStartTime, sequence.get(),
 							clicks.get(), totalClicks.get(), keys.get(),
 							totalKeys.get(), collectMode);

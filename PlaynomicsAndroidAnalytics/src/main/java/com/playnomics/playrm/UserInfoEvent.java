@@ -20,18 +20,18 @@ class UserInfoEvent extends PlaynomicsEvent {
 	private Date installTime;
 
 	public UserInfoEvent(String internalSessionId, Long applicationId,
-			String userId, UserInfoType type) {
+			String userId, UserInfoType type, String deviceId) {
 
-		super(EventType.userInfo, internalSessionId, applicationId, userId);
+		super(EventType.userInfo, internalSessionId, applicationId, userId, deviceId);
 		this.type = type;
 	}
 
 	public UserInfoEvent(String sessionId, Long applicationId, String userId,
 			UserInfoType type, String country, String subdivision,
 			UserInfoSex sex, Date birthday, String source,
-			String sourceCampaign, Date installTime) {
+			String sourceCampaign, Date installTime, String deviceId) {
 
-		this(sessionId, applicationId, userId, type);
+		this(sessionId, applicationId, userId, type, deviceId);
 		this.country = country;
 		this.subdivision = subdivision;
 		this.sex = sex;
@@ -113,7 +113,7 @@ class UserInfoEvent extends PlaynomicsEvent {
 		// Set common params
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
 				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&pt="
-				+ getType() + "&jsh=" + getSessionId();
+				+ getType() + "&jsh=" + getSessionId() + "&b=" + getDeviceId();
 
 		// Optional params
 		queryString = addOptionalParam(queryString, "pc", getCountry());

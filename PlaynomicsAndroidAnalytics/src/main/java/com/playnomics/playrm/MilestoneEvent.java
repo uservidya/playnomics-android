@@ -10,10 +10,10 @@ class MilestoneEvent extends PlaynomicsEvent {
 	public String milestoneName;
 
 	public MilestoneEvent(EventType eventType, String internalSessionId,
-			long applicationId, String userId, String cookieId, long mileStone,
+			long applicationId, String userId, String deviceId, long mileStone,
 			String mileStoneName) {
 
-		super(eventType, internalSessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId, deviceId);
 
 		this.milestoneId = mileStone;
 		this.milestoneName = mileStoneName;
@@ -30,9 +30,9 @@ class MilestoneEvent extends PlaynomicsEvent {
 	@Override
 	protected String toQueryString() {
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
-				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&jsh="
-				+ getSessionId() + "&mi=" + getMilestoneId() + "&mn="
-				+ getMilestoneName() + "&jsh=" + getInternalSessionId();
+				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&b="+ getDeviceId()
+				+ "&jsh=" + getSessionId() + "&mi=" + getMilestoneId() + "&mn="
+				+ getMilestoneName();
 
 		return queryString;
 	}

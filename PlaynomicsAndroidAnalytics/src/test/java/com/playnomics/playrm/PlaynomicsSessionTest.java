@@ -36,18 +36,20 @@ public class PlaynomicsSessionTest {
 		String userId = "testUserId";
 		String sessionId = RandomGenerator.createRandomHex();
 		
-		BasicEvent startEvent = new BasicEvent(eventType, applicationId, userId, "testCookieId",
+		String deviceId  = "testDeviceId";
+		
+		BasicEvent startEvent = new BasicEvent(eventType, applicationId, userId, deviceId,
 			sessionId, RandomGenerator.createRandomHex(), 480);
 		eventList.add(startEvent);
 		
 		@SuppressWarnings("deprecation")
 		UserInfoEvent userInfoEvent = new UserInfoEvent(sessionId, applicationId, userId, UserInfoType.update, "US", "CA",
-			UserInfoSex.Male, new Date("01/01/1999"), UserInfoSource.Other.toString(), "testCampaign", new Date());
+			UserInfoSex.Male, new Date("01/01/1999"), UserInfoSource.Other.toString(), "testCampaign", new Date(), deviceId);
 		eventList.add(userInfoEvent);
 		
 		GameEvent gameEvent = new GameEvent(EventType.gameStart, sessionId, applicationId, userId,
 			3L, "testSite", 3L, "testType",
-			"testGameId", null);
+			"testGameId", null, deviceId);
 		eventList.add(gameEvent);
 	
 		String[] currencyTypes = {CurrencyType.USD.toString(), CurrencyType.OFF.toString()};
@@ -56,12 +58,12 @@ public class PlaynomicsSessionTest {
 		
 		Double quantity = new Double(1);
 		TransactionEvent transactionEvent = new TransactionEvent(EventType.transaction, sessionId, applicationId, userId, 123456,
-			"testItemId", quantity, TransactionType.SellItem, null, currencyTypes, currencyValues, currencyCategories);
+			"testItemId", quantity, TransactionType.SellItem, null, currencyTypes, currencyValues, currencyCategories, deviceId);
 
 		eventList.add(transactionEvent);
 		
 		SocialEvent socialEvent = new SocialEvent(EventType.invitationSent, sessionId, applicationId, userId, 3L,
-			"testRecipientId", "test@test.com", "email",null);
+			"testRecipientId", "test@test.com", "email",null, deviceId);
 
 		eventList.add(socialEvent);
 		

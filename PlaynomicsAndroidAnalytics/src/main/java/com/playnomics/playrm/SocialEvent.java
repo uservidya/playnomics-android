@@ -15,9 +15,9 @@ class SocialEvent extends PlaynomicsEvent {
 	public SocialEvent(EventType eventType, String internalSessionId,
 			Long applicationId, String userId, Long invitationId,
 			String recipientUserId, String recipientAddress, String method,
-			ResponseType response) {
+			ResponseType response, String deviceId) {
 
-		super(eventType, internalSessionId, applicationId, userId);
+		super(eventType, internalSessionId, applicationId, userId, deviceId);
 		this.invitationId = invitationId;
 		this.recipientUserId = recipientUserId;
 		this.recipientAddress = recipientAddress;
@@ -80,8 +80,9 @@ class SocialEvent extends PlaynomicsEvent {
 
 		// Set common params
 		String queryString = getEventType() + "?t=" + getEventTime().getTime()
-				+ "&a=" + getApplicationId() + "&u=" + getUserId() + "&ii="
-				+ getInvitationId() + "&jsh=" + getSessionId();
+				+ "&a=" + getApplicationId() + "&u=" + getUserId() 
+				+ "&b=" + getDeviceId() + "&ii=" + getInvitationId() 
+				+ "&jsh=" + getSessionId();
 
 		if (getEventType() == EventType.invitationResponse) {
 			queryString += "&ie=" + getResponse() + "&ir="
