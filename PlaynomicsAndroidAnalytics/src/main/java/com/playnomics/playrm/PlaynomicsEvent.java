@@ -49,41 +49,20 @@ abstract class PlaynomicsEvent implements Serializable {
 		return eventType;
 	}
 
-	protected void setEventType(EventType eventType) {
-		this.eventType = eventType;
-	}
-
 	protected Date getEventTime() {
 		return eventTime;
-	}
-
-	protected void setEventTime(Date eventTime) {
-		this.eventTime = eventTime;
 	}
 
 	protected String getSessionId() {
 		return internalSessionId;
 	}
 
-	protected void setSessionId(String sessionId) {
-		this.internalSessionId = sessionId;
-	}
-
 	protected Long getApplicationId() {
 		return applicationId;
 	}
 
-	protected void setApplicationId(Long applicationId) {
-		this.applicationId = applicationId;
-	}
-
 	protected String getUserId() {
-
 		return userId;
-	}
-
-	protected void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String toString() {

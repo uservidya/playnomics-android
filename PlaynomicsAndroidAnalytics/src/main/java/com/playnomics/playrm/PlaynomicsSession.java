@@ -88,7 +88,7 @@ public class PlaynomicsSession {
 	private static String internalSessionId;
 	private static String instanceId;
 	private static Date sessionStartTime;
-	private static String userId = "";
+	private static String userId;
 	private static int timeZoneOffset;
 
 	private static AtomicInteger sequence = new AtomicInteger(0);
@@ -322,20 +322,26 @@ public class PlaynomicsSession {
 			}
 
 			editor.putString(SETTING_LAST_USER_ID, userId);
-			editor.putLong(SETTING_LAST_SESSION_START_TIME,
-					sessionStartTime.getTime());
+			editor.putLong(SETTING_LAST_SESSION_START_TIME, sessionStartTime.getTime());
 			editor.commit();
 
 			// Get unique ID for device; may be null on emulator
-			cookieId = Secure.getString(activity.getContentResolver(),
-					Secure.ANDROID_ID);
-			if (cookieId == null)
+			cookieId = Secure.getString(activity.getContentResolver(), Secure.ANDROID_ID);
+			
+			PlaynomicsLogger.i(TAG, "Device ID is " + cookieId);
+			
+			if (cookieId == null){
 				cookieId = "UNKNOWN_DEVICE_ID";
-
-			// Set userId to cookieId if it isn't present
-			if (userId == null)
+			}
+			
+			if (userId == null){
+				// Set userId to cookieId if it isn't present
+				PlaynomicsLogger.i(TAG, "User ID is null, setting to Device ID");
 				userId = cookieId;
+			}
 
+			PlaynomicsLogger.i(TAG,  "User ID " + userId );
+			
 			BasicEvent be = new BasicEvent(eventType, applicationId, userId,
 					cookieId, internalSessionId, instanceId, timeZoneOffset);
 

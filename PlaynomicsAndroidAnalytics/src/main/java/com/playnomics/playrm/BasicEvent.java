@@ -51,20 +51,11 @@ class BasicEvent extends PlaynomicsEvent {
 		return cookieId;
 	}
 
-	protected void setCookieId(String cookieId) {
-
-		this.cookieId = cookieId;
-	}
-
 	protected String getInstanceId() {
 
 		return instanceId;
 	}
 
-	protected void setInstanceId(String instanceId) {
-
-		this.instanceId = instanceId;
-	}
 
 	protected Date getSessionStartTime() {
 
