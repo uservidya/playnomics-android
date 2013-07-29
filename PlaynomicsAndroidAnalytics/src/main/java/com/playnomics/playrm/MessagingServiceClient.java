@@ -83,14 +83,13 @@ class MessagingServiceClient {
 			jObj = new JSONObject(jsonString);
 			return parseResponse(jObj);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			PlaynomicsLogger.e(TAG, "Could not fetch ad for frame "+ frameId, e);
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			PlaynomicsLogger.e(TAG, "Could not fetch ad for frame "+ frameId, e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			PlaynomicsLogger.e(TAG, "Could not fetch ad for frame "+ frameId, e);
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			PlaynomicsLogger.e(TAG, "Could not fetch ad for frame "+ frameId, e);
 		}
 		return null;
 	}
