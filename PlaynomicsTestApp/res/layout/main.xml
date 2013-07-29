@@ -4,91 +4,57 @@
     android:layout_height="fill_parent"
     android:gravity="center"
     android:orientation="vertical" >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Activity 1" />
- 
-    <Button
-        android:id="@+id/changeUserButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="changeUser"
-        android:onClick="onChangeUserClick" />
- 
     <Button
         android:id="@+id/userInfoButton"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="userInfo"
+        android:text="UserInfo"
         android:onClick="onUserInfoClick" />
     
     <Button
-        android:id="@+id/sessionStartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="sessionStart"
-        android:onClick="onSessionStartClick" />
-    
-    <Button
-        android:id="@+id/sessionEndButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="sessionEnd"
-        android:onClick="onSessionEndClick" />
-
-    <Button
-        android:id="@+id/gameStartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="gameStart"
-        android:onClick="onGameStartClick" />
-
-    <Button
-        android:id="@+id/gameEndButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="gameEnd" 
-        android:onClick="onGameEndClick"/>
-
-    <Button
         android:id="@+id/transactionButton"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="transaction"
+        android:text="Transaction"
         android:onClick="onTransactionClick" />
-
-    <Button
-        android:id="@+id/invitationSentButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="invitationSent"
-        android:onClick="onInvitationSentClick" />
-
-    <Button
-        android:id="@+id/invitationResponseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="invitationResponse" 
-        android:onClick="onInvitationResponseClick"/>
-    
     <Button
         android:id="@+id/milestoneSentButton"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="mile stone"
+        android:text="All Milestones"
         android:onClick="onMilestoneClick" />
+
+    <Button
+        android:id="@+id/messagingHttpButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Messaging HTTP"
+        android:onClick="onHttpClick" />
     
-	<Button android:id="@+id/switchActivityButton"
-	    android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/messagingJsonButton"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Switch Activity" 
-        android:onClick="onSwitchActivityClick"/>
-	
-	<Button android:id="@+id/closeButton"
-	    android:layout_width="wrap_content"
+        android:text="Messaging JSON"
+        android:onClick="onJsonClick" />
+   
+    <Button
+        android:id="@+id/messagingNoAdsButton"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Close" 
-        android:onClick="onCloseClick"/>
+        android:text="Messaging No Ads"
+        android:onClick="onNoAdsClick" />
+     <Button
+        android:id="@+id/messagingPnxButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Messaging PNX"
+        android:onClick="onPnxClick" />
+    
+      <Button
+        android:id="@+id/messagingNullTargetButton"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Messaging Null Target"
+        android:onClick="onNullTargetClick" />
 </LinearLayout>
