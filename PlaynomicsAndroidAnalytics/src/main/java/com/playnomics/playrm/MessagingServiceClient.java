@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.playnomics.playrm.Ad.AdTargetType;
 import com.playnomics.playrm.Background.Orientation;
 
 class MessagingServiceClient {
@@ -109,10 +110,6 @@ class MessagingServiceClient {
 			CloseButton button = getCloseButtonFromData(responseData);
 
 			List<Ad> ads = getAdFromData(responseData);
-			if (ads == null || ads.size() == 0) {
-				return null;
-			}
-
 			return new AdResponse(ads, button, background, location,
 					expirationSeconds, status, message);
 		} catch (JSONException e) {
@@ -203,6 +200,8 @@ class MessagingServiceClient {
 			throws JSONException {
 		final String imageKey = "i";
 		final String targetKey = "t";
+		final String targetTypeKey = "targetType";
+		final String targetDataKey = "targetData";
 		final String impressionKey = "s";
 		final String preExecuteKey = "u";
 		final String postExecuteKey = "v";
@@ -219,14 +218,26 @@ class MessagingServiceClient {
 		for (int i = 0; i < adsData.length(); i++) {
 			JSONObject adData = adsData.getJSONObject(i);
 			String imageUrl = cleanJSONString(adData, imageKey);
-			String targetUrl = cleanJSONString(adData, targetKey);
 			String impressionUrl = cleanJSONString(adData, impressionKey);
 			String preExecute = cleanJSONString(adData, preExecuteKey);
 			String postExecute = cleanJSONString(adData, postExecuteKey);
 			String closeUrl = cleanJSONString(adData, closeUrlKey);
-			Ad ad = new Ad(imageUrl, targetUrl, impressionUrl, preExecute,
+			
+			String targetTypeString = cleanJSONString(adData, targetTypeKey);
+			
+			String target;
+			AdTargetType targetType;
+			if(targetTypeString == "url"){
+				targetType = AdTargetType.URL;
+				target = cleanJSONString(adData, targetKey);
+			} else {
+				targetType = AdTargetType.DATA;
+				target = cleanJSONString(adData, targetDataKey);
+			}
+			
+			Ad ad = new Ad(imageUrl, targetType, target, impressionUrl, preExecute,
 					postExecute, closeUrl);
-
+			
 			ads.add(ad);
 		}
 		return ads;

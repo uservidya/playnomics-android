@@ -327,56 +327,51 @@ public class Frame {
 		String preExecuteUrl = ad.getPreExecutionUrl();
 		String postExecuteUrl = ad.getPostExecutionUrl();
 		String clickTarget = ad.getTargetUrlForClick();
-		Ad.AdTargetType targetType = ad.getTargetType();
+		Ad.AdTargetUrlType targetType = ad.getTargetUrlType();
 
-		if (clickTarget == null) {
-			return;
-		}
+		if (clickTarget != null) {
+			Exception exec = null;
+			int statusCode;
 
-		Exception exec = null;
-		int statusCode;
+			if (targetType == Ad.AdTargetUrlType.WEB) {
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+						Uri.parse(clickTarget));
+				this.activity.startActivity(browserIntent);
+			} else if (targetType == Ad.AdTargetUrlType.PNA
+					|| targetType == Ad.AdTargetUrlType.PNX) {
 
-		if (targetType == Ad.AdTargetType.WEB) {
-			Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-					Uri.parse(clickTarget));
-			this.activity.startActivity(browserIntent);
-
-		} else if (targetType == Ad.AdTargetType.PNA
-				|| targetType == Ad.AdTargetType.PNX) {
-
-			if (preExecuteUrl != null) {
-				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
-			}
-
-			if (targetType == Ad.AdTargetType.PNA) {
-				try {
-					Messaging.performActionForLabel(activity, clickTarget);
-					statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
-				} catch (Exception e) {
-					statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
-					exec = e;
+				if (preExecuteUrl != null) {
+					PlaynomicsSession.preExecution(preExecuteUrl, x, y);
 				}
-			} else {
-				if (this.adEnabledCode) {
+
+				if (targetType == Ad.AdTargetUrlType.PNA) {
 					try {
-						Messaging
-								.executeActionOnDelegate(activity, clickTarget);
-						statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
+						Messaging.performActionForLabel(activity, clickTarget);
+						statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
 					} catch (Exception e) {
-						statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+						statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
 						exec = e;
 					}
 				} else {
-					statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
+					if (this.adEnabledCode) {
+						try {
+							Messaging
+									.executeActionOnDelegate(activity, clickTarget);
+							statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
+						} catch (Exception e) {
+							statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+							exec = e;
+						}
+					} else {
+						statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
+					}
+				}
+
+				if (postExecuteUrl != null) {
+					PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
+							exec);
 				}
 			}
-
-			if (postExecuteUrl != null) {
-				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
-						exec);
-			}
-		} else {
-			// log error
 		}
 
 		if (closeButtonView != null) {

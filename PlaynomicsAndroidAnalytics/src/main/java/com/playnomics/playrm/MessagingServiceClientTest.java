@@ -2,6 +2,9 @@ package com.playnomics.playrm;
 
 import java.util.ResourceBundle;
 
+import org.json.JSONException;
+
+import com.playnomics.playrm.Ad.AdTargetType;
 import com.playnomics.playrm.Background.Orientation;
 
 class MessagingServiceClientTest extends MessagingServiceClient {
@@ -33,67 +36,72 @@ class MessagingServiceClientTest extends MessagingServiceClient {
 	@Override
 	public AdResponse requestAd(String frameId, String caller, int width,
 			int height) {
+		try
+		{
+			final String impressionUrl = "https://ads.b.playnomics.net/v1/impression?a=3&b=4491464577382170140&d=20121019&i=7861628744956845208&r=201210190001&s=GusysoT0lOfJXp-Bp-d6QcSegzVa-OYa3dFtpmyzvxE%3D&u=testUserId";
+			final String closeUrl = "https://ads.b.playnomics.net/v1/closeImpression?a=3&b=4491464577382170140&d=20121019&i=7861628744956845208&r=201210190001&s=ixDNt0akWB1M0ctorrKh1HsCfvje4UURN9ct8KThM-s%3D&u=testUserId";
+			final String targetWebUrl = "http://www.facebook.com";
+			final String goodPNA = "pna://myGoodMethod";
+			final String goodPNX = "pnx://myGoodMethod";
+			final String badPNA = "pna://myBadMethod";
+			final String badPNX = "pnx://myBadMethod";
+			
+			final String adImage = getRotatedAdImage(true);
+			final String preExecuteUrl = "http://www.google.com";
+			final String postExecureUrl = "http://www.nytimes.com";
 
-		final String impressionUrl = "https://ads.b.playnomics.net/v1/impression?a=3&b=4491464577382170140&d=20121019&i=7861628744956845208&r=201210190001&s=GusysoT0lOfJXp-Bp-d6QcSegzVa-OYa3dFtpmyzvxE%3D&u=testUserId";
-		final String closeUrl = "https://ads.b.playnomics.net/v1/closeImpression?a=3&b=4491464577382170140&d=20121019&i=7861628744956845208&r=201210190001&s=ixDNt0akWB1M0ctorrKh1HsCfvje4UURN9ct8KThM-s%3D&u=testUserId";
-		final String targetWebUrl = "http://www.facebook.com";
-		final String goodPNA = "pna://myGoodMethod";
-		final String goodPNX = "pnx://myGoodMethod";
-		final String badPNA = "pna://myBadMethod";
-		final String badPNX = "pnx://myBadMethod";
+			Background background = getBackground(Orientation.DETECT, true, width, height);
+			CloseButton button = getCloseButton(true);
+			// should never shown
+			Ad secondAd;
+			secondAd = new Ad("", AdTargetType.URL, "http://www.google.com", impressionUrl, null,
+						null, null);
 
-		final String adImage = getRotatedAdImage(true);
-		final String preExecuteUrl = "http://www.google.com";
-		final String postExecureUrl = "http://www.nytimes.com";
+			Location location = new Location(10, 20, 300, 240);
 
-		Background background = getBackground(Orientation.DETECT, true, width, height);
-		CloseButton button = getCloseButton(true);
-		// should never shown
-		Ad secondAd = new Ad("", "http://www.google.com", impressionUrl, null,
-				null, null);
+			Ad adToShow;
+			adToShow = new Ad(adImage, AdTargetType.URL, targetWebUrl, impressionUrl, null, null,
+					closeUrl);
 
-		Location location = new Location(10, 20, 300, 240);
+			if (frameId == testCases.FixedPortrait) {
+				background = getBackground(Orientation.PORTRAIT, true, width, height);
+			} else if (frameId == testCases.FixedLandscape) {
+				background = getBackground(Orientation.LANDSCAPE, true, width, height);
+			} else if (frameId == testCases.NoCloseButton) {
+				button = getCloseButtonNoImage();
+			} else if (frameId == testCases.NoBackground) {
+				background = getBackgroundNoImage(Orientation.DETECT);
+			} else if (frameId == testCases.BadAdImage) {
+				adToShow = new Ad(getRotatedAdImage(false), AdTargetType.URL, targetWebUrl,
+						impressionUrl, null, null, closeUrl);
+			} else if (frameId == testCases.BadBackgroundImage) {
+				background = getBackground(Orientation.DETECT, false, width, height);
+			} else if (frameId == testCases.BadCloseButtonImage) {
+				button = getCloseButton(false);
+			} else if (frameId == testCases.BadData) {
+				// not sure how to test this just yet
+			} else if (frameId == testCases.GoodPNA) {
+				adToShow = new Ad(getRotatedAdImage(true), AdTargetType.URL, goodPNA, impressionUrl,
+						preExecuteUrl, postExecureUrl, closeUrl);
+			} else if (frameId == testCases.BadPNA) {
+				adToShow = new Ad(getRotatedAdImage(true), AdTargetType.URL, badPNA, impressionUrl,
+						preExecuteUrl, postExecureUrl, closeUrl);
+			} else if (frameId == testCases.GoodPNX) {
+				adToShow = new Ad(getRotatedAdImage(true), AdTargetType.URL, goodPNX, impressionUrl,
+						preExecuteUrl, postExecureUrl, closeUrl);
+			} else if (frameId == testCases.BadPNX) {
+				adToShow = new Ad(getRotatedAdImage(true), AdTargetType.URL, badPNX, impressionUrl,
+						preExecuteUrl, postExecureUrl, closeUrl);
+			}
 
-		Ad adToShow;
-		adToShow = new Ad(adImage, targetWebUrl, impressionUrl, null, null,
-				closeUrl);
-
-		if (frameId == testCases.FixedPortrait) {
-			background = getBackground(Orientation.PORTRAIT, true, width, height);
-		} else if (frameId == testCases.FixedLandscape) {
-			background = getBackground(Orientation.LANDSCAPE, true, width, height);
-		} else if (frameId == testCases.NoCloseButton) {
-			button = getCloseButtonNoImage();
-		} else if (frameId == testCases.NoBackground) {
-			background = getBackgroundNoImage(Orientation.DETECT);
-		} else if (frameId == testCases.BadAdImage) {
-			adToShow = new Ad(getRotatedAdImage(false), targetWebUrl,
-					impressionUrl, null, null, closeUrl);
-		} else if (frameId == testCases.BadBackgroundImage) {
-			background = getBackground(Orientation.DETECT, false, width, height);
-		} else if (frameId == testCases.BadCloseButtonImage) {
-			button = getCloseButton(false);
-		} else if (frameId == testCases.BadData) {
-			// not sure how to test this just yet
-		} else if (frameId == testCases.GoodPNA) {
-			adToShow = new Ad(getRotatedAdImage(true), goodPNA, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl);
-		} else if (frameId == testCases.BadPNA) {
-			adToShow = new Ad(getRotatedAdImage(true), badPNA, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl);
-		} else if (frameId == testCases.GoodPNX) {
-			adToShow = new Ad(getRotatedAdImage(true), goodPNX, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl);
-		} else if (frameId == testCases.BadPNX) {
-			adToShow = new Ad(getRotatedAdImage(true), badPNX, impressionUrl,
-					preExecuteUrl, postExecureUrl, closeUrl);
+			AdResponse responseData = new AdResponse(button, background, location,
+					30, "Ok", null);
+			responseData.insertAd(adToShow);
+			responseData.insertAd(secondAd);
+			return responseData;
+		} catch(JSONException ex){
+			return null;
 		}
-
-		AdResponse responseData = new AdResponse(button, background, location,
-				30, "Ok", null);
-		responseData.insertAd(adToShow);
-		responseData.insertAd(secondAd);
-		return responseData;
 	}
 
 	private Background getBackground(Orientation orientation,
