@@ -34,9 +34,11 @@ class AdRenderData {
 	}
 	
 	public void loadAllImages(){
-		getOrAddDrawableForImage(adResponse.getBackground().getImageUrl());
-		getOrAddDrawableForImage(adResponse.getFirstAd().getImageUrl());
-		getOrAddDrawableForImage(adResponse.getCloseButton().getImageUrl());
+		if(adResponse.getFirstAd() != null){
+			getOrAddDrawableForImage(adResponse.getBackground().getImageUrl());
+			getOrAddDrawableForImage(adResponse.getFirstAd().getImageUrl());
+			getOrAddDrawableForImage(adResponse.getCloseButton().getImageUrl());
+		}
 	}
 	
 	private Drawable getOrAddDrawableForImage(String imageUrl){

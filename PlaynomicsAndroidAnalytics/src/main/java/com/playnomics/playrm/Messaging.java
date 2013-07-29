@@ -132,15 +132,17 @@ public class Messaging {
 					PlaynomicsSession.errorReport(detail);
 				} else {
 					final AdRenderData renderData = new AdRenderData(response);
-					renderData.loadAllImages();
-
-					final Frame frame = activityFrames.get(contextKey).get(
-							frameId);
-					activity.runOnUiThread(new Runnable() {
-						public void run() {
-							frame.refreshData(renderData);
-						}
-					});
+					
+					if(response.getFirstAd() != null){
+						renderData.loadAllImages();
+						final Frame frame = activityFrames.get(contextKey).get(
+								frameId);
+						activity.runOnUiThread(new Runnable() {
+							public void run() {
+								frame.refreshData(renderData);
+							}
+						});
+					}
 				}
 			}
 		}).start();
