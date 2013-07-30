@@ -152,10 +152,10 @@ class MessagingServiceClient {
 	}
 
 	private Orientation getOrientation(String orientation) {
-		if (orientation == "landscape") {
+		if (orientation.equals("landscape")) {
 			return Orientation.LANDSCAPE;
 		}
-		if (orientation == "portrait") {
+		if (orientation.equals("portrait")) {
 			return Orientation.PORTRAIT;
 		}
 		return Orientation.DETECT;
@@ -210,10 +210,7 @@ class MessagingServiceClient {
 		List<Ad> ads = new ArrayList<Ad>();
 
 		JSONArray adsData = responseData.getJSONArray(adsKey);
-		if (adsData.length() == 0) {
-			return null;
-		}
-
+		
 		for (int i = 0; i < adsData.length(); i++) {
 			JSONObject adData = adsData.getJSONObject(i);
 			String imageUrl = cleanJSONString(adData, imageKey);
@@ -226,7 +223,7 @@ class MessagingServiceClient {
 			
 			String target;
 			AdTargetType targetType;
-			if(targetTypeString == "url"){
+			if(targetTypeString.equals("url")){
 				targetType = AdTargetType.URL;
 				target = cleanJSONString(adData, targetKey);
 			} else {

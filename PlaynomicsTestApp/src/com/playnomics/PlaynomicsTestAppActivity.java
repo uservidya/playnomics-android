@@ -29,13 +29,13 @@ public class PlaynomicsTestAppActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		PlaynomicsSession.setTestMode(false);
-		System.out.println("START: " + PlaynomicsSession.start(this, applicationId).toString());
+		Log.d(logTag, "START: " + PlaynomicsSession.start(this, applicationId).toString());
 	}
 	
 	@Override
 	protected void onStart() {
+		Log.d(logTag, "SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this));
 		super.onStart();
-		System.out.println("SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this));
 	};
 	
 	@Override
@@ -46,7 +46,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 
 	
 	public void onUserInfoClick(View view) {
-		System.out.println("USER INFO: " +PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.Male, new Date("1/1/1999"),
+		Log.d(logTag, "USER INFO: " +PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.Male, new Date("1/1/1999"),
 				UserInfoSource.Other, "test", new Date()).toString());
 	}
 	
@@ -55,17 +55,17 @@ public class PlaynomicsTestAppActivity extends Activity {
 		double[] currencyValues = { 1, 2 };
 		CurrencyCategory[] currencyCategories = { CurrencyCategory.Real, CurrencyCategory.Virtual };
 	
-		System.out.println("TRANSACTION: " +
+		Log.d(logTag, "TRANSACTION: " +
 				PlaynomicsSession.transaction(1234567890L, "TEST_ITEM_ID", null, TransactionType.BuyItem, "TEST_USER_ID",
 						currencyTypes, currencyValues, currencyCategories).toString());
 	}
 
 	public void onMilestoneClick(View view) {
-		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(1L, "CUSTOM1").toString());
-		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(2L, "CUSTOM2").toString());
-		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(3L, "CUSTOM3").toString());
-		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(4L, "CUSTOM4").toString());
-		System.out.println("TEST_MILESTONE: "+ PlaynomicsSession.milestone(5L, "CUSTOM5").toString());
+		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(1L, "CUSTOM1").toString());
+		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(2L, "CUSTOM2").toString());
+		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(3L, "CUSTOM3").toString());
+		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(4L, "CUSTOM4").toString());
+		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(5L, "CUSTOM5").toString());
 	}
 
 	public void onHttpClick(View view){
@@ -88,9 +88,15 @@ public class PlaynomicsTestAppActivity extends Activity {
 		setupFrame("e45c59f627043701");
 	}
 	
+	public void onPnx(){
+		//callback for pnx
+		Log.d(logTag, "PNX Called!");
+	}
+	
 	private void setupFrame (String frameId){
 		RichDataFrameDelegate delegate = new RichDataFrameDelegate(frameId);
 		Frame frame = Messaging.initWithFrameID(frameId, this, delegate);
+		frame.setEnableAdCode(true);
 		frame.start();
 	}
 }

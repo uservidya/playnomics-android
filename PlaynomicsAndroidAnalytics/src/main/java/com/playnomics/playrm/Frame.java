@@ -334,15 +334,13 @@ public class Frame {
 		String postExecuteUrl = ad.getPostExecutionUrl();
 		Exception exec = null;
 		int statusCode;
-		
+
 		AdTargetType targetType = ad.getTargetType();
-		if(targetType == AdTargetType.URL){
+		if (targetType == AdTargetType.URL) {
 			String clickTarget = ad.getTargetUrl();
 			AdTargetUrlType targetUrlType = ad.getTargetUrlType();
-			
-			if (clickTarget != null) {
-				
 
+			if (clickTarget != null) {
 				if (targetUrlType == Ad.AdTargetUrlType.WEB) {
 					Intent browserIntent = new Intent(Intent.ACTION_VIEW,
 							Uri.parse(clickTarget));
@@ -350,13 +348,16 @@ public class Frame {
 				} else if (targetUrlType == Ad.AdTargetUrlType.PNA
 						|| targetUrlType == Ad.AdTargetUrlType.PNX) {
 
+					String actionNoProtocol = ad.getTargetUrlForClick();
+
 					if (preExecuteUrl != null) {
 						PlaynomicsSession.preExecution(preExecuteUrl, x, y);
 					}
 
 					if (targetUrlType == Ad.AdTargetUrlType.PNA) {
 						try {
-							Messaging.performActionForLabel(activity, clickTarget);
+							Messaging.performActionForLabel(activity,
+									actionNoProtocol);
 							statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
 						} catch (Exception e) {
 							statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
@@ -365,8 +366,8 @@ public class Frame {
 					} else {
 						if (this.adEnabledCode) {
 							try {
-								Messaging
-										.executeActionOnDelegate(activity, clickTarget);
+								Messaging.executeActionOnDelegate(activity,
+										actionNoProtocol);
 								statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
 							} catch (Exception e) {
 								statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
@@ -378,30 +379,30 @@ public class Frame {
 					}
 
 					if (postExecuteUrl != null) {
-						PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
-								exec);
+						PlaynomicsSession.postExecution(postExecuteUrl,
+								statusCode, exec);
 					}
 				}
 			}
-		} else if(targetType == AdTargetType.DATA){
+		} else if (targetType == AdTargetType.DATA) {
 			if (preExecuteUrl != null) {
 				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
 			}
-			
+
 			JSONObject jsonData = ad.getTargetData();
-			
-			if(jsonData == null || this.frameDelegate == null){
+
+			if (jsonData == null || this.frameDelegate == null) {
 				statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
 			} else {
-				try{
+				try {
 					this.frameDelegate.onClick(jsonData);
 					statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
-				} catch(Exception e){
+				} catch (Exception e) {
 					statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
 					exec = e;
 				}
 			}
-			
+
 			if (postExecuteUrl != null) {
 				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
 						exec);
