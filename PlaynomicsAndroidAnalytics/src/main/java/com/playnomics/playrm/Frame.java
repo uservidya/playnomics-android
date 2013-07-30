@@ -8,6 +8,8 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.RelativeLayout;
 
+import com.playnomics.playrm.Ad.AdTargetType;
+import com.playnomics.playrm.Ad.AdTargetUrlType;
 import com.playnomics.playrm.AdImageView.ImageType;
 import com.playnomics.playrm.Background.Orientation;
 import com.playnomics.playrm.PlaynomicsSession.SessionState;
@@ -41,6 +45,7 @@ public class Frame {
 	private AtomicBoolean updatingComponent = new AtomicBoolean(false);
 
 	private final String frameID;
+	private final FrameDelegate frameDelegate;
 
 	private Timer expirationTimer;
 
@@ -66,9 +71,10 @@ public class Frame {
 		this.actions.put(name, method);
 	}
 
-	public Frame(String frameId, Activity context) {
+	public Frame(String frameId, Activity context, FrameDelegate frameDelegate) {
 		this.frameID = frameId;
 		this.activity = context;
+		this.frameDelegate = frameDelegate;
 	}
 
 	public void setEnableAdCode(boolean enable) {
@@ -326,51 +332,79 @@ public class Frame {
 
 		String preExecuteUrl = ad.getPreExecutionUrl();
 		String postExecuteUrl = ad.getPostExecutionUrl();
-		String clickTarget = ad.getTargetUrlForClick();
-		Ad.AdTargetUrlType targetType = ad.getTargetUrlType();
+		Exception exec = null;
+		int statusCode;
+		
+		AdTargetType targetType = ad.getTargetType();
+		if(targetType == AdTargetType.URL){
+			String clickTarget = ad.getTargetUrl();
+			AdTargetUrlType targetUrlType = ad.getTargetUrlType();
+			
+			if (clickTarget != null) {
+				
 
-		if (clickTarget != null) {
-			Exception exec = null;
-			int statusCode;
+				if (targetUrlType == Ad.AdTargetUrlType.WEB) {
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+							Uri.parse(clickTarget));
+					this.activity.startActivity(browserIntent);
+				} else if (targetUrlType == Ad.AdTargetUrlType.PNA
+						|| targetUrlType == Ad.AdTargetUrlType.PNX) {
 
-			if (targetType == Ad.AdTargetUrlType.WEB) {
-				Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-						Uri.parse(clickTarget));
-				this.activity.startActivity(browserIntent);
-			} else if (targetType == Ad.AdTargetUrlType.PNA
-					|| targetType == Ad.AdTargetUrlType.PNX) {
-
-				if (preExecuteUrl != null) {
-					PlaynomicsSession.preExecution(preExecuteUrl, x, y);
-				}
-
-				if (targetType == Ad.AdTargetUrlType.PNA) {
-					try {
-						Messaging.performActionForLabel(activity, clickTarget);
-						statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
-					} catch (Exception e) {
-						statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
-						exec = e;
+					if (preExecuteUrl != null) {
+						PlaynomicsSession.preExecution(preExecuteUrl, x, y);
 					}
-				} else {
-					if (this.adEnabledCode) {
+
+					if (targetUrlType == Ad.AdTargetUrlType.PNA) {
 						try {
-							Messaging
-									.executeActionOnDelegate(activity, clickTarget);
-							statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
+							Messaging.performActionForLabel(activity, clickTarget);
+							statusCode = PostExecutionEvent.Status.PNA_SUCCESS;
 						} catch (Exception e) {
-							statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+							statusCode = PostExecutionEvent.Status.PNA_EXCEPTION;
 							exec = e;
 						}
 					} else {
-						statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
+						if (this.adEnabledCode) {
+							try {
+								Messaging
+										.executeActionOnDelegate(activity, clickTarget);
+								statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
+							} catch (Exception e) {
+								statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+								exec = e;
+							}
+						} else {
+							statusCode = PostExecutionEvent.Status.PNX_ACTIONS_NOT_ENABLED;
+						}
+					}
+
+					if (postExecuteUrl != null) {
+						PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
+								exec);
 					}
 				}
-
-				if (postExecuteUrl != null) {
-					PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
-							exec);
+			}
+		} else if(targetType == AdTargetType.DATA){
+			if (preExecuteUrl != null) {
+				PlaynomicsSession.preExecution(preExecuteUrl, x, y);
+			}
+			
+			JSONObject jsonData = ad.getTargetData();
+			
+			if(jsonData == null || this.frameDelegate != null){
+				statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+			} else {
+				try{
+					this.frameDelegate.onClick(jsonData);
+					statusCode = PostExecutionEvent.Status.PNX_SUCCESS;
+				} catch(Exception e){
+					statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
+					exec = e;
 				}
+			}
+			
+			if (postExecuteUrl != null) {
+				PlaynomicsSession.postExecution(postExecuteUrl, statusCode,
+						exec);
 			}
 		}
 

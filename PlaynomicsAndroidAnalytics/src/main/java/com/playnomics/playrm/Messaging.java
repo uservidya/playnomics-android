@@ -75,9 +75,13 @@ public class Messaging {
 		return element.getMethodName();
 	}
 
-	public static Frame initWithFrameID(String frameId, Activity context) {
+	public static Frame initWithFrameID(String frameId, Activity context){
+		return initWithFrameID(frameId, context, null);
+	}
+	
+	public static Frame initWithFrameID(String frameId, Activity context, FrameDelegate frameDelegate) {
 		String caller = getCaller();
-		Frame frame = new Frame(frameId, context);
+		Frame frame = new Frame(frameId, context, frameDelegate);
 
 		ConcurrentHashMap<String, Frame> framesById = getFramesForActivity(context);
 		boolean framesAreNew = framesById == null;
