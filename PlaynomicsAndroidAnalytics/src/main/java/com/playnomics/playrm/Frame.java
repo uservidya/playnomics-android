@@ -390,7 +390,7 @@ public class Frame {
 			
 			JSONObject jsonData = ad.getTargetData();
 			
-			if(jsonData == null || this.frameDelegate != null){
+			if(jsonData == null || this.frameDelegate == null){
 				statusCode = PostExecutionEvent.Status.PNX_EXCEPTION;
 			} else {
 				try{
