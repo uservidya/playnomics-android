@@ -69,27 +69,28 @@ public class PlaynomicsTestAppActivity extends Activity {
 	}
 
 	public void onHttpClick(View view){
-		Frame frame = Messaging.initWithFrameID("44841d6a2bcec8c9", this);
-		frame.start();
+		setupFrame("44841d6a2bcec8c9");
 	}
 	
 	public void onJsonClick(View view){
-		Frame frame = Messaging.initWithFrameID("a40893b36c6ddb32", this);
-		frame.start();
+		setupFrame("a40893b36c6ddb32");
 	}
 	
 	public void onNullTargetClick(View view){
-		Frame frame = Messaging.initWithFrameID("67dbfcad37eccbf9", this);
-		frame.start();
+		setupFrame("67dbfcad37eccbf9");
 	}
 	
 	public void onNoAdsClick(View view){
-		Frame frame = Messaging.initWithFrameID("5bc049bb66ffc121", this);
-		frame.start();
+		setupFrame("5bc049bb66ffc121");
 	}
 	
 	public void onPnxClick(View view){
-		Frame frame = Messaging.initWithFrameID("e45c59f627043701", this);
+		setupFrame("e45c59f627043701");
+	}
+	
+	private void setupFrame (String frameId){
+		RichDataFrameDelegate delegate = new RichDataFrameDelegate(frameId);
+		Frame frame = Messaging.initWithFrameID(frameId, this, delegate);
 		frame.start();
 	}
 }
