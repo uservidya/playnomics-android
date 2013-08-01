@@ -163,14 +163,33 @@ public class PlaynomicsSession {
 		return resourceBundle;
 	}
 
+	private static String overrideBaseEventUrl;
+	public static void setOverrideBaseEventUrl(String url){
+		PlaynomicsSession.overrideBaseEventUrl = url;
+	}
+	
 	protected static String getBaseEventUrl() {
+		if(!(PlaynomicsSession.overrideBaseEventUrl == null 
+				&& PlaynomicsSession.overrideBaseEventUrl.equals(""))){
+			return PlaynomicsSession.overrideBaseEventUrl;
+		}
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("baseTestUrl");
 		}
 		return resourceBundle.getString("baseProdUrl");
 	}
 
+
+	private static String overrideBaseMessagingUrl;
+	public static void setOverrideBaseMessagingUrl(String url){
+		PlaynomicsSession.overrideBaseMessagingUrl = url;
+	}
+	
 	protected static String getBaseMessagingUrl() {
+		if(!(PlaynomicsSession.overrideBaseMessagingUrl == null 
+				&& PlaynomicsSession.overrideBaseEventUrl.equals(""))){
+			return PlaynomicsSession.overrideBaseEventUrl;
+		}
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("messagingTestUrl");
 		}

@@ -29,6 +29,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		PlaynomicsSession.setTestMode(false);
+		Messaging.setup(this);
 		Log.d(logTag, "START: " + PlaynomicsSession.start(this, applicationId).toString());
 	}
 	
