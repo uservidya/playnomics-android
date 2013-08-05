@@ -114,7 +114,7 @@ public class Messaging {
 
 				MessagingServiceClient client = new MessagingServiceClient(
 						PlaynomicsSession.getResourceBundle(),
-						PlaynomicsSession.getBaseMessagingUrl(),
+						PlaynomicsSession.getMessagingUrl(),
 						PlaynomicsSession.getAppID(),
 						PlaynomicsSession.getUserID(),
 						PlaynomicsSession.getCookieID());

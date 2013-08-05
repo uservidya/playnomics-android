@@ -163,15 +163,15 @@ public class PlaynomicsSession {
 		return resourceBundle;
 	}
 
-	private static String overrideBaseEventUrl;
-	public static void setOverrideBaseEventUrl(String url){
-		PlaynomicsSession.overrideBaseEventUrl = url;
+	private static String overrideEventsUrl;
+	public static void setOverrideEventsUrl(String url){
+		PlaynomicsSession.overrideEventsUrl = url;
 	}
 	
-	protected static String getBaseEventUrl() {
-		if(!(PlaynomicsSession.overrideBaseEventUrl == null 
-			|| PlaynomicsSession.overrideBaseEventUrl.equals(""))){
-			return PlaynomicsSession.overrideBaseEventUrl;
+	protected static String getEventsUrl() {
+		if(!(PlaynomicsSession.overrideEventsUrl == null 
+			|| PlaynomicsSession.overrideEventsUrl.equals(""))){
+			return PlaynomicsSession.overrideEventsUrl;
 		}
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("baseTestUrl");
@@ -180,15 +180,15 @@ public class PlaynomicsSession {
 	}
 
 
-	private static String overrideBaseMessagingUrl;
-	public static void setOverrideBaseMessagingUrl(String url){
-		PlaynomicsSession.overrideBaseMessagingUrl = url;
+	private static String overrideMessagingUrl;
+	public static void setOverrideMessagingUrl(String url){
+		PlaynomicsSession.overrideMessagingUrl = url;
 	}
 	
-	protected static String getBaseMessagingUrl() {
-		if(!(PlaynomicsSession.overrideBaseMessagingUrl == null 
-			|| PlaynomicsSession.overrideBaseEventUrl.equals(""))){
-			return PlaynomicsSession.overrideBaseEventUrl;
+	protected static String getMessagingUrl() {
+		if(!(PlaynomicsSession.overrideMessagingUrl == null 
+			|| PlaynomicsSession.overrideMessagingUrl.equals(""))){
+			return PlaynomicsSession.overrideEventsUrl;
 		}
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("messagingTestUrl");

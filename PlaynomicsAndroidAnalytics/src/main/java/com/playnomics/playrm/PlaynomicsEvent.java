@@ -25,7 +25,7 @@ abstract class PlaynomicsEvent implements Serializable {
 	protected PlaynomicsEvent(EventType eventType, 
 			String internalSessionId,
 			Long applicationId, String userId, String deviceId) {
-		this.baseUrl = PlaynomicsSession.getBaseEventUrl();
+		this.baseUrl = PlaynomicsSession.getEventsUrl();
 		this.eventTime = new Date();
 		this.eventType = eventType;
 		this.internalSessionId = internalSessionId;
@@ -39,7 +39,7 @@ abstract class PlaynomicsEvent implements Serializable {
 	}
 
 	public PlaynomicsEvent() {
-		this.baseUrl = PlaynomicsSession.getBaseEventUrl();
+		this.baseUrl = PlaynomicsSession.getEventsUrl();
 	}
 
 	protected EventType getEventType() {
