@@ -12,7 +12,7 @@ class EventSender {
         String eventUrl = event.getEventUrl();
     	// Add version info
 		if (event.appendSourceInformation()) {
-			eventUrl += "&esrc=aj&ever=" + PlaynomicsSession.getVersion();
+			eventUrl += "&esrc=aj&ever=" + PlaynomicsSession.getSDKVersion();
 		}
 			
 		PlaynomicsLogger.d(TAG, "Requesting event url: " + eventUrl);

@@ -28,7 +28,8 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		PlaynomicsSession.setTestMode(false);
+		PlaynomicsSession.setOverrideBaseEventUrl("https://e.c.playnomics.net/v1/");
+		PlaynomicsSession.setOverrideBaseMessagingUrl("https://ads.c.playnomics.net/v1/");
 		Messaging.setup(this);
 		Log.d(logTag, "START: " + PlaynomicsSession.start(this, applicationId).toString());
 	}

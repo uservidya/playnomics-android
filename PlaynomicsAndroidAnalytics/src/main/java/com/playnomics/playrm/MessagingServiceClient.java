@@ -58,7 +58,7 @@ class MessagingServiceClient {
 							.encode(caller, PlaynomicsSession.getEncoding())
 					+ "&t=" + time + "&b=" + this.cookieId + "&f=" + frameId
 					+ "&c=" + height + "&d=" + width + "&esrc=aj&ever="
-					+ PlaynomicsSession.getVersion();
+					+ PlaynomicsSession.getSDKVersion();
 
 			PlaynomicsLogger.d(TAG, "Fetching ad...");
 			PlaynomicsLogger.d(TAG, url);

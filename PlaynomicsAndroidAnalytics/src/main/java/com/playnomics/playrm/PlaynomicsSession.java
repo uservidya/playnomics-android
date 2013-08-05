@@ -136,7 +136,7 @@ public class PlaynomicsSession {
 		return deviceId;
 	}
 
-	protected static String getVersion() {
+	public static String getSDKVersion() {
 		return resourceBundle.getString("version");
 	}
 
@@ -170,7 +170,7 @@ public class PlaynomicsSession {
 	
 	protected static String getBaseEventUrl() {
 		if(!(PlaynomicsSession.overrideBaseEventUrl == null 
-				&& PlaynomicsSession.overrideBaseEventUrl.equals(""))){
+			|| PlaynomicsSession.overrideBaseEventUrl.equals(""))){
 			return PlaynomicsSession.overrideBaseEventUrl;
 		}
 		if (PlaynomicsSession.getTestMode()) {
@@ -187,7 +187,7 @@ public class PlaynomicsSession {
 	
 	protected static String getBaseMessagingUrl() {
 		if(!(PlaynomicsSession.overrideBaseMessagingUrl == null 
-				&& PlaynomicsSession.overrideBaseEventUrl.equals(""))){
+			|| PlaynomicsSession.overrideBaseEventUrl.equals(""))){
 			return PlaynomicsSession.overrideBaseEventUrl;
 		}
 		if (PlaynomicsSession.getTestMode()) {
