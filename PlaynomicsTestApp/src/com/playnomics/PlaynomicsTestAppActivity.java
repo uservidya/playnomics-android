@@ -3,20 +3,18 @@ package com.playnomics;
 import java.util.Date;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.playnomics.playrm.Frame;
+import com.playnomics.playrm.Messaging;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
 import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
-import com.playnomics.playrm.PlaynomicsConstants.ResponseType;
 import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
 import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
-import com.playnomics.playrm.Frame;
-import com.playnomics.playrm.Messaging;
 import com.playnomics.playrm.PlaynomicsSession;
 
 public class PlaynomicsTestAppActivity extends Activity {

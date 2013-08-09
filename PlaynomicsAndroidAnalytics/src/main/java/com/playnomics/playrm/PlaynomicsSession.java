@@ -188,7 +188,7 @@ public class PlaynomicsSession {
 	protected static String getMessagingUrl() {
 		if(!(PlaynomicsSession.overrideMessagingUrl == null 
 			|| PlaynomicsSession.overrideMessagingUrl.equals(""))){
-			return PlaynomicsSession.overrideEventsUrl;
+			return PlaynomicsSession.overrideMessagingUrl;
 		}
 		if (PlaynomicsSession.getTestMode()) {
 			return resourceBundle.getString("messagingTestUrl");

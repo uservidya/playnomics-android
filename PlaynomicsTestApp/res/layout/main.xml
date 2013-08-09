@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:text="UserInfo"
         android:onClick="onUserInfoClick" />
-    
     <Button
         android:id="@+id/transactionButton"
         android:layout_width="fill_parent"
