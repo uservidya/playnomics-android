@@ -6,8 +6,8 @@ public class LargeGeneratedId {
 		this.generatedId = value;
 	}
 	
-	static LargeGeneratedId generateNextValue(){
-		long id = Util.generateRandomLong();
+	public static LargeGeneratedId generateNextValue(){
+		long id = Util.generatePositiveRandomLong();
 		return new LargeGeneratedId(id);
 	}
 	

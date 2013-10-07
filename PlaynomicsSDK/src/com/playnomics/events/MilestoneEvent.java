@@ -45,7 +45,7 @@ public class MilestoneEvent extends ExplicitEvent{
 	public MilestoneEvent(GameSessionInfo sessionInfo, MilestoneType milestoneType){
 		super(sessionInfo);
 		
-		long milestoneId = Util.generateRandomLong();
+		long milestoneId = Util.generatePositiveRandomLong();
 		String milestoneName = milestoneType.getMilestoneName();
 		appendParameter(milestoneIdKey, milestoneId);
 		appendParameter(milestoneNameKey, milestoneName);

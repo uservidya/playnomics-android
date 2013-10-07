@@ -8,7 +8,7 @@ public class TransactionEvent extends ExplicitEvent {
 	public TransactionEvent(GameSessionInfo sessionInfo, int quantity, float price){
 		super(sessionInfo);
 		
-		long transactionId = Util.generateRandomLong();
+		long transactionId = Util.generatePositiveRandomLong();
 		//only currency allowed
 		int currencyIndex = 0;
 		//hard code these values since we are simplifying transactions

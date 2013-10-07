@@ -1,5 +1,6 @@
 package com.playnomics.events;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import com.playnomics.util.*;
@@ -72,5 +73,9 @@ public abstract class PlaynomicsEvent {
 
 	protected void appendParameter(String key, Object value){
 		eventParameters.put(key, value);
+	}
+	
+	public Map<String, Object> getEventParameters(){
+		return this.eventParameters;
 	}
 }

@@ -4,9 +4,9 @@ import java.util.Random;
 import java.util.TimeZone;
 
 public class Util {
-	public static long generateRandomLong(){
+	public static long generatePositiveRandomLong(){
 		Random rand = new Random();
-		return rand.nextLong();
+		return Math.abs(rand.nextLong());
 	}
 	
 	public static String getSdkVersion(){
