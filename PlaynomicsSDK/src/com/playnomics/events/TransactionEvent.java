@@ -5,10 +5,10 @@ import com.playnomics.util.Util;
 
 public class TransactionEvent extends ExplicitEvent {
 	
-	public TransactionEvent(GameSessionInfo sessionInfo, int quantity, float price){
-		super(sessionInfo);
+	public TransactionEvent(Util util, GameSessionInfo sessionInfo, int quantity, float price){
+		super(util, sessionInfo);
 		
-		long transactionId = Util.generatePositiveRandomLong();
+		long transactionId = util.generatePositiveRandomLong();
 		//only currency allowed
 		int currencyIndex = 0;
 		//hard code these values since we are simplifying transactions

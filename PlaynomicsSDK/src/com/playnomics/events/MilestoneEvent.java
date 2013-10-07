@@ -37,18 +37,18 @@ public class MilestoneEvent extends ExplicitEvent{
 			this.milestoneNum = milestoneNum;
 		}
 		
-		public String getMilestoneName(){
+		@Override
+		public String toString(){
 			return String.format("CUSTOM%d", this.milestoneNum);
 		}
 	}
 	
-	public MilestoneEvent(GameSessionInfo sessionInfo, MilestoneType milestoneType){
-		super(sessionInfo);
+	public MilestoneEvent(Util util, GameSessionInfo sessionInfo, MilestoneType milestoneType){
+		super(util, sessionInfo);
 		
-		long milestoneId = Util.generatePositiveRandomLong();
-		String milestoneName = milestoneType.getMilestoneName();
+		long milestoneId = util.generatePositiveRandomLong();
 		appendParameter(milestoneIdKey, milestoneId);
-		appendParameter(milestoneNameKey, milestoneName);
+		appendParameter(milestoneNameKey, milestoneType);
 	}
 	
 	@Override

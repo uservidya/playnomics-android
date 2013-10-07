@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.EventTime;
 import com.playnomics.util.LargeGeneratedId;
+import com.playnomics.util.Util;
 
 public class AppResumeEventTest extends PlaynomicsEventTest {
 
@@ -36,7 +37,8 @@ public class AppResumeEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppResume() {
-		LargeGeneratedId instanceId = LargeGeneratedId.generateNextValue();
+		Util util = new Util();
+		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		
 		//2 minutes ago
@@ -50,8 +52,8 @@ public class AppResumeEventTest extends PlaynomicsEventTest {
 		
 		assertTrue("Pause time greater than start time", pauseTime.compareTo(startTime) > 0);
 		int sequenceNumber = 10;
-		AppResumeEvent event = new AppResumeEvent(sessionInfo, instanceId, startTime, pauseTime, sequenceNumber);
-		testCommonEventParameters(event, sessionInfo);
+		AppResumeEvent event = new AppResumeEvent(util, sessionInfo, instanceId, startTime, pauseTime, sequenceNumber);
+		testCommonEventParameters(util, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Insance ID is set", instanceId, params.get("i"));

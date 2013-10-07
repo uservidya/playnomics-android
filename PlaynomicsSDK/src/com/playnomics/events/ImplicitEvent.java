@@ -7,9 +7,9 @@ public abstract class ImplicitEvent extends PlaynomicsEvent {
 	
 	private final String implicitEventSessionKey = "s";
 	private final String instanceKey = "i";
-	public ImplicitEvent(GameSessionInfo sessionInfo, LargeGeneratedId instanceId)
+	public ImplicitEvent(Util util, GameSessionInfo sessionInfo, LargeGeneratedId instanceId)
 	{
-		super(sessionInfo);
+		super(util, sessionInfo);
 		appendParameter(instanceKey, instanceId);
 	}
 

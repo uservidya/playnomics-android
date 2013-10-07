@@ -28,6 +28,8 @@ public abstract class PlaynomicsEvent {
 	protected final String sessionStartTimeKey = "r";
 	protected final String intervalMillisecondsKey = "d";
 	protected final String collectionModeKey = "m";
+	//appResume
+	protected final String sessionPauseTimeKey = "p";
 	//user info
 	protected final String userInfoType = "pt";
 	//protected final String PNEventParameterUserInfoPushToken = "pushTok";
@@ -48,18 +50,16 @@ public abstract class PlaynomicsEvent {
 	//push notifications
 	protected final String pushToken = "pt";
 
-	protected PlaynomicsEvent(GameSessionInfo sessionInfo){
+	protected PlaynomicsEvent(Util util, GameSessionInfo sessionInfo){
 		this.eventTime = new EventTime();
-		
-		final String source = "aj";
 		
 		this.eventParameters = new TreeMap<String, Object>();
 		eventParameters.put(applicationIdKey, sessionInfo.getApplicationId());
 		eventParameters.put(userIdKey, sessionInfo.getUserId());
 		eventParameters.put(breadcrumbIdKey, sessionInfo.getBreadcrumbId());
 		eventParameters.put(this.getSessionKey(), sessionInfo.getSessionId());
-		eventParameters.put(sdkVersionKey, Util.getSdkVersion());
-		eventParameters.put(sdkNameKey, source);
+		eventParameters.put(sdkVersionKey, util.getSdkVersion());
+		eventParameters.put(sdkNameKey, util.getSdkName());
 		eventParameters.put(eventTimeKey, this.eventTime);
 	}
 	

@@ -37,7 +37,8 @@ public class AppRunningEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppRunning() {
-		LargeGeneratedId instanceId = LargeGeneratedId.generateNextValue();
+		Util util = new Util();
+		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		
 		//1 minute ago
@@ -52,8 +53,8 @@ public class AppRunningEventTest extends PlaynomicsEventTest {
 		int keysPressed = 0;
 		int totalKeysPressed = 0;
 		
-		AppRunningEvent event =  new AppRunningEvent(sessionInfo, instanceId, startTime, sequenceNumber, touches, totalTouches);
-		testCommonEventParameters(event, sessionInfo);
+		AppRunningEvent event =  new AppRunningEvent(util, sessionInfo, instanceId, startTime, sequenceNumber, touches, totalTouches);
+		testCommonEventParameters(util, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Insance ID is set", instanceId, params.get("i"));
@@ -63,7 +64,7 @@ public class AppRunningEventTest extends PlaynomicsEventTest {
 		assertEquals("Keys pressed is set", keysPressed, params.get("k"));
 		assertEquals("Total keys pressed is set", totalKeysPressed, params.get("l"));
 		assertEquals("Session start time is set", startTime, params.get("r"));
-		assertEquals("Capture mode is set", Util.getCollectionMode(), params.get("m"));
-		assertEquals("Interval is set", Util.getAppRunningIntervalSeconds() * 1000, params.get("d"));	
+		assertEquals("Capture mode is set", util.getCollectionMode(), params.get("m"));
+		assertEquals("Interval is set", util.getAppRunningIntervalSeconds() * 1000, params.get("d"));	
 	}
 }

@@ -2,19 +2,19 @@ package com.playnomics.events;
 
 import static org.junit.Assert.*;
 
-import java.util.Map;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+import java.util.Map;
 
+import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.session.GameSessionInfo;
-import com.playnomics.util.LargeGeneratedId;
 import com.playnomics.util.Util;
 
-public class AppStartEventTest extends PlaynomicsEventTest {
+public class MilestoneEventTest extends PlaynomicsEventTest {
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -26,6 +26,7 @@ public class AppStartEventTest extends PlaynomicsEventTest {
 
 	@Before
 	public void setUp() throws Exception {
+		
 	}
 
 	@After
@@ -33,16 +34,21 @@ public class AppStartEventTest extends PlaynomicsEventTest {
 	}
 
 	@Test
-	public void testAppStart() {
+	public void testMilestoneToString() {
+		MilestoneType milestoneType = MilestoneType.MilestoneCustom1;
+		assertEquals("MilestoneType has correct string representation", "CUSTOM1", milestoneType.toString());
+	}
+	
+	@Test
+	public void testMilestoneEvent(){
 		Util util = new Util();
-		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		
-		AppPageEvent event = new AppPageEvent(util, sessionInfo, instanceId);
+		MilestoneType milestone25 = MilestoneType.MilestoneCustom25;
+	
+		MilestoneEvent event = new MilestoneEvent(util, sessionInfo, milestone25);
 		testCommonEventParameters(util, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
-		assertEquals("Instance ID is set", instanceId, params.get("i"));
-		assertEquals("Time zone is set", util.getMinutesTimezoneOffset(), params.get("z"));
+		assertEquals("Milestone Name is set", milestone25, params.get("mn"));
 	}
 }

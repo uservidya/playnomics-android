@@ -3,17 +3,21 @@ package com.playnomics.util;
 import java.util.Random;
 import java.util.TimeZone;
 
-public class Util {
-	public static long generatePositiveRandomLong(){
+public class Util {	
+	public long generatePositiveRandomLong(){
 		Random rand = new Random();
 		return Math.abs(rand.nextLong());
 	}
 	
-	public static String getSdkVersion(){
+	public String getSdkVersion(){
 		return "1.0.0";
 	}
 	
-	public static int getMinutesTimezoneOffset(){
+	public String getSdkName(){
+		return "aj";
+	}
+	
+	public int getMinutesTimezoneOffset(){
 		//get the offset local timezone from GMT in ms (local time + offset = UTC time)
 		int millisecondsOffset = TimeZone.getDefault().getRawOffset();		
 		int minutesOffset = millisecondsOffset/(60 * 1000);
@@ -21,11 +25,11 @@ public class Util {
 		return minutesOffset * -1;
 	}
 	
-	public static int getAppRunningIntervalSeconds(){
+	public int getAppRunningIntervalSeconds(){
 		return 60;
 	}
 	
-	public static int getCollectionMode(){
+	public int getCollectionMode(){
 		return 7;
 	}
 }

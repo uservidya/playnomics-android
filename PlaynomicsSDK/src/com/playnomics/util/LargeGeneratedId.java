@@ -2,13 +2,13 @@ package com.playnomics.util;
 
 public class LargeGeneratedId {
 	private long generatedId;
-	public LargeGeneratedId(long value){
-		this.generatedId = value;
+	
+	public LargeGeneratedId(Util util){
+		this.generatedId = util.generatePositiveRandomLong();
 	}
 	
-	public static LargeGeneratedId generateNextValue(){
-		long id = Util.generatePositiveRandomLong();
-		return new LargeGeneratedId(id);
+	public LargeGeneratedId(long value){
+		this.generatedId = value;
 	}
 	
 	@Override

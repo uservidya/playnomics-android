@@ -27,8 +27,9 @@ public class UtilTests {
 
 	@Test
 	public void testGeneratedLongsAlwaysPositive() {
+		Util util = new Util();
 		for(int i = 0; i < 1000; i ++){
-			long num = Util.generatePositiveRandomLong();
+			long num = util.generatePositiveRandomLong();
 			assertTrue(num >= 0);
 		}
 	}
@@ -36,12 +37,14 @@ public class UtilTests {
 	@Test
 	public void testCorrectCollectionMode(){
 		//collection mode for Android is 7
-		assertEquals(7, Util.getCollectionMode());
+		Util util = new Util();
+		assertEquals(7, util.getCollectionMode());
 	}
 	
 	@Test
 	public void testCorrectAppRunningInterval(){
 		//appRunning Interval is 60 seconds
-		assertEquals(60, Util.getAppRunningIntervalSeconds());
+		Util util = new Util();
+		assertEquals(60, util.getAppRunningIntervalSeconds());
 	}
 }
