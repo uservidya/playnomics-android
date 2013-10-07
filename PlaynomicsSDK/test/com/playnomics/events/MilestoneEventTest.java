@@ -7,7 +7,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.mockito.Mockito.mock;
+
+import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import java.util.Map;
 
 import com.playnomics.events.MilestoneEvent.MilestoneType;
@@ -16,6 +18,9 @@ import com.playnomics.util.Util;
 
 public class MilestoneEventTest extends PlaynomicsEventTest {
 
+	@Mock
+	private Util utilMock;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -41,14 +46,24 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 	
 	@Test
 	public void testMilestoneEvent(){
-		Util util = new Util();
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		MilestoneType milestone25 = MilestoneType.MilestoneCustom25;
-	
-		MilestoneEvent event = new MilestoneEvent(util, sessionInfo, milestone25);
-		testCommonEventParameters(util, event, sessionInfo);
+		
+		long milestoneId = 100L;
+		
+		when(utilMock.getSdkName()).thenReturn("aj");
+		when(utilMock.getSdkVersion()).thenReturn("1.0.0");
+		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
+		
+		MilestoneEvent event = new MilestoneEvent(utilMock, sessionInfo, milestone25);
+		testCommonEventParameters(utilMock, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Milestone Name is set", milestone25, params.get("mn"));
+		assertEquals("Milestone ID is set", milestoneId, params.get("mi"));
+		
+		verify(utilMock, times(2)).getSdkName();
+		verify(utilMock, times(2)).getSdkVersion();
+		verify(utilMock).generatePositiveRandomLong();
 	}
 }
