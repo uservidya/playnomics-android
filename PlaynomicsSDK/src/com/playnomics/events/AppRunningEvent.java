@@ -6,7 +6,7 @@ import com.playnomics.session.GameSessionInfo;
 public class AppRunningEvent extends ImplicitEvent {
 	
 	public AppRunningEvent(GameSessionInfo sessionInfo, LargeGeneratedId instanceId, 
-			EpochTime sessionStartTime, int sequenceNumber, int touches, int totalTouches) 
+			EventTime sessionStartTime, int sequenceNumber, int touches, int totalTouches) 
 	{
 		super(sessionInfo, instanceId);
 	

@@ -5,8 +5,8 @@ import com.playnomics.session.GameSessionInfo;
 
 public class AppResumeEvent extends ImplicitEvent {
 
-	public AppResumeEvent(GameSessionInfo sessionInfo, LargeGeneratedId instanceId, EpochTime sessionStartTime, 
-			EpochTime sessionPauseTime, int sequenceNumber)
+	public AppResumeEvent(GameSessionInfo sessionInfo, LargeGeneratedId instanceId, EventTime sessionStartTime, 
+			EventTime sessionPauseTime, int sequenceNumber)
 	{
 		super(sessionInfo, instanceId);
 		

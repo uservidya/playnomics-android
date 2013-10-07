@@ -8,7 +8,7 @@ import com.playnomics.session.GameSessionInfo;
 
 public abstract class PlaynomicsEvent {
 	private TreeMap<String, Object> eventParameters;
-	private EpochTime eventTime;
+	private EventTime eventTime;
 	
 	private final String applicationIdKey = "a";
 	private final String userIdKey = "u";
@@ -49,7 +49,7 @@ public abstract class PlaynomicsEvent {
 	protected final String pushToken = "pt";
 
 	protected PlaynomicsEvent(GameSessionInfo sessionInfo){
-		this.eventTime = EpochTime.getEpochTimeNow();
+		this.eventTime = new EventTime();
 		
 		final String source = "aj";
 		
@@ -63,7 +63,7 @@ public abstract class PlaynomicsEvent {
 		eventParameters.put(eventTimeKey, this.eventTime);
 	}
 	
-	public EpochTime getEventTime(){
+	public EventTime getEventTime(){
 		return eventTime;
 	}
 	

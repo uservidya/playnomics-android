@@ -6,7 +6,7 @@ import com.playnomics.session.GameSessionInfo;
 public class AppPauseEvent extends ImplicitEvent {
 	
 	public AppPauseEvent(GameSessionInfo sessionInfo, LargeGeneratedId instanceId, 
-			EpochTime sessionStartTime, int sequenceNumber, int touches, int totalTouches) 
+			EventTime sessionStartTime, int sequenceNumber, int touches, int totalTouches) 
 	{
 		super(sessionInfo, instanceId);
 	
