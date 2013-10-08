@@ -24,7 +24,7 @@ public class Logger {
 		Logger.logLevel = level;
 	}
 	
-	public static void log(LogLevel logLevel, String message, Object[] args){
+	public static void log(LogLevel logLevel, String message, Object ... args){
 		int authorizedLogLevel = Logger.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if(authorizedLogLevel <= targetLogLevel){
@@ -40,7 +40,7 @@ public class Logger {
 		}
 	}
 	
-	public static void log(LogLevel logLevel, Exception ex, String message, Object[] args){
+	public static void log(LogLevel logLevel, Exception ex, String message, Object ... args){
 		int authorizedLogLevel = Logger.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if(authorizedLogLevel <= targetLogLevel){
