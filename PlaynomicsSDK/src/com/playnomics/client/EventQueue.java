@@ -1,0 +1,71 @@
+package com.playnomics.client;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.playnomics.events.PlaynomicsEvent;
+import com.playnomics.util.Util;
+
+public class EventQueue{
+
+	private String apiUrl;
+	private ConcurrentLinkedQueue<String> eventUrlQueue;
+	private Util util;
+	
+	public EventQueue(Util util, String apiUrl){
+		this.util = util;
+		this.apiUrl = apiUrl;
+		this.eventUrlQueue = new ConcurrentLinkedQueue<String>();
+	}
+	
+	public void enqueueEvent(PlaynomicsEvent event){
+		String eventUrl = buildUrl(this.apiUrl, event.getBaseUrl(), event.getEventParameters());
+		enqueueEventUrl(eventUrl);
+	}
+	
+	public void enqueueEventUrl(String eventUrl){
+		if(!util.stringIsNullOrEmpty(eventUrl)){
+			this.eventUrlQueue.add(eventUrl);
+		}
+	}
+	
+	public boolean isEmpty(){
+		return this.eventUrlQueue.isEmpty();
+	}
+	
+	public String dequeueEventUrl(){
+		return this.eventUrlQueue.remove();
+	}
+	
+	String buildUrl(String url, String path, Map<String, Object> queryParameters){
+		if(util.stringIsNullOrEmpty(url)){
+			return null;
+		}
+		
+		StringBuilder builder = new StringBuilder(url);
+		
+		if(path != null && path.isEmpty()){
+			builder.append(url.endsWith("/") ? String.format("/%s", path) : path);
+		}
+		
+		boolean hasQueryString = builder.toString().endsWith("?");
+		boolean firstParam = false;
+		
+		for(String key : queryParameters.keySet()){
+			if(util.stringIsNullOrEmpty(key)){
+				continue;
+			}
+			
+			Object value = queryParameters.get(key);
+			if(value == null){
+				continue;
+			}
+			
+			builder.append(hasQueryString && firstParam 
+					? String.format("%s=%s", key, value.toString())
+					: String.format("?%s=%s", key, value.toString()));
+			firstParam = false;
+		}
+		return builder.toString();
+	}
+}
