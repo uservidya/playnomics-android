@@ -27,7 +27,7 @@ public class TransactionEvent extends ExplicitEvent {
 	}
 	
 	@Override
-	protected String getBaseUrl() {
+	public String getBaseUrl() {
 		return "transaction";
 	}
 

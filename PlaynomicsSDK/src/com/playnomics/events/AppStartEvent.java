@@ -11,7 +11,7 @@ public class AppStartEvent extends ImplicitEvent {
 	}
 	
 	@Override
-	protected String getBaseUrl() {
+	public String getBaseUrl() {
 		return "appStart";
 	}
 }

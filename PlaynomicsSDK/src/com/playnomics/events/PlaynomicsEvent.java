@@ -67,7 +67,7 @@ public abstract class PlaynomicsEvent {
 		return eventTime;
 	}
 	
-	protected abstract String getBaseUrl();
+	public abstract String getBaseUrl();
 	
 	protected abstract String getSessionKey();
 

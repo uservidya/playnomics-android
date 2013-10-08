@@ -16,7 +16,7 @@ public class AppResumeEvent extends ImplicitEvent {
 	}
 	
 	@Override
-	protected String getBaseUrl() {
+	public String getBaseUrl() {
 		return "appResume";
 	}
 }
