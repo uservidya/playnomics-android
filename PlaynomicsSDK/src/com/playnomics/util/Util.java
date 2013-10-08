@@ -32,4 +32,8 @@ public class Util {
 	public int getCollectionMode(){
 		return 7;
 	}
+	
+	public boolean stringIsNullOrEmpty(String value){
+		return (value == null || value.isEmpty());
+	}
 }
