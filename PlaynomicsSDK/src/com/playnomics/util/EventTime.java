@@ -17,6 +17,14 @@ public class EventTime extends GregorianCalendar{
 		((Calendar)this).setTimeInMillis(millisecondsSinceEpoch);
 	}
 	
+	public static int getMinutesTimezoneOffset(){
+		//get the offset local timezone from GMT in ms (local time + offset = UTC time)
+		int millisecondsOffset = TimeZone.getDefault().getRawOffset();		
+		int minutesOffset = millisecondsOffset/(60 * 1000);
+		//flip the sign, because we want to view the calculation as UTC - offset = localTime
+		return minutesOffset * -1;
+	}
+	
 	@Override
 	public String toString(){
 		return String.format("%l", this.getTimeInMillis());

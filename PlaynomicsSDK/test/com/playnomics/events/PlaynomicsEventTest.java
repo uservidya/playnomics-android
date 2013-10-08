@@ -15,6 +15,7 @@ import org.mockito.*;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.LargeGeneratedId;
+import com.playnomics.util.Config;
 import com.playnomics.util.Util;
 
 
@@ -31,7 +32,7 @@ public class PlaynomicsEventTest {
 		return new GameSessionInfo(1L, "userId", "breadcrumId", sessionId);
 	}
 	
-	protected void testCommonEventParameters(Util util, PlaynomicsEvent event, GameSessionInfo sessionInfo){
+	protected void testCommonEventParameters(Config config, PlaynomicsEvent event, GameSessionInfo sessionInfo){
 		Map<String, Object> params = event.getEventParameters();
 		
 		assertEquals("Application ID is set", sessionInfo.getApplicationId(), params.get("a"));
@@ -39,8 +40,8 @@ public class PlaynomicsEventTest {
 		assertEquals("Breadcrumb ID is set", sessionInfo.getBreadcrumbId(), params.get("b"));
 		assertEquals("Session ID is set", sessionInfo.getSessionId(), params.get(event.getSessionKey()));
 		assertEquals("Event time is set", event.getEventTime(), params.get("t"));
-		assertEquals("SDK Name is set", util.getSdkName(), params.get("esrc"));
-		assertEquals("SDK Name is set", util.getSdkVersion(), params.get("ever"));
+		assertEquals("SDK Name is set", config.getSdkName(), params.get("esrc"));
+		assertEquals("SDK Name is set", config.getSdkVersion(), params.get("ever"));
 		
 		if(event instanceof ImplicitEvent){
 			assertEquals("Session key is set correctly", event.getSessionKey(), "s");

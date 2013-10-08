@@ -5,9 +5,9 @@ import com.playnomics.session.GameSessionInfo;
 
 public class AppStartEvent extends ImplicitEvent {
 	
-	public AppStartEvent(Util util, GameSessionInfo sessionInfo, LargeGeneratedId instanceId){
-		super(util, sessionInfo, instanceId);
-		appendParameter(timeZoneOffsetKey, util.getMinutesTimezoneOffset());
+	public AppStartEvent(Config config, GameSessionInfo sessionInfo, LargeGeneratedId instanceId){
+		super(config, sessionInfo, instanceId);
+		appendParameter(config.getTimeZoneOffsetKey(), EventTime.getMinutesTimezoneOffset());
 	}
 	
 	@Override

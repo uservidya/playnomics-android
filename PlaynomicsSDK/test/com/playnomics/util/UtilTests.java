@@ -33,18 +33,4 @@ public class UtilTests {
 			assertTrue(num >= 0);
 		}
 	}
-	
-	@Test
-	public void testCorrectCollectionMode(){
-		//collection mode for Android is 7
-		Util util = new Util();
-		assertEquals(7, util.getCollectionMode());
-	}
-	
-	@Test
-	public void testCorrectAppRunningInterval(){
-		//appRunning Interval is 60 seconds
-		Util util = new Util();
-		assertEquals(60, util.getAppRunningIntervalSeconds());
-	}
 }

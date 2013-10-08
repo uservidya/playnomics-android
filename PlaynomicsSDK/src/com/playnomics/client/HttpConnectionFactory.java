@@ -10,7 +10,8 @@ import com.playnomics.util.Logger.LogLevel;
 
 public class HttpConnectionFactory {
 	
-	public HttpURLConnection startConnectionForUrl(String urlString) throws IOException{
+	public HttpURLConnection startConnectionForUrl(String urlString) 
+			throws IOException {
 		try{
 			URL url = new URL(urlString);
 			return ((HttpURLConnection) url.openConnection());

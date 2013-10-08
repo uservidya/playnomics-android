@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.util.Log;
-
 import com.playnomics.util.Logger;
 import com.playnomics.util.Logger.LogLevel;
 

@@ -44,12 +44,11 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 	
 		long transactionId = 10000L;
 	
-		when(utilMock.getSdkName()).thenReturn("aj");
-		when(utilMock.getSdkVersion()).thenReturn("1.0.0");
 		when(utilMock.generatePositiveRandomLong()).thenReturn(transactionId);
 		
-		TransactionEvent event = new TransactionEvent(utilMock, sessionInfo, 10, .99f);
-		testCommonEventParameters(utilMock, event, sessionInfo);
+		Config config = new Config();
+		TransactionEvent event = new TransactionEvent(config, utilMock, sessionInfo, 10, .99f);
+		testCommonEventParameters(config, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		
@@ -61,8 +60,6 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 		assertEquals("Transaction Type is set", "BuyItem", params.get("tt"));
 		assertEquals("Quantity is set", 10, params.get("tq"));
 		
-		verify(utilMock, times(2)).getSdkName();
-		verify(utilMock, times(2)).getSdkVersion();
 		verify(utilMock).generatePositiveRandomLong();
 	}
 }

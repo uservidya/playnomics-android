@@ -6,28 +6,57 @@ import com.playnomics.util.*;
 import com.playnomics.client.HttpConnectionFactory;
 
 public class Session {
-
 	private EventWorker eventWorker;
 	private EventQueue eventQueue;
 	private Util util;
+	private Config config; 
 	private static final Object syncLock = new Object();
-	
-	private String eventUrl;
-	
-	private String getEventUrl(){
-		return eventUrl;
-	}
-	
-	private String messagingUrl;	
-	
-	
+
 	//private session data
 	private long applicationId;
 	private String userId;
+	private LargeGeneratedId sessionId;
+	private LargeGeneratedId instanceId;
+
+	private boolean testMode = false;
+	public void setTestMode(boolean value){
+		this.testMode = value;
+	}
+	
+	private String overrideEventsUrl;
+	public void setOverrideEventsUrl(String url){
+		this.overrideEventsUrl = url;
+	}
+	
+	public String getEventsUrl() {
+		if(!util.stringIsNullOrEmpty(this.overrideEventsUrl)){
+			return this.overrideEventsUrl;
+		}
+		if (this.testMode) {
+			return config.getTestEventsUrl();
+		}
+		return config.getProdEventsUrl();
+	}
+
+	private String overrideMessagingUrl;
+	public void setOverrideMessagingUrl(String url){
+		this.overrideMessagingUrl = url;
+	}
+	
+	public String getMessagingUrl() {
+		if(!util.stringIsNullOrEmpty(this.overrideMessagingUrl)){
+			return this.overrideMessagingUrl;
+		}
+		if (this.testMode) {
+			return config.getTestMessagingUrl();
+		}
+		return config.getProdMessagingUrl();
+	}
 	
 	private Session(){
 		this.util = new Util();
-		this.eventQueue = new EventQueue(util, getEventUrl());
+		this.config = new Config();
+		this.eventQueue = new EventQueue(util, this.getEventsUrl());
 		this.eventWorker = new EventWorker(this.eventQueue, new HttpConnectionFactory());
 	}
 	
@@ -50,6 +79,14 @@ public class Session {
 		this.applicationId = applicationId;
 	
 		//session start code here
+	}
+	
+	private void pause(){
+		
+	}
+	
+	private void resume(){
+		
 	}
 	
 }

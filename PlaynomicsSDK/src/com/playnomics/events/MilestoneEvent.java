@@ -1,6 +1,7 @@
 package com.playnomics.events;
 
 import com.playnomics.session.GameSessionInfo;
+import com.playnomics.util.Config;
 import com.playnomics.util.Util;
 
 public class MilestoneEvent extends ExplicitEvent{
@@ -43,12 +44,12 @@ public class MilestoneEvent extends ExplicitEvent{
 		}
 	}
 	
-	public MilestoneEvent(Util util, GameSessionInfo sessionInfo, MilestoneType milestoneType){
-		super(util, sessionInfo);
+	public MilestoneEvent(Config config, Util util, GameSessionInfo sessionInfo, MilestoneType milestoneType){
+		super(config, sessionInfo);
 		
 		long milestoneId = util.generatePositiveRandomLong();
-		appendParameter(milestoneIdKey, milestoneId);
-		appendParameter(milestoneNameKey, milestoneType);
+		appendParameter(config.getMilestoneIdKey(), milestoneId);
+		appendParameter(config.getMilestoneNameKey(), milestoneType);
 	}
 	
 	@Override

@@ -15,6 +15,7 @@ import java.util.Map;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Util;
+import com.playnomics.util.Config;
 
 public class MilestoneEventTest extends PlaynomicsEventTest {
 
@@ -51,19 +52,16 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 		
 		long milestoneId = 100L;
 		
-		when(utilMock.getSdkName()).thenReturn("aj");
-		when(utilMock.getSdkVersion()).thenReturn("1.0.0");
+		Config config = new Config();
+		
 		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 		
-		MilestoneEvent event = new MilestoneEvent(utilMock, sessionInfo, milestone25);
-		testCommonEventParameters(utilMock, event, sessionInfo);
+		MilestoneEvent event = new MilestoneEvent(config, utilMock, sessionInfo, milestone25);
+		testCommonEventParameters(config, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Milestone Name is set", milestone25, params.get("mn"));
 		assertEquals("Milestone ID is set", milestoneId, params.get("mi"));
-		
-		verify(utilMock, times(2)).getSdkName();
-		verify(utilMock, times(2)).getSdkVersion();
 		verify(utilMock).generatePositiveRandomLong();
 	}
 }

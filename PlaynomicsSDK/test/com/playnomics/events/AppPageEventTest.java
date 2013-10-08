@@ -12,7 +12,9 @@ import org.junit.Test;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.LargeGeneratedId;
+import com.playnomics.util.Config;
 import com.playnomics.util.Util;
+import com.playnomics.util.EventTime;
 
 public class AppPageEventTest extends PlaynomicsEventTest {
 	
@@ -34,15 +36,16 @@ public class AppPageEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppPage() {
+		Config config = new Config();
 		Util util = new Util();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		
-		AppPageEvent event = new AppPageEvent(new Util(), sessionInfo, instanceId);
-		testCommonEventParameters(util, event, sessionInfo);
+		AppPageEvent event = new AppPageEvent(config, sessionInfo, instanceId);
+		testCommonEventParameters(config, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Instance ID is set", instanceId, params.get("i"));
-		assertEquals("Time zone is set", util.getMinutesTimezoneOffset(), params.get("z"));
+		assertEquals("Time zone is set", EventTime.getMinutesTimezoneOffset(), params.get("z"));
 	}
 }

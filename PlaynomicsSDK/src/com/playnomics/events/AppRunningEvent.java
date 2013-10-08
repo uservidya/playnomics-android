@@ -5,24 +5,24 @@ import com.playnomics.session.GameSessionInfo;
 
 public class AppRunningEvent extends ImplicitEvent {
 	
-	public AppRunningEvent(Util util, GameSessionInfo sessionInfo, LargeGeneratedId instanceId, 
+	public AppRunningEvent(Config config, GameSessionInfo sessionInfo, LargeGeneratedId instanceId, 
 			EventTime sessionStartTime, int sequenceNumber, int touches, int totalTouches) 
 	{
-		super(util, sessionInfo, instanceId);
+		super(config, sessionInfo, instanceId);
 	
-		final int updateTimeIntervalMilliseconds = util.getAppRunningIntervalSeconds() * 1000;
+		final int updateTimeIntervalMilliseconds = config.getAppRunningIntervalMilliseconds();
 		final int keysPressed = 0;
 		final int totalKeysPressed = 0;
-		final int collectionMode = util.getCollectionMode();
+		final int collectionMode = config.getCollectionMode();
 		
-		appendParameter(sequenceKey, sequenceNumber);
-		appendParameter(touchesKey, touches);
-		appendParameter(totalTouchesKey, totalTouches);
-		appendParameter(sessionStartTimeKey, sessionStartTime);
-		appendParameter(keysPressedKey, keysPressed);
-		appendParameter(totalKeysPressedKey, totalKeysPressed);
-		appendParameter(intervalMillisecondsKey, updateTimeIntervalMilliseconds);
-		appendParameter(collectionModeKey, collectionMode);
+		appendParameter(config.getSequenceKey(), sequenceNumber);
+		appendParameter(config.getTouchesKey(), touches);
+		appendParameter(config.getTotalTouchesKey(), totalTouches);
+		appendParameter(config.getSessionStartTimeKey(), sessionStartTime);
+		appendParameter(config.getKeysPressedKey(), keysPressed);
+		appendParameter(config.getTotalKeysPressedKey(), totalKeysPressed);
+		appendParameter(config.getIntervalMillisecondsKey(), updateTimeIntervalMilliseconds);
+		appendParameter(config.getCollectionModeKey(), collectionMode);
 	}
 		
 	@Override
