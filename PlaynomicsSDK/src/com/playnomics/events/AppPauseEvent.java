@@ -26,7 +26,7 @@ public class AppPauseEvent extends ImplicitEvent {
 	}
 		
 	@Override
-	public String getBaseUrl() {
+	public String getUrlPath() {
 		return "appPause";
 	}
 }

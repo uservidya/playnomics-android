@@ -26,7 +26,7 @@ public class AppRunningEvent extends ImplicitEvent {
 	}
 		
 	@Override
-	public String getBaseUrl() {
+	public String getUrlPath() {
 		return "appRunning";
 	}
 }

@@ -49,19 +49,19 @@ public class PlaynomicsEventTest {
 		}
 		
 		if(event instanceof AppPageEvent){
-			assertEquals("Has correct URL Path", "appPage", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "appPage", event.getUrlPath());
 		} else if (event instanceof AppStartEvent){
-			assertEquals("Has correct URL Path", "appStart", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "appStart", event.getUrlPath());
 		} else if (event instanceof AppPauseEvent){
-			assertEquals("Has correct URL Path", "appPause", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "appPause", event.getUrlPath());
 		} else if (event instanceof AppResumeEvent){
-			assertEquals("Has correct URL Path", "appResume", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "appResume", event.getUrlPath());
 		} else if (event instanceof TransactionEvent){
-			assertEquals("Has correct URL Path", "transaction", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "transaction", event.getUrlPath());
 		} else if (event instanceof MilestoneEvent){
-			assertEquals("Has correct URL Path", "milestone", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "milestone", event.getUrlPath());
 		} else if (event instanceof UserInfoEvent){
-			assertEquals("Has correct URL Path", "userInfo", event.getBaseUrl());
+			assertEquals("Has correct URL Path", "userInfo", event.getUrlPath());
 		}
 	}
 }

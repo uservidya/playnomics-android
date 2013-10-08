@@ -16,7 +16,7 @@ public class UserInfoEvent extends ExplicitEvent {
 	}
 	
 	@Override
-	public String getBaseUrl() {
+	public String getUrlPath() {
 		return "userInfo";
 	}
 }

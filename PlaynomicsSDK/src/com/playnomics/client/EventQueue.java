@@ -19,7 +19,7 @@ public class EventQueue{
 	}
 	
 	public void enqueueEvent(PlaynomicsEvent event){
-		String eventUrl = buildUrl(this.apiUrl, event.getBaseUrl(), event.getEventParameters());
+		String eventUrl = buildUrl(this.apiUrl, event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}
 	

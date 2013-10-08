@@ -52,7 +52,7 @@ public class MilestoneEvent extends ExplicitEvent{
 	}
 	
 	@Override
-	public String getBaseUrl() {
+	public String getUrlPath() {
 		return "milestone";
 	}
 }

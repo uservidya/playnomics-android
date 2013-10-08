@@ -11,7 +11,7 @@ public class AppPageEvent extends ImplicitEvent {
 	}
 
 	@Override
-	public String getBaseUrl() {
+	public String getUrlPath() {
 		return "appPage";
 	}
 }
