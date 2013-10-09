@@ -4,12 +4,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-public class EventTime extends GregorianCalendar{
+public class EventTime extends GregorianCalendar implements Comparable<Calendar>{
 	
 	private static final long serialVersionUID = 1L;
 
 	public EventTime(){
-		super(TimeZone.getTimeZone("GMT"));
+		super(Util.TIME_ZONE_GMT);
 	}
 	
 	public EventTime(long millisecondsSinceEpoch){
