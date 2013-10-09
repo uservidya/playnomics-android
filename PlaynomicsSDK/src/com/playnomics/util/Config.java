@@ -114,7 +114,15 @@ public class Config {
 	public String getUserInfoInstallDateKey(){
 	    return this.bundle.getString("eventKeys.userInfoInstallDateKey");
 	}
+	
+	public String getUserInfoDeviceIdKey(){
+		return this.bundle.getString("eventKeys.userInfoDeviceIdKey");
+	}
 
+	public String getUserInfoPushTokenKey(){
+		return this.bundle.getString("eventKeys.userInfoPushTokenKey");
+	}
+	
 	public String getTransactionIdKey(){
 	    return this.bundle.getString("eventKeys.transactionIdKey");
 	}
