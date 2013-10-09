@@ -3,6 +3,10 @@ package com.playnomics.util;
 public class LargeGeneratedId {
 	private long generatedId;
 	
+	public long getId(){
+		return this.generatedId;
+	}
+	
 	public LargeGeneratedId(Util util){
 		this.generatedId = util.generatePositiveRandomLong();
 	}
