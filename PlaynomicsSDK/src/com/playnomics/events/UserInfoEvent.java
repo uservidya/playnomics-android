@@ -15,6 +15,14 @@ public class UserInfoEvent extends ExplicitEvent {
 		appendParameter(config.getUserInfoTypeKey(), "update");
 	}
 	
+	
+	public UserInfoEvent(Config config, GameSessionInfo sessionInfo, String pushRegistrationId, String deviceId){
+		super(config, sessionInfo);
+		appendParameter(config.getUserInfoPushTokenKey(), pushRegistrationId);
+		appendParameter(config.getUserInfoDeviceIdKey(), deviceId);
+		appendParameter(config.getUserInfoTypeKey(), "update");
+	}
+	
 	@Override
 	public String getUrlPath() {
 		return "userInfo";
