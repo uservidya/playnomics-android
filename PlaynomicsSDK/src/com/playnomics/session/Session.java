@@ -2,8 +2,8 @@ package com.playnomics.session;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import android.content.Context;
 
@@ -16,7 +16,8 @@ import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppRunningEvent;
 import com.playnomics.events.AppStartEvent;
 import com.playnomics.events.ImplicitEvent;
-import com.playnomics.events.PlaynomicsEvent;
+import com.playnomics.events.MilestoneEvent;
+import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 
 public class Session {
@@ -188,6 +189,12 @@ public class Session {
 		return new GameSessionInfo(this.applicationId, this.userId, this.breadcrumbId, this.sessionId);
 	}
 	
+	private void assertSessionStarted(){
+		if(this.sessionState != SessionState.STARTED || this.sessionState != SessionState.PAUSED){
+			throw new IllegalStateException("Session must be started");
+		}
+	}
+	
 	private void onDeviceSettingsUpdated() throws UnsupportedEncodingException{
 		if(enablePushNotifications && this.deviceManager.getPushRegistrationId() == null){
 			registerForPushNotifcations();
@@ -200,5 +207,44 @@ public class Session {
 	
 	void registerForPushNotifcations(){
 		
+	}
+	
+	// explicit events
+	public void transactionInUSD(float priceInUSD, int quantity){
+		try{
+			assertSessionStarted();
+			TransactionEvent event = new TransactionEvent(this.config, this.util, getSessionInfo(), quantity, priceInUSD);
+			eventQueue.enqueueEvent(event);
+		} catch(Exception ex){
+			Logger.log(LogLevel.ERROR, ex, "Could not send transaction");
+		}
+	}
+	
+	public void attributeInstall(String source){
+		attributeInstall(source, null, null);
+	}
+	
+	public void attributeInstall(String source, String campaign){
+		attributeInstall(source, campaign, null);
+	}
+	
+	public void attributeInstall(String source, String campaign, Date installDate){
+		try{
+			assertSessionStarted();
+			UserInfoEvent event = new UserInfoEvent(this.config, getSessionInfo(), source, campaign, installDate);
+			eventQueue.enqueueEvent(event);
+		} catch (Exception ex){
+			Logger.log(LogLevel.ERROR, ex, "Could not send install attribution information");
+		}
+	}
+	
+	public void milestone(MilestoneEvent.MilestoneType milestoneType){
+		try{
+			assertSessionStarted();
+			MilestoneEvent event = new MilestoneEvent(this.config, this.util, getSessionInfo(), milestoneType);
+			eventQueue.enqueueEvent(event);
+		} catch (Exception ex){
+			Logger.log(LogLevel.ERROR, ex, "Could not send milestone");
+		}
 	}
 }
