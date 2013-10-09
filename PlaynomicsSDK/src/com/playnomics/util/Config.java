@@ -170,4 +170,36 @@ public class Config {
 	public int getCollectionMode(){
 		return Integer.parseInt(this.bundle.getString("collectionMode"));
 	}
+	
+	public String getEventPathUserInfo(){
+		return this.bundle.getString("eventNames.userInfo");
+	}
+	
+	public String getEventPathMilestone(){
+		return this.bundle.getString("eventNames.milestone");
+	}
+	
+	public String getEventPathTransaction(){
+		return this.bundle.getString("eventNames.transaction");
+	}
+	
+	public String getEventPathAppRunning(){
+		return this.bundle.getString("eventNames.appRunning");
+	}
+
+	public String getEventPathAppPage(){
+		return this.bundle.getString("eventNames.appPage");
+	}
+	
+	public String getEventPathAppResume(){
+		return this.bundle.getString("eventNames.appResume");
+	}
+	
+	public String getEventPathAppStart(){
+		return this.bundle.getString("eventNames.appStart");
+	}
+	
+	public String getEventPathAppPause(){
+		return this.bundle.getString("eventNames.appPause");
+	}
 }

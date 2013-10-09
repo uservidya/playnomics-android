@@ -12,6 +12,6 @@ public class AppPageEvent extends ImplicitEvent {
 
 	@Override
 	public String getUrlPath() {
-		return "appPage";
+		return this.config.getEventPathAppPage();
 	}
 }

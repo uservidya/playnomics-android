@@ -208,7 +208,6 @@ public class Session {
 	void registerForPushNotifcations(){
 		
 	}
-	
 	// explicit events
 	public void transactionInUSD(float priceInUSD, int quantity){
 		try{

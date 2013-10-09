@@ -27,6 +27,6 @@ public class AppPauseEvent extends ImplicitEvent {
 		
 	@Override
 	public String getUrlPath() {
-		return "appPause";
+		return this.config.getEventPathAppPause();
 	}
 }

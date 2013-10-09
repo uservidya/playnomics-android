@@ -54,6 +54,6 @@ public class MilestoneEvent extends ExplicitEvent{
 	
 	@Override
 	public String getUrlPath() {
-		return "milestone";
+		return this.config.getEventPathMilestone();
 	}
 }

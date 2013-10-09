@@ -10,9 +10,12 @@ public abstract class PlaynomicsEvent {
 	private TreeMap<String, Object> eventParameters;
 	private EventTime eventTime;
 	
+	protected Config config;
+	
 	protected PlaynomicsEvent(Config config, GameSessionInfo sessionInfo){
 		this.eventTime = new EventTime();
 		this.eventParameters = new TreeMap<String, Object>();
+		this.config = config;
 		eventParameters.put(config.getApplicationIdKey(), sessionInfo.getApplicationId());
 		eventParameters.put(config.getUserIdKey(), sessionInfo.getUserId());
 		eventParameters.put(config.getBreadcrumbIdKey(), sessionInfo.getBreadcrumbId());

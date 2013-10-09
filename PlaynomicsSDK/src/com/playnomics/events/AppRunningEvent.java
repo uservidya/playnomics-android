@@ -27,6 +27,6 @@ public class AppRunningEvent extends ImplicitEvent {
 		
 	@Override
 	public String getUrlPath() {
-		return "appRunning";
+		return this.config.getEventPathAppRunning();
 	}
 }
