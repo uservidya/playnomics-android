@@ -11,11 +11,11 @@ public class UserInfoEvent extends ExplicitEvent {
 		super(config, sessionInfo);	
 		appendParameter(config.getUserInfoSourceKey(), source);
 		appendParameter(config.getUserInfoCampaignKey(), campaign);
-		appendParameter(config.getUserInfoInstallDateKey(), installDate);
+		//date should be in EPOCH format
+		appendParameter(config.getUserInfoInstallDateKey(), installDate.getTime());
 		appendParameter(config.getUserInfoTypeKey(), "update");
 	}
-	
-	
+
 	public UserInfoEvent(Config config, GameSessionInfo sessionInfo, String pushRegistrationId, String deviceId){
 		super(config, sessionInfo);
 		appendParameter(config.getUserInfoPushTokenKey(), pushRegistrationId);
