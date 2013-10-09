@@ -1,5 +1,7 @@
 package com.playnomics.client;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,7 +20,7 @@ public class EventQueue{
 		this.eventUrlQueue = new ConcurrentLinkedQueue<String>();
 	}
 	
-	public void enqueueEvent(PlaynomicsEvent event){
+	public void enqueueEvent(PlaynomicsEvent event) throws UnsupportedEncodingException{
 		String eventUrl = buildUrl(this.apiUrl, event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}
@@ -37,7 +39,7 @@ public class EventQueue{
 		return this.eventUrlQueue.remove();
 	}
 	
-	String buildUrl(String url, String path, Map<String, Object> queryParameters){
+	String buildUrl(String url, String path, Map<String, Object> queryParameters) throws UnsupportedEncodingException{
 		if(util.stringIsNullOrEmpty(url)){
 			return null;
 		}
@@ -62,8 +64,8 @@ public class EventQueue{
 			}
 			
 			builder.append(hasQueryString && firstParam 
-					? String.format("%s=%s", key, value.toString())
-					: String.format("?%s=%s", key, value.toString()));
+					? String.format("%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
+					: String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
 			firstParam = false;
 		}
 		return builder.toString();
