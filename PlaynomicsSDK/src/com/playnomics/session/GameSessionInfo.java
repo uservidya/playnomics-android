@@ -7,27 +7,28 @@ public class GameSessionInfo {
 	private String userId;
 	private String breadcrumbId;
 	private LargeGeneratedId sessionId;
-	
-	public GameSessionInfo(Long applicationId, String userId, String breadcrumbId, LargeGeneratedId sessionId){
+
+	public GameSessionInfo(Long applicationId, String userId,
+			String breadcrumbId, LargeGeneratedId sessionId) {
 		this.applicationId = applicationId;
 		this.userId = userId;
 		this.breadcrumbId = breadcrumbId;
 		this.sessionId = sessionId;
 	}
-	
-	public Long getApplicationId(){
+
+	public Long getApplicationId() {
 		return this.applicationId;
 	}
-	
-	public String getUserId(){
+
+	public String getUserId() {
 		return this.userId;
 	}
-	
-	public String getBreadcrumbId(){
+
+	public String getBreadcrumbId() {
 		return this.breadcrumbId;
 	}
-	
-	public LargeGeneratedId getSessionId(){
+
+	public LargeGeneratedId getSessionId() {
 		return this.sessionId;
 	}
 }
