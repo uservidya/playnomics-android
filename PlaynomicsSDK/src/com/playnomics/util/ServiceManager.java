@@ -12,6 +12,6 @@ public class ServiceManager {
 	}
 	
 	public PackageManager getPackageManager(){
-		return this.context.getPackageManager();
+		return context.getPackageManager();
 	}
 }

@@ -12,7 +12,7 @@ public class HeartBeatProducer {
 
 	public HeartBeatProducer(HeartBeatHandler handler, Config config) {
 		this.handler = handler;
-		this.hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
+		hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
 	}
 
 	public void start() {

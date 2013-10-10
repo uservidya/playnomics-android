@@ -4,19 +4,19 @@ public class LargeGeneratedId {
 	private long generatedId;
 	
 	public long getId(){
-		return this.generatedId;
+		return generatedId;
 	}
 	
 	public LargeGeneratedId(Util util){
-		this.generatedId = util.generatePositiveRandomLong();
+		generatedId = util.generatePositiveRandomLong();
 	}
 	
 	public LargeGeneratedId(long value){
-		this.generatedId = value;
+		generatedId = value;
 	}
 	
 	@Override
 	public String toString(){
-		return String.format("%X", this.generatedId);
+		return String.format("%X", generatedId);
 	}
 }

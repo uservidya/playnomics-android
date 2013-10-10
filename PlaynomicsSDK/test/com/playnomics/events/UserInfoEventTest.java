@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
 import com.playnomics.util.Util;

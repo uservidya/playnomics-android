@@ -16,6 +16,6 @@ public abstract class ImplicitEvent extends PlaynomicsEvent {
 
 	@Override
 	protected String getSessionKey(){
-		return this.implicitEventSessionKey;
+		return implicitEventSessionKey;
 	}
 }

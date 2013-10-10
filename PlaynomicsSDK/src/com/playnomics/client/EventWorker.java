@@ -15,7 +15,7 @@ public class EventWorker {
 	private AtomicBoolean running;
 	
 	public EventWorker(EventQueue eventQueue, HttpConnectionFactory factory){
-		this.connectionFactory = factory;
+		connectionFactory = factory;
 		this.eventQueue = eventQueue;
 	}
 	
@@ -38,13 +38,13 @@ public class EventWorker {
 	
 	private void doWork(){
 		while(running.get()){
-			while(!this.eventQueue.isEmpty()){
-				String url = this.eventQueue.dequeueEventUrl();
+			while(!eventQueue.isEmpty()){
+				String url = eventQueue.dequeueEventUrl();
 				
 				boolean successful = false;
 				HttpURLConnection connection = null;
 				try {
-					connection = this.connectionFactory.startConnectionForUrl(url);
+					connection = connectionFactory.startConnectionForUrl(url);
 					successful = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
 				} catch (IOException e) {
 					Logger.log(LogLevel.WARNING, e, "Event URL Request failed for URL: %s", url);
@@ -55,14 +55,16 @@ public class EventWorker {
 				}
 				
 				if(!successful){
-					this.eventQueue.enqueueEventUrl(url);
+					eventQueue.enqueueEventUrl(url);
 				}
 			}
 			
 			try {
 				//put this thread to sleep
 				Thread.sleep(1000);
-			} catch (InterruptedException e) { }
+			} catch (InterruptedException e) { 
+				return;
+			}
 		}
 	}
 }

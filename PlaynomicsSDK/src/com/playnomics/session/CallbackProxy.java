@@ -37,12 +37,12 @@ public class CallbackProxy implements InvocationHandler {
 				if (event != null
 						&& event instanceof MotionEvent
 						&& ((MotionEvent) event).getAction() == MotionEvent.ACTION_DOWN) {
-					this.eventHandler.onTouchEventReceived();
+					eventHandler.onTouchEventReceived();
 				}
 			}
 		}
 		// invoke the method as normal
-		result = method.invoke(this.callback, args);
+		result = method.invoke(callback, args);
 		return result;
 	}
 

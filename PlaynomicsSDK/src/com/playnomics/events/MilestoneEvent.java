@@ -40,7 +40,7 @@ public class MilestoneEvent extends ExplicitEvent{
 		
 		@Override
 		public String toString(){
-			return String.format("CUSTOM%d", this.milestoneNum);
+			return String.format("CUSTOM%d", milestoneNum);
 		}
 	}
 	
@@ -54,6 +54,6 @@ public class MilestoneEvent extends ExplicitEvent{
 	
 	@Override
 	public String getUrlPath() {
-		return this.config.getEventPathMilestone();
+		return config.getEventPathMilestone();
 	}
 }

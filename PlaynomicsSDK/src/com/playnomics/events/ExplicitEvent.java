@@ -12,6 +12,6 @@ public abstract class ExplicitEvent extends PlaynomicsEvent {
 	
 	@Override
 	protected String getSessionKey() {
-		return this.explicitEventSessionKey;
+		return explicitEventSessionKey;
 	}
 }

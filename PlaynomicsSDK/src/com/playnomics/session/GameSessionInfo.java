@@ -17,18 +17,18 @@ public class GameSessionInfo {
 	}
 
 	public Long getApplicationId() {
-		return this.applicationId;
+		return applicationId;
 	}
 
 	public String getUserId() {
-		return this.userId;
+		return userId;
 	}
 
 	public String getBreadcrumbId() {
-		return this.breadcrumbId;
+		return breadcrumbId;
 	}
 
 	public LargeGeneratedId getSessionId() {
-		return this.sessionId;
+		return sessionId;
 	}
 }

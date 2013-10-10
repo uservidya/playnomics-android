@@ -29,7 +29,7 @@ public class TransactionEvent extends ExplicitEvent {
 	
 	@Override
 	public String getUrlPath() {
-		return this.config.getEventPathTransaction();
+		return config.getEventPathTransaction();
 	}
 
 }

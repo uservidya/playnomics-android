@@ -24,13 +24,13 @@ public class DeviceManager {
 
 	public DeviceManager(Context context, ServiceManager serviceManager) {
 		this.context = context;
-		this.manager = serviceManager;
-		this.preferences = this.context.getSharedPreferences(CACHE_NAME,
+		manager = serviceManager;
+		preferences = context.getSharedPreferences(CACHE_NAME,
 				Context.MODE_PRIVATE);
 	}
 
 	public String getAndroidDeviceId() {
-		return Settings.Secure.getString(this.context.getContentResolver(),
+		return Settings.Secure.getString(context.getContentResolver(),
 				Settings.Secure.ANDROID_ID);
 	}
 
@@ -51,7 +51,7 @@ public class DeviceManager {
 	}
 	
 	public LargeGeneratedId getPreviousSessionId(){
-		Long sessionId = this.preferences.getLong(SESSION_ID_KEY, -1);
+		Long sessionId = preferences.getLong(SESSION_ID_KEY, -1);
 		if(sessionId < 0){
 			//session ID was never saved
 			return null;
@@ -61,35 +61,35 @@ public class DeviceManager {
 	}
 	
 	public void getPreviousSessionId(LargeGeneratedId sessionId){
-		SharedPreferences.Editor editor = this.preferences.edit();
+		SharedPreferences.Editor editor = preferences.edit();
 		editor.putLong(SESSION_ID_KEY, sessionId.getId());
 		editor.commit();
 	}
 
 	public String getPushRegistrationId() {
-		return this.preferences
+		return preferences
 				.getString(DeviceManager.PUSH_ID_CACHE_KEY, null);
 	}
 
 	public void setPushRegistrationId(String pushId) {
-		SharedPreferences.Editor editor = this.preferences.edit();
+		SharedPreferences.Editor editor = preferences.edit();
 		editor.putString(DeviceManager.PUSH_ID_CACHE_KEY, pushId);
 		editor.commit();
 	}
 
 	public int getApplicationVersion() {
-		return this.preferences.getInt(DeviceManager.PUSH_ID_CACHE_KEY, -1);
+		return preferences.getInt(DeviceManager.PUSH_ID_CACHE_KEY, -1);
 	}
 
 	private void setApplicationVersion(int version) {
-		SharedPreferences.Editor editor = this.preferences.edit();
+		SharedPreferences.Editor editor = preferences.edit();
 		editor.putInt(DeviceManager.APP_VERSION_CACHE_KEY, version);
 		editor.commit();
 	}
 
 	private int getCurrentAppVersion() {
 		try {
-			PackageManager packageManager = this.manager.getPackageManager();
+			PackageManager packageManager = manager.getPackageManager();
 			PackageInfo info;
 			info = packageManager.getPackageInfo(context.getPackageName(), 0);
 			return info.versionCode;
@@ -115,12 +115,12 @@ public class DeviceManager {
 	}
 	
 	private EventTime getEventTimeValue(String key){
-		long lastEventTimeMilliseconds = this.preferences.getLong(key, 0);
+		long lastEventTimeMilliseconds = preferences.getLong(key, 0);
 		return new EventTime(lastEventTimeMilliseconds);
 	}
 	
 	private void setEventTimeValue(String key, EventTime value){
-		SharedPreferences.Editor editor = this.preferences.edit();
+		SharedPreferences.Editor editor = preferences.edit();
 		editor.putLong(key, value.getTimeInMillis());
 		editor.commit();
 	}

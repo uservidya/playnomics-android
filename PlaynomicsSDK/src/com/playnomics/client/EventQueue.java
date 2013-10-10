@@ -17,26 +17,26 @@ public class EventQueue{
 	public EventQueue(Util util, String apiUrl){
 		this.util = util;
 		this.apiUrl = apiUrl;
-		this.eventUrlQueue = new ConcurrentLinkedQueue<String>();
+		eventUrlQueue = new ConcurrentLinkedQueue<String>();
 	}
 	
 	public void enqueueEvent(PlaynomicsEvent event) throws UnsupportedEncodingException{
-		String eventUrl = buildUrl(this.apiUrl, event.getUrlPath(), event.getEventParameters());
+		String eventUrl = buildUrl(apiUrl, event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}
 	
 	public void enqueueEventUrl(String eventUrl){
 		if(!util.stringIsNullOrEmpty(eventUrl)){
-			this.eventUrlQueue.add(eventUrl);
+			eventUrlQueue.add(eventUrl);
 		}
 	}
 	
 	public boolean isEmpty(){
-		return this.eventUrlQueue.isEmpty();
+		return eventUrlQueue.isEmpty();
 	}
 	
 	public String dequeueEventUrl(){
-		return this.eventUrlQueue.remove();
+		return eventUrlQueue.remove();
 	}
 	
 	String buildUrl(String url, String path, Map<String, Object> queryParameters) throws UnsupportedEncodingException{

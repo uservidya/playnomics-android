@@ -14,7 +14,7 @@ public class Logger {
 		}
 		
 		public int level(){
-			return this.level;
+			return level;
 		}
 	}
 

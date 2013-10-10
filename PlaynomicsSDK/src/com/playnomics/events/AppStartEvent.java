@@ -12,6 +12,6 @@ public class AppStartEvent extends ImplicitEvent {
 	
 	@Override
 	public String getUrlPath() {
-		return this.config.getEventPathAppStart();
+		return config.getEventPathAppStart();
 	}
 }

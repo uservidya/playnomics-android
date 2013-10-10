@@ -17,6 +17,6 @@ public class AppResumeEvent extends ImplicitEvent {
 	
 	@Override
 	public String getUrlPath() {
-		return this.config.getEventPathAppResume();
+		return config.getEventPathAppResume();
 	}
 }

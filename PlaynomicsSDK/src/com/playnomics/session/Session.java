@@ -24,7 +24,8 @@ import com.playnomics.events.MilestoneEvent;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 
-public class Session implements SessionStateMachine, TouchEventHandler, HeartBeatHandler {
+public class Session implements SessionStateMachine, TouchEventHandler,
+		HeartBeatHandler {
 	// session
 	private SessionState sessionState;
 
@@ -41,7 +42,7 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 	private DeviceManager deviceManager;
 	private UIObserver observer;
 	private HeartBeatProducer producer;
-	
+
 	// session data
 	private long applicationId;
 	private String userId;
@@ -68,26 +69,26 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 	private boolean enablePushNotifications;
 
 	public void setEnabledPushNotifications(boolean value) {
-		this.enablePushNotifications = value;
+		enablePushNotifications = value;
 	}
 
 	private boolean testMode = false;
 
 	public void setTestMode(boolean value) {
-		this.testMode = value;
+		testMode = value;
 	}
 
 	private String overrideEventsUrl;
 
 	public void setOverrideEventsUrl(String url) {
-		this.overrideEventsUrl = url;
+		overrideEventsUrl = url;
 	}
 
 	public String getEventsUrl() {
-		if (!util.stringIsNullOrEmpty(this.overrideEventsUrl)) {
-			return this.overrideEventsUrl;
+		if (!util.stringIsNullOrEmpty(overrideEventsUrl)) {
+			return overrideEventsUrl;
 		}
-		if (this.testMode) {
+		if (testMode) {
 			return config.getTestEventsUrl();
 		}
 		return config.getProdEventsUrl();
@@ -96,28 +97,28 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 	private String overrideMessagingUrl;
 
 	public void setOverrideMessagingUrl(String url) {
-		this.overrideMessagingUrl = url;
+		overrideMessagingUrl = url;
 	}
 
 	public String getMessagingUrl() {
-		if (!util.stringIsNullOrEmpty(this.overrideMessagingUrl)) {
-			return this.overrideMessagingUrl;
+		if (!util.stringIsNullOrEmpty(overrideMessagingUrl)) {
+			return overrideMessagingUrl;
 		}
-		if (this.testMode) {
+		if (testMode) {
 			return config.getTestMessagingUrl();
 		}
 		return config.getProdMessagingUrl();
 	}
 
 	private Session() {
-		this.sessionState = SessionState.NOT_STARTED;
-		this.util = new Util();
-		this.config = new Config();
-		this.eventQueue = new EventQueue(util, this.getEventsUrl());
-		this.eventWorker = new EventWorker(this.eventQueue,
+		sessionState = SessionState.NOT_STARTED;
+		util = new Util();
+		config = new Config();
+		eventQueue = new EventQueue(util, getEventsUrl());
+		eventWorker = new EventWorker(eventQueue,
 				new HttpConnectionFactory());
-		this.observer = new UIObserver(this, this);
-		this.producer = new HeartBeatProducer(this, config);
+		observer = new UIObserver(this, this);
+		producer = new HeartBeatProducer(this, config);
 	}
 
 	private static Session instance;
@@ -153,21 +154,21 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 
 			sessionState = SessionState.STARTED;
 
-			this.serviceManager = new ServiceManager(context);
-			this.deviceManager = new DeviceManager(context, this.serviceManager);
-			boolean settingsChanged = this.deviceManager
+			serviceManager = new ServiceManager(context);
+			deviceManager = new DeviceManager(context, serviceManager);
+			boolean settingsChanged = deviceManager
 					.synchronizeDeviceSettings();
 
-			this.breadcrumbId = this.deviceManager.getAndroidDeviceId();
+			breadcrumbId = deviceManager.getAndroidDeviceId();
 
-			if (util.stringIsNullOrEmpty(this.userId)) {
-				this.userId = this.breadcrumbId;
+			if (util.stringIsNullOrEmpty(userId)) {
+				userId = breadcrumbId;
 			}
 
-			this.sequence = new AtomicInteger(1);
-			this.touchEvents = new AtomicInteger(0);
-			this.allTouchEvents = new AtomicInteger(0);
-			this.sequence = new AtomicInteger(0);
+			sequence = new AtomicInteger(1);
+			touchEvents = new AtomicInteger(0);
+			allTouchEvents = new AtomicInteger(0);
+			sequence = new AtomicInteger(0);
 
 			// start the background UI service
 
@@ -185,19 +186,19 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 
 			ImplicitEvent implicitEvent;
 			if (sessionLapsed) {
-				this.sessionId = new LargeGeneratedId(util);
-				this.instanceId = this.sessionId;
+				sessionId = new LargeGeneratedId(util);
+				instanceId = sessionId;
 
 				implicitEvent = new AppStartEvent(config, getSessionInfo(),
 						instanceId);
 				sessionStartTime = implicitEvent.getEventTime();
-				this.deviceManager.setLastSessionStartTime(sessionStartTime);
+				deviceManager.setLastSessionStartTime(sessionStartTime);
 			} else {
-				this.sessionId = lastSessionId;
-				this.instanceId = new LargeGeneratedId(util);
+				sessionId = lastSessionId;
+				instanceId = new LargeGeneratedId(util);
 				implicitEvent = new AppPageEvent(config, getSessionInfo(),
 						instanceId);
-				sessionStartTime = this.deviceManager.getLastSessionStartTime();
+				sessionStartTime = deviceManager.getLastSessionStartTime();
 			}
 
 			eventQueue.enqueueEvent(implicitEvent);
@@ -214,15 +215,15 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 
 	public void pause() {
 		try {
-			if (this.sessionState != SessionState.STARTED) {
+			if (sessionState != SessionState.STARTED) {
 				return;
 			}
-			this.sessionPauseTime = new EventTime();
-			AppPauseEvent event = new AppPauseEvent(this.config,
-					getSessionInfo(), this.instanceId, this.sessionStartTime,
-					this.sequence.get(), getTouchEvents(), getAllTouchEvents());
-			this.sequence.incrementAndGet();
-			this.eventQueue.enqueueEvent(event);
+			sessionPauseTime = new EventTime();
+			AppPauseEvent event = new AppPauseEvent(config, getSessionInfo(),
+					instanceId, sessionStartTime, sequence.get(),
+					getTouchEvents(), getAllTouchEvents());
+			sequence.incrementAndGet();
+			eventQueue.enqueueEvent(event);
 			eventWorker.stop();
 			producer.stop();
 		} catch (Exception ex) {
@@ -232,13 +233,13 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 
 	public void resume() {
 		try {
-			if (this.sessionState != SessionState.PAUSED) {
+			if (sessionState != SessionState.PAUSED) {
 				return;
 			}
 
 			AppResumeEvent event = new AppResumeEvent(config, getSessionInfo(),
-					this.instanceId, this.sessionStartTime,
-					this.sessionPauseTime, this.sequence.get());
+					instanceId, sessionStartTime, sessionPauseTime,
+					sequence.get());
 			eventQueue.enqueueEvent(event);
 			eventWorker.start();
 			producer.start();
@@ -247,46 +248,48 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 		}
 	}
 
-	public void onHeartBeat(int heartBeatIntervalSeconds){
-		try{
+	public void onHeartBeat(int heartBeatIntervalSeconds) {
+		try {
 			sequence.incrementAndGet();
-			AppRunningEvent event = new AppRunningEvent(config, getSessionInfo(), instanceId, sessionStartTime, sequence.get(), touchEvents.get(), allTouchEvents.get());
+			AppRunningEvent event = new AppRunningEvent(config,
+					getSessionInfo(), instanceId, sessionStartTime,
+					sequence.get(), touchEvents.get(), allTouchEvents.get());
 			eventQueue.enqueueEvent(event);
-			//reset the touch events
+			// reset the touch events
 			touchEvents.set(0);
 			allTouchEvents.set(0);
-			
-		} catch(UnsupportedEncodingException exception){
+
+		} catch (UnsupportedEncodingException exception) {
 			Logger.log(LogLevel.ERROR, exception, "Could not log appRunning");
 		}
 	}
-	
+
 	public void onTouchEventReceived() {
 		touchEvents.incrementAndGet();
 		allTouchEvents.incrementAndGet();
 	}
 
 	private GameSessionInfo getSessionInfo() {
-		return new GameSessionInfo(this.applicationId, this.userId,
-				this.breadcrumbId, this.sessionId);
+		return new GameSessionInfo(applicationId, userId,
+				breadcrumbId, sessionId);
 	}
 
 	private void assertSessionStarted() {
-		if (this.sessionState != SessionState.STARTED
-				|| this.sessionState != SessionState.PAUSED) {
+		if (sessionState != SessionState.STARTED
+				|| sessionState != SessionState.PAUSED) {
 			throw new IllegalStateException("Session must be started");
 		}
 	}
 
 	private void onDeviceSettingsUpdated() throws UnsupportedEncodingException {
 		if (enablePushNotifications
-				&& this.deviceManager.getPushRegistrationId() == null) {
+				&& deviceManager.getPushRegistrationId() == null) {
 			registerForPushNotifcations();
 		} else {
-			UserInfoEvent event = new UserInfoEvent(this.config,
+			UserInfoEvent event = new UserInfoEvent(config,
 					getSessionInfo(),
-					this.deviceManager.getPushRegistrationId(),
-					this.deviceManager.getAndroidDeviceId());
+					deviceManager.getPushRegistrationId(),
+					deviceManager.getAndroidDeviceId());
 			eventQueue.enqueueEvent(event);
 		}
 	}
@@ -299,8 +302,8 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 	public void transactionInUSD(float priceInUSD, int quantity) {
 		try {
 			assertSessionStarted();
-			TransactionEvent event = new TransactionEvent(this.config,
-					this.util, getSessionInfo(), quantity, priceInUSD);
+			TransactionEvent event = new TransactionEvent(config,
+				util, getSessionInfo(), quantity, priceInUSD);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex, "Could not send transaction");
@@ -319,7 +322,7 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 			Date installDate) {
 		try {
 			assertSessionStarted();
-			UserInfoEvent event = new UserInfoEvent(this.config,
+			UserInfoEvent event = new UserInfoEvent(config,
 					getSessionInfo(), source, campaign, installDate);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
@@ -331,7 +334,7 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 	public void milestone(MilestoneEvent.MilestoneType milestoneType) {
 		try {
 			assertSessionStarted();
-			MilestoneEvent event = new MilestoneEvent(this.config, this.util,
+			MilestoneEvent event = new MilestoneEvent(config, util,
 					getSessionInfo(), milestoneType);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
@@ -339,13 +342,13 @@ public class Session implements SessionStateMachine, TouchEventHandler, HeartBea
 		}
 	}
 
-	//activity attach/detach
-	
-	public void attachActivity(Activity activity){
+	// activity attach/detach
+
+	public void attachActivity(Activity activity) {
 		observer.observeNewActivity(activity);
 	}
-	
-	public void detachActivity(){
+
+	public void detachActivity() {
 		observer.forgetLastActivity();
 	}
 }

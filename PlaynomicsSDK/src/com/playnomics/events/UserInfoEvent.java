@@ -25,6 +25,6 @@ public class UserInfoEvent extends ExplicitEvent {
 	
 	@Override
 	public String getUrlPath() {
-		return this.config.getEventPathUserInfo();
+		return config.getEventPathUserInfo();
 	}
 }

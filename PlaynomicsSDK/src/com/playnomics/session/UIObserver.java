@@ -18,15 +18,15 @@ public class UIObserver {
 	public void observeNewActivity(Activity activity) {
 		activity.getWindow().setCallback(
 				CallbackProxy.newCallbackProxyForActivity(activity,
-						this.handler));
+						handler));
 		activities.add(activity);
-		this.stateMachine.resume();
+		stateMachine.resume();
 	}
 
 	public void forgetLastActivity() {
-		this.activities.remove();
+		activities.remove();
 		if (activities.isEmpty()) {
-			this.stateMachine.pause();
+			stateMachine.pause();
 		}
 	}
 }

@@ -27,6 +27,6 @@ public class EventTime extends GregorianCalendar implements Comparable<Calendar>
 	
 	@Override
 	public String toString(){
-		return String.format("%l", this.getTimeInMillis());
+		return String.format("%l", getTimeInMillis());
 	}
 }

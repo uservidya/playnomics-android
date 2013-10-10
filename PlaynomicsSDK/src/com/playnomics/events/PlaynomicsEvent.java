@@ -13,8 +13,8 @@ public abstract class PlaynomicsEvent {
 	protected Config config;
 	
 	protected PlaynomicsEvent(Config config, GameSessionInfo sessionInfo){
-		this.eventTime = new EventTime();
-		this.eventParameters = new TreeMap<String, Object>();
+		eventTime = new EventTime();
+		eventParameters = new TreeMap<String, Object>();
 		this.config = config;
 		eventParameters.put(config.getApplicationIdKey(), sessionInfo.getApplicationId());
 		eventParameters.put(config.getUserIdKey(), sessionInfo.getUserId());
@@ -22,7 +22,7 @@ public abstract class PlaynomicsEvent {
 		eventParameters.put(getSessionKey(), sessionInfo.getSessionId());
 		eventParameters.put(config.getSdkVersionKey(), config.getSdkVersion());
 		eventParameters.put(config.getSdkNameKey(), config.getSdkName());
-		eventParameters.put(config.getEventTimeKey(), this.eventTime);
+		eventParameters.put(config.getEventTimeKey(), eventTime);
 	}
 	
 	public EventTime getEventTime(){
@@ -38,6 +38,6 @@ public abstract class PlaynomicsEvent {
 	}
 	
 	public Map<String, Object> getEventParameters(){
-		return this.eventParameters;
+		return eventParameters;
 	}
 }
