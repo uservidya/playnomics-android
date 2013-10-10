@@ -39,33 +39,38 @@ public class UserInfoEventTest extends PlaynomicsEventTest {
 	public void testUserInfoAttribution() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		Config config = new Config();
-		
+
 		String source = "source";
 		String campaign = "campaign";
-		Date installDate = new Date(new GregorianCalendar(Util.TIME_ZONE_GMT).get(Calendar.DATE));
-		
-		UserInfoEvent event = new UserInfoEvent(config, sessionInfo, source, campaign, installDate);
+		Date installDate = new Date(
+				new GregorianCalendar(Util.TIME_ZONE_GMT).get(Calendar.DATE));
+
+		UserInfoEvent event = new UserInfoEvent(config, sessionInfo, source,
+				campaign, installDate);
 		testCommonEventParameters(config, event, sessionInfo);
 
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Source is set", source, params.get("po"));
 		assertEquals("Campaign is set", campaign, params.get("pm"));
-		assertEquals("Install Date is set", installDate.getTime(), params.get("pi"));
+		assertEquals("Install Date is set", installDate.getTime(),
+				params.get("pi"));
 	}
 
 	@Test
-	public void testUserInfoDevice(){
+	public void testUserInfoDevice() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		Config config = new Config();
-		
+
 		String pushRegistrationId = "pushId";
 		String deviceId = "deviceId";
-		
-		UserInfoEvent event = new UserInfoEvent(config, sessionInfo, pushRegistrationId, deviceId);
+
+		UserInfoEvent event = new UserInfoEvent(config, sessionInfo,
+				pushRegistrationId, deviceId);
 		testCommonEventParameters(config, event, sessionInfo);
 
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Device ID is set", deviceId, params.get("deviceId"));
-		assertEquals("Push ID is set", pushRegistrationId, params.get("pushTok"));
+		assertEquals("Push ID is set", pushRegistrationId,
+				params.get("pushTok"));
 	}
 }

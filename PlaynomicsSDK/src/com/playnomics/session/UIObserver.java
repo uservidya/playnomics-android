@@ -17,8 +17,7 @@ public class UIObserver {
 
 	public void observeNewActivity(Activity activity) {
 		activity.getWindow().setCallback(
-				CallbackProxy.newCallbackProxyForActivity(activity,
-						handler));
+				CallbackProxy.newCallbackProxyForActivity(activity, handler));
 		activities.add(activity);
 		stateMachine.resume();
 	}
