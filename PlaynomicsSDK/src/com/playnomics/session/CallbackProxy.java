@@ -11,6 +11,10 @@ public class CallbackProxy implements InvocationHandler {
 	private Window.Callback callback;
 	private TouchEventHandler eventHandler;
 
+	public Window.Callback getOriginalCallback(){
+		return callback;
+	}
+	
 	public static Window.Callback newCallbackProxyForActivity(
 			Window.Callback callback, TouchEventHandler eventHandler) {
 		return (Window.Callback) java.lang.reflect.Proxy.newProxyInstance(
