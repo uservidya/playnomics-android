@@ -41,34 +41,33 @@ public class DeviceManager {
 	public void setLastEventTime(EventTime time) {
 		setEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY, time);
 	}
-	
-	public EventTime getLastSessionStartTime(){
+
+	public EventTime getLastSessionStartTime() {
 		return getEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY);
 	}
-	
-	public void setLastSessionStartTime(EventTime time){
+
+	public void setLastSessionStartTime(EventTime time) {
 		setEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY, time);
 	}
-	
-	public LargeGeneratedId getPreviousSessionId(){
+
+	public LargeGeneratedId getPreviousSessionId() {
 		Long sessionId = preferences.getLong(SESSION_ID_KEY, -1);
-		if(sessionId < 0){
-			//session ID was never saved
+		if (sessionId < 0) {
+			// session ID was never saved
 			return null;
 		}
-		
+
 		return new LargeGeneratedId(sessionId);
 	}
-	
-	public void getPreviousSessionId(LargeGeneratedId sessionId){
+
+	public void getPreviousSessionId(LargeGeneratedId sessionId) {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putLong(SESSION_ID_KEY, sessionId.getId());
 		editor.commit();
 	}
 
 	public String getPushRegistrationId() {
-		return preferences
-				.getString(DeviceManager.PUSH_ID_CACHE_KEY, null);
+		return preferences.getString(DeviceManager.PUSH_ID_CACHE_KEY, null);
 	}
 
 	public void setPushRegistrationId(String pushId) {
@@ -113,13 +112,13 @@ public class DeviceManager {
 		}
 		return false;
 	}
-	
-	private EventTime getEventTimeValue(String key){
+
+	private EventTime getEventTimeValue(String key) {
 		long lastEventTimeMilliseconds = preferences.getLong(key, 0);
 		return new EventTime(lastEventTimeMilliseconds);
 	}
-	
-	private void setEventTimeValue(String key, EventTime value){
+
+	private void setEventTimeValue(String key, EventTime value) {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putLong(key, value.getTimeInMillis());
 		editor.commit();

@@ -42,21 +42,23 @@ public class AppResumeEventTest extends PlaynomicsEventTest {
 		Util util = new Util();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		
-		//2 minutes ago
+
+		// 2 minutes ago
 		Calendar calendar = new GregorianCalendar();
 		calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) - 60 * 2);
 		EventTime pauseTime = new EventTime(calendar.getTimeInMillis());
-		
-		//another 2 minutes back
+
+		// another 2 minutes back
 		calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) - 60 * 2);
 		EventTime startTime = new EventTime(calendar.getTimeInMillis());
-		
-		assertTrue("Pause time greater than start time", pauseTime.compareTo(startTime) > 0);
+
+		assertTrue("Pause time greater than start time",
+				pauseTime.compareTo(startTime) > 0);
 		int sequenceNumber = 10;
-		AppResumeEvent event = new AppResumeEvent(config, sessionInfo, instanceId, startTime, pauseTime, sequenceNumber);
+		AppResumeEvent event = new AppResumeEvent(config, sessionInfo,
+				instanceId, startTime, pauseTime, sequenceNumber);
 		testCommonEventParameters(config, event, sessionInfo);
-		
+
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Insance ID is set", instanceId, params.get("i"));
 		assertEquals("Sequence is set", sequenceNumber, params.get("q"));

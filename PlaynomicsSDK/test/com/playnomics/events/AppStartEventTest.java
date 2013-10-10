@@ -40,12 +40,13 @@ public class AppStartEventTest extends PlaynomicsEventTest {
 		Config config = new Config();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		
+
 		AppPageEvent event = new AppPageEvent(config, sessionInfo, instanceId);
 		testCommonEventParameters(config, event, sessionInfo);
-		
+
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Instance ID is set", instanceId, params.get("i"));
-		assertEquals("Time zone is set", EventTime.getMinutesTimezoneOffset(), params.get("z"));
+		assertEquals("Time zone is set", EventTime.getMinutesTimezoneOffset(),
+				params.get("z"));
 	}
 }

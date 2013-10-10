@@ -28,7 +28,7 @@ public class UtilTests {
 	@Test
 	public void testGeneratedLongsAlwaysPositive() {
 		Util util = new Util();
-		for(int i = 0; i < 1000; i ++){
+		for (int i = 0; i < 1000; i++) {
 			long num = util.generatePositiveRandomLong();
 			assertTrue(num >= 0);
 		}

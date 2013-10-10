@@ -49,11 +49,11 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 	public void testMilestoneEvent(){
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		MilestoneType milestone25 = MilestoneType.MilestoneCustom25;
-		
+
 		long milestoneId = 100L;
-		
+
 		Config config = new Config();
-		
+
 		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 		
 		MilestoneEvent event = new MilestoneEvent(config, utilMock, sessionInfo, milestone25);

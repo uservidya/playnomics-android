@@ -4,14 +4,14 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 
 public class ServiceManager {
-	
+
 	private Context context;
-	
-	public ServiceManager(Context context){
+
+	public ServiceManager(Context context) {
 		this.context = context;
 	}
-	
-	public PackageManager getPackageManager(){
+
+	public PackageManager getPackageManager() {
 		return context.getPackageManager();
 	}
 }

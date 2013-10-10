@@ -115,8 +115,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		util = new Util();
 		config = new Config();
 		eventQueue = new EventQueue(util, getEventsUrl());
-		eventWorker = new EventWorker(eventQueue,
-				new HttpConnectionFactory());
+		eventWorker = new EventWorker(eventQueue, new HttpConnectionFactory());
 		observer = new UIObserver(this, this);
 		producer = new HeartBeatProducer(this, config);
 	}
@@ -156,8 +155,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 			serviceManager = new ServiceManager(context);
 			deviceManager = new DeviceManager(context, serviceManager);
-			boolean settingsChanged = deviceManager
-					.synchronizeDeviceSettings();
+			boolean settingsChanged = deviceManager.synchronizeDeviceSettings();
 
 			breadcrumbId = deviceManager.getAndroidDeviceId();
 
@@ -270,8 +268,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private GameSessionInfo getSessionInfo() {
-		return new GameSessionInfo(applicationId, userId,
-				breadcrumbId, sessionId);
+		return new GameSessionInfo(applicationId, userId, breadcrumbId,
+				sessionId);
 	}
 
 	private void assertSessionStarted() {
@@ -286,8 +284,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 				&& deviceManager.getPushRegistrationId() == null) {
 			registerForPushNotifcations();
 		} else {
-			UserInfoEvent event = new UserInfoEvent(config,
-					getSessionInfo(),
+			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
 					deviceManager.getPushRegistrationId(),
 					deviceManager.getAndroidDeviceId());
 			eventQueue.enqueueEvent(event);
@@ -302,8 +299,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	public void transactionInUSD(float priceInUSD, int quantity) {
 		try {
 			assertSessionStarted();
-			TransactionEvent event = new TransactionEvent(config,
-				util, getSessionInfo(), quantity, priceInUSD);
+			TransactionEvent event = new TransactionEvent(config, util,
+					getSessionInfo(), quantity, priceInUSD);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex, "Could not send transaction");
@@ -322,8 +319,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			Date installDate) {
 		try {
 			assertSessionStarted();
-			UserInfoEvent event = new UserInfoEvent(config,
-					getSessionInfo(), source, campaign, installDate);
+			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
+					source, campaign, installDate);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex,

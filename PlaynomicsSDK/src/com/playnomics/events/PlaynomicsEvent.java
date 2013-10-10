@@ -9,35 +9,37 @@ import com.playnomics.session.GameSessionInfo;
 public abstract class PlaynomicsEvent {
 	private TreeMap<String, Object> eventParameters;
 	private EventTime eventTime;
-	
+
 	protected Config config;
-	
-	protected PlaynomicsEvent(Config config, GameSessionInfo sessionInfo){
+
+	protected PlaynomicsEvent(Config config, GameSessionInfo sessionInfo) {
 		eventTime = new EventTime();
 		eventParameters = new TreeMap<String, Object>();
 		this.config = config;
-		eventParameters.put(config.getApplicationIdKey(), sessionInfo.getApplicationId());
+		eventParameters.put(config.getApplicationIdKey(),
+				sessionInfo.getApplicationId());
 		eventParameters.put(config.getUserIdKey(), sessionInfo.getUserId());
-		eventParameters.put(config.getBreadcrumbIdKey(), sessionInfo.getBreadcrumbId());
+		eventParameters.put(config.getBreadcrumbIdKey(),
+				sessionInfo.getBreadcrumbId());
 		eventParameters.put(getSessionKey(), sessionInfo.getSessionId());
 		eventParameters.put(config.getSdkVersionKey(), config.getSdkVersion());
 		eventParameters.put(config.getSdkNameKey(), config.getSdkName());
 		eventParameters.put(config.getEventTimeKey(), eventTime);
 	}
-	
-	public EventTime getEventTime(){
+
+	public EventTime getEventTime() {
 		return eventTime;
 	}
-	
+
 	public abstract String getUrlPath();
-	
+
 	protected abstract String getSessionKey();
 
-	protected void appendParameter(String key, Object value){
+	protected void appendParameter(String key, Object value) {
 		eventParameters.put(key, value);
 	}
-	
-	public Map<String, Object> getEventParameters(){
+
+	public Map<String, Object> getEventParameters() {
 		return eventParameters;
 	}
 }

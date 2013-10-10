@@ -21,7 +21,7 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 
 	@Mock
 	private Util utilMock;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -41,17 +41,18 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 	@Test
 	public void testTransaction() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-	
+
 		long transactionId = 10000L;
-	
+
 		when(utilMock.generatePositiveRandomLong()).thenReturn(transactionId);
-		
+
 		Config config = new Config();
-		TransactionEvent event = new TransactionEvent(config, utilMock, sessionInfo, 10, .99f);
+		TransactionEvent event = new TransactionEvent(config, utilMock,
+				sessionInfo, 10, .99f);
 		testCommonEventParameters(config, event, sessionInfo);
-		
+
 		Map<String, Object> params = event.getEventParameters();
-		
+
 		assertEquals("Transaction ID is set", transactionId, params.get("r"));
 		assertEquals("Currency Category is set", "r", params.get("ta0"));
 		assertEquals("Currency Type is set", "USD", params.get("tc0"));
@@ -59,7 +60,7 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 		assertEquals("Item ID is set", "monetized", params.get("i"));
 		assertEquals("Transaction Type is set", "BuyItem", params.get("tt"));
 		assertEquals("Quantity is set", 10, params.get("tq"));
-		
+
 		verify(utilMock).generatePositiveRandomLong();
 	}
 }
