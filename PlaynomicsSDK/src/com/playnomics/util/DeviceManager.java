@@ -13,7 +13,8 @@ public class DeviceManager {
 
 	static final String CACHE_NAME = "com.playnomics.cache";
 	static final String PUSH_ID_CACHE_KEY = "pushId";
-	static final String LAST_EVENT_TIME_CACHE_KEY = "eventTime";
+	static final String LAST_EVENT_TIME_CACHE_KEY = "lastEventTime";
+	static final String SESSION_START_TIME_CACHE_KEY = "sessionStartTime";
 	static final String APP_VERSION_CACHE_KEY = "appVersion";
 	static final String SESSION_ID_KEY = "sessionId";
 
@@ -34,16 +35,19 @@ public class DeviceManager {
 	}
 
 	public EventTime getLastEventTime() {
-		long lastEventTimeMilliseconds = this.preferences.getLong(
-				DeviceManager.LAST_EVENT_TIME_CACHE_KEY, 0);
-		return new EventTime(lastEventTimeMilliseconds);
+		return getEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY);
 	}
 
 	public void setLastEventTime(EventTime time) {
-		SharedPreferences.Editor editor = this.preferences.edit();
-		editor.putLong(DeviceManager.LAST_EVENT_TIME_CACHE_KEY,
-				time.getTimeInMillis());
-		editor.commit();
+		setEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY, time);
+	}
+	
+	public EventTime getLastSessionStartTime(){
+		return getEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY);
+	}
+	
+	public void setLastSessionStartTime(EventTime time){
+		setEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY, time);
 	}
 	
 	public LargeGeneratedId getPreviousSessionId(){
@@ -108,5 +112,16 @@ public class DeviceManager {
 			return true;
 		}
 		return false;
+	}
+	
+	private EventTime getEventTimeValue(String key){
+		long lastEventTimeMilliseconds = this.preferences.getLong(key, 0);
+		return new EventTime(lastEventTimeMilliseconds);
+	}
+	
+	private void setEventTimeValue(String key, EventTime value){
+		SharedPreferences.Editor editor = this.preferences.edit();
+		editor.putLong(key, value.getTimeInMillis());
+		editor.commit();
 	}
 }
