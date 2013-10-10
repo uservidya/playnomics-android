@@ -85,7 +85,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	public String getEventsUrl() {
-		if (!util.stringIsNullOrEmpty(overrideEventsUrl)) {
+		if (!Util.stringIsNullOrEmpty(overrideEventsUrl)) {
 			return overrideEventsUrl;
 		}
 		if (testMode) {
@@ -101,7 +101,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	public String getMessagingUrl() {
-		if (!util.stringIsNullOrEmpty(overrideMessagingUrl)) {
+		if (!Util.stringIsNullOrEmpty(overrideMessagingUrl)) {
 			return overrideMessagingUrl;
 		}
 		if (testMode) {
@@ -114,7 +114,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		sessionState = SessionState.NOT_STARTED;
 		util = new Util();
 		config = new Config();
-		eventQueue = new EventQueue(util, getEventsUrl());
+		eventQueue = new EventQueue(getEventsUrl());
 		eventWorker = new EventWorker(eventQueue, new HttpConnectionFactory());
 		observer = new ActivityObserver(this, this);
 		producer = new HeartBeatProducer(this, config);
@@ -159,7 +159,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 			breadcrumbId = deviceManager.getAndroidDeviceId();
 
-			if (util.stringIsNullOrEmpty(userId)) {
+			if (Util.stringIsNullOrEmpty(userId)) {
 				userId = breadcrumbId;
 			}
 

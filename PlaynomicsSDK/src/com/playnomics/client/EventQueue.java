@@ -12,10 +12,8 @@ public class EventQueue{
 
 	private String apiUrl;
 	private ConcurrentLinkedQueue<String> eventUrlQueue;
-	private Util util;
 	
-	public EventQueue(Util util, String apiUrl){
-		this.util = util;
+	public EventQueue(String apiUrl){
 		this.apiUrl = apiUrl;
 		eventUrlQueue = new ConcurrentLinkedQueue<String>();
 	}
@@ -26,7 +24,7 @@ public class EventQueue{
 	}
 	
 	public void enqueueEventUrl(String eventUrl){
-		if(!util.stringIsNullOrEmpty(eventUrl)){
+		if(!Util.stringIsNullOrEmpty(eventUrl)){
 			eventUrlQueue.add(eventUrl);
 		}
 	}
@@ -39,8 +37,8 @@ public class EventQueue{
 		return eventUrlQueue.remove();
 	}
 	
-	String buildUrl(String url, String path, Map<String, Object> queryParameters) throws UnsupportedEncodingException{
-		if(util.stringIsNullOrEmpty(url)){
+	public static String buildUrl(String url, String path, Map<String, Object> queryParameters) throws UnsupportedEncodingException{
+		if(Util.stringIsNullOrEmpty(url)){
 			return null;
 		}
 		
@@ -54,7 +52,7 @@ public class EventQueue{
 		boolean firstParam = false;
 		
 		for(String key : queryParameters.keySet()){
-			if(util.stringIsNullOrEmpty(key)){
+			if(Util.stringIsNullOrEmpty(key)){
 				continue;
 			}
 			

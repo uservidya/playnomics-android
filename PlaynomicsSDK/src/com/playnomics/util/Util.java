@@ -13,7 +13,7 @@ public class Util {
 		return Math.abs(rand.nextLong());
 	}
 
-	public boolean stringIsNullOrEmpty(String value) {
+	public static boolean stringIsNullOrEmpty(String value) {
 		return (value == null || value.isEmpty());
 	}
 }
