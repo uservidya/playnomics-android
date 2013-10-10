@@ -29,7 +29,7 @@ public class UIObserver {
 	public void observeNewActivity(Activity activity) {
 		Window.Callback currentCallback = activity.getWindow().getCallback();
 		activity.getWindow().setCallback(
-				CallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
+				WindowCallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
 		activities.add(activity);
 		stateMachine.resume();
 	}
@@ -40,7 +40,7 @@ public class UIObserver {
 	 */
 	public void forgetLastActivity() {
 		Activity activity = activities.remove();
-		CallbackProxy proxy = (CallbackProxy)activity.getWindow().getCallback();
+		WindowCallbackProxy proxy = (WindowCallbackProxy)activity.getWindow().getCallback();
 		activity.getWindow().setCallback(proxy.getOriginalCallback());
 		
 		if (activities.isEmpty()) {

@@ -6,7 +6,7 @@ import java.lang.reflect.Method;
 import android.view.MotionEvent;
 import android.view.Window;
 
-public class CallbackProxy implements InvocationHandler {
+public class WindowCallbackProxy implements InvocationHandler {
 
 	private Window.Callback callback;
 	private TouchEventHandler eventHandler;
@@ -19,11 +19,11 @@ public class CallbackProxy implements InvocationHandler {
 			Window.Callback callback, TouchEventHandler eventHandler) {
 		return (Window.Callback) java.lang.reflect.Proxy.newProxyInstance(
 				callback.getClass().getClassLoader(), callback.getClass()
-						.getInterfaces(), new CallbackProxy(callback,
+						.getInterfaces(), new WindowCallbackProxy(callback,
 						eventHandler));
 	}
 
-	private CallbackProxy(Window.Callback callback,
+	private WindowCallbackProxy(Window.Callback callback,
 			TouchEventHandler eventHandler) {
 		this.callback = callback;
 		this.eventHandler = eventHandler;
