@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.playnomics.client.EventQueue;
@@ -23,14 +24,14 @@ import com.playnomics.events.MilestoneEvent;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 
-public class Session {
-
-	private enum SessionState {
-		NOT_STARTED, STARTED, PAUSED
-	};
-
+public class Session implements SessionStateMachine, TouchEventHandler, HeartBeatHandler {
 	// session
 	private SessionState sessionState;
+
+	public SessionState getSessionState() {
+		return sessionState;
+	}
+
 	private EventWorker eventWorker;
 	private EventQueue eventQueue;
 	private Util util;
@@ -38,7 +39,9 @@ public class Session {
 	private static final Object syncLock = new Object();
 	private ServiceManager serviceManager;
 	private DeviceManager deviceManager;
-
+	private UIObserver observer;
+	private HeartBeatProducer producer;
+	
 	// session data
 	private long applicationId;
 	private String userId;
@@ -47,9 +50,20 @@ public class Session {
 	private LargeGeneratedId instanceId;
 	private EventTime sessionStartTime;
 	private EventTime sessionPauseTime;
-	private AtomicInteger touchEvents;
-	private AtomicInteger allTouchEvents;
+
 	private AtomicInteger sequence;
+
+	private AtomicInteger touchEvents;
+
+	public int getTouchEvents() {
+		return touchEvents.get();
+	}
+
+	private AtomicInteger allTouchEvents;
+
+	public int getAllTouchEvents() {
+		return allTouchEvents.get();
+	}
 
 	private boolean enablePushNotifications;
 
@@ -96,11 +110,14 @@ public class Session {
 	}
 
 	private Session() {
+		this.sessionState = SessionState.NOT_STARTED;
 		this.util = new Util();
 		this.config = new Config();
 		this.eventQueue = new EventQueue(util, this.getEventsUrl());
 		this.eventWorker = new EventWorker(this.eventQueue,
 				new HttpConnectionFactory());
+		this.observer = new UIObserver(this, this);
+		this.producer = new HeartBeatProducer(this, config);
 	}
 
 	private static Session instance;
@@ -114,6 +131,7 @@ public class Session {
 		}
 	}
 
+	// Session life-cycle
 	public void start(long applicationId, String userId, Context context) {
 		this.userId = userId;
 		start(applicationId, context);
@@ -184,7 +202,7 @@ public class Session {
 
 			eventQueue.enqueueEvent(implicitEvent);
 			eventWorker.start();
-
+			producer.start();
 			if (settingsChanged) {
 				onDeviceSettingsUpdated();
 			}
@@ -201,10 +219,12 @@ public class Session {
 			}
 			this.sessionPauseTime = new EventTime();
 			AppPauseEvent event = new AppPauseEvent(this.config,
-					getSessionInfo(), this.instanceId, sessionStartTime,
-					sequence.get(), touchEvents.get(), allTouchEvents.get());
-			sequence.incrementAndGet();
-			eventQueue.enqueueEvent(event);
+					getSessionInfo(), this.instanceId, this.sessionStartTime,
+					this.sequence.get(), getTouchEvents(), getAllTouchEvents());
+			this.sequence.incrementAndGet();
+			this.eventQueue.enqueueEvent(event);
+			eventWorker.stop();
+			producer.stop();
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
@@ -216,21 +236,32 @@ public class Session {
 				return;
 			}
 
-			AppResumeEvent event = new AppResumeEvent(config,
-					getSessionInfo(), this.instanceId, this.sessionStartTime,
+			AppResumeEvent event = new AppResumeEvent(config, getSessionInfo(),
+					this.instanceId, this.sessionStartTime,
 					this.sessionPauseTime, this.sequence.get());
 			eventQueue.enqueueEvent(event);
-			
+			eventWorker.start();
+			producer.start();
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
 	}
 
-	public void stop() {
-
+	public void onHeartBeat(int heartBeatIntervalSeconds){
+		try{
+			sequence.incrementAndGet();
+			AppRunningEvent event = new AppRunningEvent(config, getSessionInfo(), instanceId, sessionStartTime, sequence.get(), touchEvents.get(), allTouchEvents.get());
+			eventQueue.enqueueEvent(event);
+			//reset the touch events
+			touchEvents.set(0);
+			allTouchEvents.set(0);
+			
+		} catch(UnsupportedEncodingException exception){
+			Logger.log(LogLevel.ERROR, exception, "Could not log appRunning");
+		}
 	}
-
-	void receivedTouchEvent() {
+	
+	public void onTouchEventReceived() {
 		touchEvents.incrementAndGet();
 		allTouchEvents.incrementAndGet();
 	}
@@ -306,5 +337,15 @@ public class Session {
 		} catch (Exception ex) {
 			Logger.log(LogLevel.ERROR, ex, "Could not send milestone");
 		}
+	}
+
+	//activity attach/detach
+	
+	public void attachActivity(Activity activity){
+		observer.observeNewActivity(activity);
+	}
+	
+	public void detachActivity(){
+		observer.forgetLastActivity();
 	}
 }
