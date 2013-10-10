@@ -307,14 +307,6 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	public void attributeInstall(String source) {
-		attributeInstall(source, null, null);
-	}
-
-	public void attributeInstall(String source, String campaign) {
-		attributeInstall(source, campaign, null);
-	}
-
 	public void attributeInstall(String source, String campaign,
 			Date installDate) {
 		try {
