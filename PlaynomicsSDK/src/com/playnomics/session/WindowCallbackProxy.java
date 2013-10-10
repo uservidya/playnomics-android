@@ -6,6 +6,10 @@ import java.lang.reflect.Method;
 import android.view.MotionEvent;
 import android.view.Window;
 
+/**
+ * @author jaredjenkins
+ * Uses a dynamic proxy to safely intercept the UI events for an Activity's Window Callback.
+ */
 public class WindowCallbackProxy implements InvocationHandler {
 
 	private Window.Callback callback;

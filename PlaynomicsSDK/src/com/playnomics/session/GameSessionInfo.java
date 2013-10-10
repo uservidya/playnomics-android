@@ -2,6 +2,11 @@ package com.playnomics.session;
 
 import com.playnomics.util.*;
 
+
+/**
+ * @author jaredjenkins
+ * Encapsulates general information about the session for PlaynomicsEvents.
+ */
 public class GameSessionInfo {
 	private Long applicationId;
 	private String userId;

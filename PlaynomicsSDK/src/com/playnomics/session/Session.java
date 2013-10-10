@@ -40,7 +40,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private static final Object syncLock = new Object();
 	private ServiceManager serviceManager;
 	private DeviceManager deviceManager;
-	private UIObserver observer;
+	private ActivityObserver observer;
 	private HeartBeatProducer producer;
 
 	// session data
@@ -116,7 +116,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		config = new Config();
 		eventQueue = new EventQueue(util, getEventsUrl());
 		eventWorker = new EventWorker(eventQueue, new HttpConnectionFactory());
-		observer = new UIObserver(this, this);
+		observer = new ActivityObserver(this, this);
 		producer = new HeartBeatProducer(this, config);
 	}
 

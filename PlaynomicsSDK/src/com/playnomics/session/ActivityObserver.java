@@ -10,12 +10,12 @@ import android.view.Window;
  * Tracks the life-cycle of Activities that modify the session state machine, and user
  * interaction with the Activity.
  */
-public class UIObserver {
+public class ActivityObserver {
 	private SessionStateMachine stateMachine;
 	private ConcurrentLinkedQueue<Activity> activities;
 	private TouchEventHandler handler;
 	
-	public UIObserver(SessionStateMachine stateMachine,
+	public ActivityObserver(SessionStateMachine stateMachine,
 			TouchEventHandler eventHandler) {
 		this.stateMachine = stateMachine;
 		this.activities = new ConcurrentLinkedQueue<Activity>();
