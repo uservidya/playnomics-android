@@ -3,7 +3,6 @@ package com.playnomics.session;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import android.app.Activity;
 import android.view.MotionEvent;
 import android.view.Window;
 
@@ -13,8 +12,7 @@ public class CallbackProxy implements InvocationHandler {
 	private TouchEventHandler eventHandler;
 
 	public static Window.Callback newCallbackProxyForActivity(
-			Activity activity, TouchEventHandler eventHandler) {
-		Window.Callback callback = activity.getWindow().getCallback();
+			Window.Callback callback, TouchEventHandler eventHandler) {
 		return (Window.Callback) java.lang.reflect.Proxy.newProxyInstance(
 				callback.getClass().getClassLoader(), callback.getClass()
 						.getInterfaces(), new CallbackProxy(callback,

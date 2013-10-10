@@ -3,6 +3,7 @@ package com.playnomics.session;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import android.app.Activity;
+import android.view.Window;
 
 public class UIObserver {
 	private SessionStateMachine stateMachine;
@@ -16,8 +17,9 @@ public class UIObserver {
 	}
 
 	public void observeNewActivity(Activity activity) {
+		Window.Callback currentCallback = activity.getWindow().getCallback();
 		activity.getWindow().setCallback(
-				CallbackProxy.newCallbackProxyForActivity(activity, handler));
+				CallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
 		activities.add(activity);
 		stateMachine.resume();
 	}
