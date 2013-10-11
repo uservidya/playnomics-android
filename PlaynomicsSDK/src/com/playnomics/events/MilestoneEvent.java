@@ -2,7 +2,7 @@ package com.playnomics.events;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
-import com.playnomics.util.Util;
+import com.playnomics.util.IRandomGenerator;
 
 public class MilestoneEvent extends ExplicitEvent {
 
@@ -16,7 +16,7 @@ public class MilestoneEvent extends ExplicitEvent {
 				19), MilestoneCustom20(20), MilestoneCustom21(21), MilestoneCustom22(
 				22), MilestoneCustom23(23), MilestoneCustom24(24), MilestoneCustom25(
 				25);
-
+ 
 		private int milestoneNum;
 
 		MilestoneType(int milestoneNum) {
@@ -29,11 +29,11 @@ public class MilestoneEvent extends ExplicitEvent {
 		}
 	}
 
-	public MilestoneEvent(Config config, Util util,
+	public MilestoneEvent(Config config, IRandomGenerator generator,
 			GameSessionInfo sessionInfo, MilestoneType milestoneType) {
 		super(config, sessionInfo);
 
-		long milestoneId = util.generatePositiveRandomLong();
+		long milestoneId = generator.generatePositiveRandomLong();
 		appendParameter(config.getMilestoneIdKey(), milestoneId);
 		appendParameter(config.getMilestoneNameKey(), milestoneType);
 	}

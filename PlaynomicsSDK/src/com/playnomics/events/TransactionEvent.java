@@ -2,14 +2,14 @@ package com.playnomics.events;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
-import com.playnomics.util.Util;
+import com.playnomics.util.IRandomGenerator;
 
 public class TransactionEvent extends ExplicitEvent {
 	
-	public TransactionEvent(Config config, Util util, GameSessionInfo sessionInfo, int quantity, float price){
+	public TransactionEvent(Config config, IRandomGenerator generator, GameSessionInfo sessionInfo, int quantity, float price){
 		super(config, sessionInfo);
 		
-		long transactionId = util.generatePositiveRandomLong();
+		long transactionId = generator.generatePositiveRandomLong();
 		//only currency allowed
 		int currencyIndex = 0;
 		//hard code these values since we are simplifying transactions

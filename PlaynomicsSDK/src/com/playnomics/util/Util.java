@@ -6,7 +6,7 @@ import java.util.TimeZone;
 import android.content.Context;
 import android.provider.Settings;
 
-public class Util {
+public class Util implements IRandomGenerator {
 
 	public static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
 	public static final String UT8_ENCODING = "UTF-8";
