@@ -8,7 +8,9 @@ import android.content.Context;
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.session.Session;
+import com.playnomics.util.AndroidLogger;
 import com.playnomics.util.Config;
+import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
 
 public class Playnomics {
@@ -17,10 +19,13 @@ public class Playnomics {
 	private static Session getInstance() {
 		synchronized (Playnomics.syncLock) {
 			if (instance == null) {
-				HttpConnectionFactory connectionFactory = new HttpConnectionFactory();
+				AndroidLogger logWriter = new AndroidLogger("PLAYNOMICS");
+				Logger logger = new Logger(logWriter);
+				
+				HttpConnectionFactory connectionFactory = new HttpConnectionFactory(logger);
 				Config config = new Config();
 				Util util = new Util();
-				instance = new Session(config, util, connectionFactory);
+				instance = new Session(config, util, connectionFactory, logger);
 			}
 			return instance;
 		}

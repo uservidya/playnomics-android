@@ -9,6 +9,10 @@ import com.playnomics.util.Logger;
 import com.playnomics.util.Logger.LogLevel;
 
 public class HttpConnectionFactory {
+	Logger logger;
+	public HttpConnectionFactory(Logger logger){
+		this.logger = logger;
+	}
 	
 	public HttpURLConnection startConnectionForUrl(String urlString) 
 			throws IOException {
@@ -16,7 +20,7 @@ public class HttpConnectionFactory {
 			URL url = new URL(urlString);
 			return ((HttpURLConnection) url.openConnection());
 		} catch(MalformedURLException ex){
-			Logger.log(LogLevel.WARNING, ex, "Could not generate a valid URL from this String %s", urlString);
+			logger.log(LogLevel.WARNING, ex, "Could not generate a valid URL from this String %s", urlString);
 			return null;
 		}		
 	}

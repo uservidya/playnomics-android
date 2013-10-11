@@ -21,9 +21,11 @@ public class DeviceManager {
 	private Context context;
 	private ServiceManager manager;
 	private SharedPreferences preferences;
+	private Logger logger;
 
-	public DeviceManager(Context context, ServiceManager serviceManager) {
+	public DeviceManager(Context context, ServiceManager serviceManager, Logger logger) {
 		this.context = context;
+		this.logger = logger;
 		manager = serviceManager;
 		preferences = context.getSharedPreferences(CACHE_NAME,
 				Context.MODE_PRIVATE);
@@ -94,7 +96,7 @@ public class DeviceManager {
 			return info.versionCode;
 		} catch (NameNotFoundException ex) {
 			// according to Google's docs this should never happen
-			Logger.log(LogLevel.DEBUG, ex,
+			logger.log(LogLevel.WARNING, ex,
 					"Could not obtain the application version from the package manager");
 			// in the event of a failure always return a -1
 			return -1;

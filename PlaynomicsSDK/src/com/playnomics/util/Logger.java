@@ -14,35 +14,43 @@ public class Logger {
 			return level;
 		}
 	}
-
-	private static LogLevel logLevel;
-
-	public static void setLogLevel(LogLevel level) {
-		Logger.logLevel = level;
+	
+	private LogLevel logLevel;
+	public void setLogLevel(LogLevel level) {
+		this.logLevel = level;
 	}
 
-	public static void log(LogLevel logLevel, String message, Object... args) {
-		int authorizedLogLevel = Logger.logLevel.level();
+	private LogWriter logWriter;
+	public Logger(LogWriter logWriter){
+		this.logWriter = logWriter;
+	}
+	
+	public void log(LogLevel logLevel, String format, Object... args) {
+		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			// can log the the message
+			//can log the the message
+			logWriter.writeLog(logLevel, format, args);
 		}
 	}
 
-	public static void log(LogLevel logLevel, Exception ex) {
-		int authorizedLogLevel = Logger.logLevel.level();
+	public void log(LogLevel logLevel, Exception ex) {
+		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			// can log the the message
+			//can log the the message
+			logWriter.writeLog(logLevel, ex);
 		}
 	}
 
-	public static void log(LogLevel logLevel, Exception ex, String message,
+	public void log(LogLevel logLevel, Exception ex, String message,
 			Object... args) {
-		int authorizedLogLevel = Logger.logLevel.level();
+		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			// can log the the message
+			//can log the the message
+			logWriter.writeLog(logLevel, message, args);
+			logWriter.writeLog(logLevel, ex);
 		}
 	}
 }

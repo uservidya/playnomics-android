@@ -33,15 +33,16 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		return sessionState;
 	}
 
+	private Logger logger;
 	private EventWorker eventWorker;
 	private EventQueue eventQueue;
 	private Util util;
 	private Config config;
-	private static final Object syncLock = new Object();
 	private ServiceManager serviceManager;
 	private DeviceManager deviceManager;
 	private ActivityObserver observer;
 	private HeartBeatProducer producer;
+	
 
 	// session data
 	private long applicationId;
@@ -98,14 +99,15 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		return config.getProdMessagingUrl();
 	}
 	
-	public Session(Config config, Util util, HttpConnectionFactory connectionFactory) {
-		sessionState = SessionState.NOT_STARTED;
+	public Session(Config config, Util util, HttpConnectionFactory connectionFactory, Logger logger) {
+		this.logger = logger;
+		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
 		this.config = config;
-		eventQueue = new EventQueue(getEventsUrl());
-		eventWorker = new EventWorker(eventQueue, connectionFactory);
-		observer = new ActivityObserver(this, this);
-		producer = new HeartBeatProducer(this, config);
+		this.eventQueue = new EventQueue(getEventsUrl());
+		this.eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
+		this.observer = new ActivityObserver(this, this);
+		this.producer = new HeartBeatProducer(this, config);
 	}
 	
 	// Session life-cycle
@@ -131,7 +133,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			sessionState = SessionState.STARTED;
 
 			serviceManager = new ServiceManager(context);
-			deviceManager = new DeviceManager(context, serviceManager);
+			deviceManager = new DeviceManager(context, serviceManager, this.logger);
 			boolean settingsChanged = deviceManager.synchronizeDeviceSettings();
 
 			breadcrumbId = deviceManager.getAndroidDeviceId();
@@ -183,7 +185,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 				onDeviceSettingsUpdated();
 			}
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex, "Could not start session");
+			logger.log(LogLevel.ERROR, ex, "Could not start session");
 			sessionState = SessionState.NOT_STARTED;
 		}
 	}
@@ -202,7 +204,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.stop();
 			producer.stop();
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex, "Could not pause session");
+			logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
 	}
 
@@ -219,7 +221,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.start();
 			producer.start();
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex, "Could not pause session");
+			logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
 	}
 
@@ -235,7 +237,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			allTouchEvents.set(0);
 
 		} catch (UnsupportedEncodingException exception) {
-			Logger.log(LogLevel.ERROR, exception, "Could not log appRunning");
+			logger.log(LogLevel.ERROR, exception, "Could not log appRunning");
 		}
 	}
 
@@ -280,7 +282,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					getSessionInfo(), quantity, priceInUSD);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex, "Could not send transaction");
+			logger.log(LogLevel.ERROR, ex, "Could not send transaction");
 		}
 	}
 
@@ -292,7 +294,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					source, campaign, installDate);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex,
+			logger.log(LogLevel.ERROR, ex,
 					"Could not send install attribution information");
 		}
 	}
@@ -304,7 +306,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					getSessionInfo(), milestoneType);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
-			Logger.log(LogLevel.ERROR, ex, "Could not send milestone");
+			logger.log(LogLevel.ERROR, ex, "Could not send milestone");
 		}
 	}
 

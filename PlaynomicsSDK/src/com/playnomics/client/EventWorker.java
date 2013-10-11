@@ -11,12 +11,13 @@ public class EventWorker {
 	
 	private HttpConnectionFactory connectionFactory;
 	private EventQueue eventQueue;
-	
+	private Logger logger;
 	private AtomicBoolean running;
 	
-	public EventWorker(EventQueue eventQueue, HttpConnectionFactory factory){
-		connectionFactory = factory;
+	public EventWorker(EventQueue eventQueue, HttpConnectionFactory factory, Logger logger){
+		this.connectionFactory = factory;
 		this.eventQueue = eventQueue;
+		this.logger = logger;
 	}
 	
 	public void start(){
@@ -47,7 +48,7 @@ public class EventWorker {
 					connection = connectionFactory.startConnectionForUrl(url);
 					successful = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
 				} catch (IOException e) {
-					Logger.log(LogLevel.WARNING, e, "Event URL Request failed for URL: %s", url);
+					logger.log(LogLevel.WARNING, e, "Event URL Request failed for URL: %s", url);
 				} finally{
 					if(connection != null){
 						connection.disconnect();
