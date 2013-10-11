@@ -43,16 +43,43 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private ActivityObserver observer;
 	private HeartBeatProducer producer;
 	
-
 	// session data
 	private long applicationId;
+	
+	public long getApplicationId(){
+		return applicationId;
+	}
+	
 	private String userId;
+	public String getUserId(){
+		return userId;
+	}
+	
 	private String breadcrumbId;
+	String getBreadcrumbId(){
+		return breadcrumbId;
+	}
+	
 	private LargeGeneratedId sessionId;
+	LargeGeneratedId getSessionId(){
+		return sessionId;
+	}
+	
 	private LargeGeneratedId instanceId;
+	LargeGeneratedId getInstanceId(){
+		return instanceId;
+	}
+	
 	private EventTime sessionStartTime;
+	EventTime getSessionStartTime(){
+		return sessionStartTime;
+	}
+	
 	private EventTime sessionPauseTime;
-
+	EventTime getSessionPauseTime(){
+		return sessionPauseTime;
+	}
+	
 	private AtomicInteger sequence;
 	private AtomicInteger touchEvents;
 	private AtomicInteger allTouchEvents;
@@ -136,7 +163,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			deviceManager = new DeviceManager(context, serviceManager, this.logger);
 			boolean settingsChanged = deviceManager.synchronizeDeviceSettings();
 
-			breadcrumbId = deviceManager.getAndroidDeviceId();
+			breadcrumbId = util.getDeviceIdFromContext(context);
 
 			if (Util.stringIsNullOrEmpty(userId)) {
 				userId = breadcrumbId;
@@ -182,7 +209,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.start();
 			producer.start();
 			if (settingsChanged) {
-				onDeviceSettingsUpdated();
+				onDeviceSettingsUpdated(context);
 			}
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not start session");
@@ -258,14 +285,14 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	private void onDeviceSettingsUpdated() throws UnsupportedEncodingException {
+	private void onDeviceSettingsUpdated(Context context) throws UnsupportedEncodingException {
 		if (enablePushNotifications
 				&& deviceManager.getPushRegistrationId() == null) {
 			registerForPushNotifcations();
 		} else {
 			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
 					deviceManager.getPushRegistrationId(),
-					deviceManager.getAndroidDeviceId());
+					util.getDeviceIdFromContext(context));
 			eventQueue.enqueueEvent(event);
 		}
 	}

@@ -26,16 +26,11 @@ public class DeviceManager {
 	public DeviceManager(Context context, ServiceManager serviceManager, Logger logger) {
 		this.context = context;
 		this.logger = logger;
-		manager = serviceManager;
+		manager = serviceManager; 
 		preferences = context.getSharedPreferences(CACHE_NAME,
 				Context.MODE_PRIVATE);
 	}
-
-	public String getAndroidDeviceId() {
-		return Settings.Secure.getString(context.getContentResolver(),
-				Settings.Secure.ANDROID_ID);
-	}
-
+	
 	public EventTime getLastEventTime() {
 		return getEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY);
 	}
