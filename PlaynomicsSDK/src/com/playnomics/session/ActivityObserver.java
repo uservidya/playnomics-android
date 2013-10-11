@@ -7,7 +7,7 @@ import android.view.Window;
 
 /**
  * @author jaredjenkins
- * Tracks the life-cycle of Activities that modify the session state machine, and user
+ * Tracks the life-cycle of Activities as a proxy for session state machine, and user
  * interaction with the Activity.
  */
 public class ActivityObserver {
