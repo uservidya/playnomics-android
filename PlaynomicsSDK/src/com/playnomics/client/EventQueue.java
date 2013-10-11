@@ -44,27 +44,29 @@ public class EventQueue{
 		
 		StringBuilder builder = new StringBuilder(url);
 		
-		if(path != null && path.isEmpty()){
-			builder.append(url.endsWith("/") ? String.format("/%s", path) : path);
+		if(!Util.stringIsNullOrEmpty(path)){
+			builder.append(url.endsWith("/") ? path : String.format("/%s", path));
 		}
 		
-		boolean hasQueryString = builder.toString().endsWith("?");
-		boolean firstParam = false;
-		
-		for(String key : queryParameters.keySet()){
-			if(Util.stringIsNullOrEmpty(key)){
-				continue;
-			}
+		if(queryParameters != null){
+			boolean hasQueryString = builder.toString().contains("?");
+			boolean firstParam = true;
 			
-			Object value = queryParameters.get(key);
-			if(value == null){
-				continue;
+			for(String key : queryParameters.keySet()){
+				if(Util.stringIsNullOrEmpty(key)){
+					continue;
+				}
+				
+				Object value = queryParameters.get(key);
+				if(value == null){
+					continue;
+				}
+				
+				builder.append((!hasQueryString && firstParam) 
+						? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
+						: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
+				firstParam = false;
 			}
-			
-			builder.append(hasQueryString && firstParam 
-					? String.format("%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
-					: String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
-			firstParam = false;
 		}
 		return builder.toString();
 	}
