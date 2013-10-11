@@ -53,19 +53,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private EventTime sessionPauseTime;
 
 	private AtomicInteger sequence;
-
 	private AtomicInteger touchEvents;
-
-	public int getTouchEvents() {
-		return touchEvents.get();
-	}
-
 	private AtomicInteger allTouchEvents;
-
-	public int getAllTouchEvents() {
-		return allTouchEvents.get();
-	}
-
 	private boolean enablePushNotifications;
 
 	public void setEnabledPushNotifications(boolean value) {
@@ -79,7 +68,6 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private String overrideEventsUrl;
-
 	public void setOverrideEventsUrl(String url) {
 		overrideEventsUrl = url;
 	}
@@ -109,28 +97,17 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 		return config.getProdMessagingUrl();
 	}
-
-	private Session() {
+	
+	public Session(Config config, Util util, HttpConnectionFactory connectionFactory) {
 		sessionState = SessionState.NOT_STARTED;
-		util = new Util();
-		config = new Config();
+		this.util = util;
+		this.config = config;
 		eventQueue = new EventQueue(getEventsUrl());
-		eventWorker = new EventWorker(eventQueue, new HttpConnectionFactory());
+		eventWorker = new EventWorker(eventQueue, connectionFactory);
 		observer = new ActivityObserver(this, this);
 		producer = new HeartBeatProducer(this, config);
 	}
-
-	private static Session instance;
-
-	public static Session getInstance() {
-		synchronized (Session.syncLock) {
-			if (instance == null) {
-				instance = new Session();
-			}
-			return Session.instance;
-		}
-	}
-
+	
 	// Session life-cycle
 	public void start(long applicationId, String userId, Context context) {
 		this.userId = userId;
@@ -219,7 +196,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			sessionPauseTime = new EventTime();
 			AppPauseEvent event = new AppPauseEvent(config, getSessionInfo(),
 					instanceId, sessionStartTime, sequence.get(),
-					getTouchEvents(), getAllTouchEvents());
+					touchEvents.get(), allTouchEvents.get());
 			sequence.incrementAndGet();
 			eventQueue.enqueueEvent(event);
 			eventWorker.stop();
