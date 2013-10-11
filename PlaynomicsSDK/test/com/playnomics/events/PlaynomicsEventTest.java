@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.mockito.*;
 
 import com.playnomics.session.GameSessionInfo;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.LargeGeneratedId;
-import com.playnomics.util.Config;
 import com.playnomics.util.Util;
 
 public class PlaynomicsEventTest {
@@ -29,7 +29,7 @@ public class PlaynomicsEventTest {
 		return new GameSessionInfo(1L, "userId", "breadcrumId", sessionId);
 	}
 
-	protected void testCommonEventParameters(Config config,
+	protected void testCommonEventParameters(IConfig config,
 			PlaynomicsEvent event, GameSessionInfo sessionInfo) {
 		Map<String, Object> params = event.getEventParameters();
 

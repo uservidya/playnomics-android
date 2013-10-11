@@ -5,7 +5,7 @@ import com.playnomics.session.GameSessionInfo;
 
 public class AppResumeEvent extends ImplicitEvent {
 
-	public AppResumeEvent(Config config, GameSessionInfo sessionInfo,
+	public AppResumeEvent(IConfig config, GameSessionInfo sessionInfo,
 			LargeGeneratedId instanceId, EventTime sessionStartTime,
 			EventTime sessionPauseTime, int sequenceNumber) {
 		super(config, sessionInfo, instanceId);

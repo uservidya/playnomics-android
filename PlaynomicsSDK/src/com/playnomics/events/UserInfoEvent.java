@@ -3,11 +3,11 @@ package com.playnomics.events;
 import java.util.Date;
 
 import com.playnomics.session.GameSessionInfo;
-import com.playnomics.util.Config;
+import com.playnomics.util.IConfig;
 
 public class UserInfoEvent extends ExplicitEvent {
 
-	public UserInfoEvent(Config config, GameSessionInfo sessionInfo, String source, String campaign, Date installDate){
+	public UserInfoEvent(IConfig config, GameSessionInfo sessionInfo, String source, String campaign, Date installDate){
 		super(config, sessionInfo);	
 		appendParameter(config.getUserInfoSourceKey(), source);
 		appendParameter(config.getUserInfoCampaignKey(), campaign);
@@ -16,7 +16,7 @@ public class UserInfoEvent extends ExplicitEvent {
 		appendParameter(config.getUserInfoTypeKey(), "update");
 	}
 
-	public UserInfoEvent(Config config, GameSessionInfo sessionInfo, String pushRegistrationId, String deviceId){
+	public UserInfoEvent(IConfig config, GameSessionInfo sessionInfo, String pushRegistrationId, String deviceId){
 		super(config, sessionInfo);
 		appendParameter(config.getUserInfoPushTokenKey(), pushRegistrationId);
 		appendParameter(config.getUserInfoDeviceIdKey(), deviceId);

@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.playnomics.session.GameSessionInfo;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.LargeGeneratedId;
 import com.playnomics.util.Config;
 import com.playnomics.util.Util;
@@ -36,7 +37,7 @@ public class AppPageEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppPage() {
-		Config config = new Config();
+		IConfig config = new Config();
 		Util util = new Util();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();

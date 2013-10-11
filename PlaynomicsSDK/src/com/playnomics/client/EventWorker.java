@@ -9,12 +9,12 @@ import com.playnomics.util.Logger.LogLevel;
 
 public class EventWorker {
 	
-	private HttpConnectionFactory connectionFactory;
+	private IHttpConnectionFactory connectionFactory;
 	private EventQueue eventQueue;
 	private Logger logger;
 	private AtomicBoolean running;
 	
-	public EventWorker(EventQueue eventQueue, HttpConnectionFactory factory, Logger logger){
+	public EventWorker(EventQueue eventQueue, IHttpConnectionFactory factory, Logger logger){
 		this.connectionFactory = factory;
 		this.eventQueue = eventQueue;
 		this.logger = logger;

@@ -3,14 +3,14 @@ package com.playnomics.session;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.playnomics.util.Config;
+import com.playnomics.util.IConfig;
 
 public class HeartBeatProducer {
 	private HeartBeatHandler handler;
 	private ScheduledThreadPoolExecutor hearbeatSchedule;
-	private Config config;
+	private IConfig config;
 
-	public HeartBeatProducer(HeartBeatHandler handler, Config config) {
+	public HeartBeatProducer(HeartBeatHandler handler, IConfig config) {
 		this.handler = handler;
 		hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
 	}

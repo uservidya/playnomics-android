@@ -20,7 +20,7 @@ public class ActivityObserver {
 		this.stateMachine = stateMachine;
 		this.activities = new ConcurrentLinkedQueue<Activity>();
 	}
-
+	
 	/**
 	 * @param activity
 	 * Enqueues the activity and attaches a proxy object on the callback so that the SDK can observe and

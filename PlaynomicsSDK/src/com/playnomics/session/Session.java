@@ -11,9 +11,9 @@ import android.content.Context;
 
 import com.playnomics.client.EventQueue;
 import com.playnomics.client.EventWorker;
+import com.playnomics.client.IHttpConnectionFactory;
 import com.playnomics.util.*;
 import com.playnomics.util.Logger.LogLevel;
-import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppPauseEvent;
 import com.playnomics.events.AppResumeEvent;
@@ -37,7 +37,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private EventWorker eventWorker;
 	private EventQueue eventQueue;
 	private Util util;
-	private Config config;
+	private IConfig config;
 	private ServiceManager serviceManager;
 	private DeviceManager deviceManager;
 	private ActivityObserver observer;
@@ -126,7 +126,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		return config.getProdMessagingUrl();
 	}
 	
-	public Session(Config config, Util util, HttpConnectionFactory connectionFactory, Logger logger) {
+	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;

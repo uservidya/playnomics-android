@@ -1,12 +1,12 @@
 package com.playnomics.events;
 
 import com.playnomics.session.GameSessionInfo;
-import com.playnomics.util.Config;
+import com.playnomics.util.IConfig;
 
 public abstract class ExplicitEvent extends PlaynomicsEvent {
 	private final String explicitEventSessionKey = "jsh";
 	
-	public ExplicitEvent(Config config, GameSessionInfo sessionInfo){
+	public ExplicitEvent(IConfig config, GameSessionInfo sessionInfo){
 		super(config, sessionInfo);
 	}
 	

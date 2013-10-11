@@ -10,9 +10,9 @@ public abstract class PlaynomicsEvent {
 	private TreeMap<String, Object> eventParameters;
 	private EventTime eventTime;
 
-	protected Config config;
+	protected IConfig config;
 
-	protected PlaynomicsEvent(Config config, GameSessionInfo sessionInfo) {
+	protected PlaynomicsEvent(IConfig config, GameSessionInfo sessionInfo) {
 		eventTime = new EventTime();
 		eventParameters = new TreeMap<String, Object>();
 		this.config = config;

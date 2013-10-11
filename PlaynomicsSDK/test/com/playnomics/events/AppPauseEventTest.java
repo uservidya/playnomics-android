@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
 import com.playnomics.util.EventTime;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.LargeGeneratedId;
 import com.playnomics.util.Util;
 
@@ -41,7 +42,7 @@ public class AppPauseEventTest extends PlaynomicsEventTest {
 		Util util = new Util();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		Config config = new Config();
+		IConfig config = new Config();
 		//1 minute ago
 		Calendar calendar = new GregorianCalendar();
 		calendar.set(Calendar.SECOND, calendar.get(Calendar.SECOND) - 60);

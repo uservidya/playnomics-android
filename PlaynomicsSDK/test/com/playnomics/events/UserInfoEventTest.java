@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.Util;
 
 public class UserInfoEventTest extends PlaynomicsEventTest {
@@ -38,7 +39,7 @@ public class UserInfoEventTest extends PlaynomicsEventTest {
 	@Test
 	public void testUserInfoAttribution() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		Config config = new Config();
+		IConfig config = new Config();
 
 		String source = "source";
 		String campaign = "campaign";
@@ -59,7 +60,7 @@ public class UserInfoEventTest extends PlaynomicsEventTest {
 	@Test
 	public void testUserInfoDevice() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		Config config = new Config();
+		IConfig config = new Config();
 
 		String pushRegistrationId = "pushId";
 		String deviceId = "deviceId";

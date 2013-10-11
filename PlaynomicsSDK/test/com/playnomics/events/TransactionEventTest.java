@@ -46,7 +46,7 @@ public class TransactionEventTest extends PlaynomicsEventTest {
 
 		when(utilMock.generatePositiveRandomLong()).thenReturn(transactionId);
 
-		Config config = new Config();
+		IConfig config = new Config();
 		TransactionEvent event = new TransactionEvent(config, utilMock,
 				sessionInfo, 10, .99f);
 		testCommonEventParameters(config, event, sessionInfo);

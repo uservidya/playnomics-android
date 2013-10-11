@@ -14,6 +14,7 @@ import java.util.Map;
 
 import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.session.GameSessionInfo;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.Util;
 import com.playnomics.util.Config;
 
@@ -52,7 +53,7 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 
 		long milestoneId = 100L;
 
-		Config config = new Config();
+		IConfig config = new Config();
 
 		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 		

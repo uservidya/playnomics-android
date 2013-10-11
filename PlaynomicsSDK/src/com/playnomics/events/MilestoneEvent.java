@@ -1,7 +1,7 @@
 package com.playnomics.events;
 
 import com.playnomics.session.GameSessionInfo;
-import com.playnomics.util.Config;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.IRandomGenerator;
 
 public class MilestoneEvent extends ExplicitEvent {
@@ -29,7 +29,7 @@ public class MilestoneEvent extends ExplicitEvent {
 		}
 	}
 
-	public MilestoneEvent(Config config, IRandomGenerator generator,
+	public MilestoneEvent(IConfig config, IRandomGenerator generator,
 			GameSessionInfo sessionInfo, MilestoneType milestoneType) {
 		super(config, sessionInfo);
 
