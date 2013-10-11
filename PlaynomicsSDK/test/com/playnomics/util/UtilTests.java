@@ -1,6 +1,7 @@
 package com.playnomics.util;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -33,4 +34,12 @@ public class UtilTests {
 			assertTrue(num >= 0);
 		}
 	}
+	
+	@Test
+	public void testStringIsEmptyOrNull(){
+		assertTrue(Util.stringIsNullOrEmpty(null));
+		assertTrue(Util.stringIsNullOrEmpty(""));
+		assertFalse(Util.stringIsNullOrEmpty("test"));
+	}
+	
 }
