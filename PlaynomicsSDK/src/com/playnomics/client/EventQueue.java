@@ -6,20 +6,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.playnomics.events.PlaynomicsEvent;
+import com.playnomics.util.IConfig;
 import com.playnomics.util.Util;
 
 public class EventQueue{
-
-	private String apiUrl;
+	private IConfig config;
 	private ConcurrentLinkedQueue<String> eventUrlQueue;
 	
-	public EventQueue(String apiUrl){
-		this.apiUrl = apiUrl;
+	public EventQueue(IConfig config){
+		this.config = config;
 		eventUrlQueue = new ConcurrentLinkedQueue<String>();
 	}
 	
 	public void enqueueEvent(PlaynomicsEvent event) throws UnsupportedEncodingException{
-		String eventUrl = buildUrl(apiUrl, event.getUrlPath(), event.getEventParameters());
+		String eventUrl = buildUrl(config.getEventsUrl(), event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}
 	

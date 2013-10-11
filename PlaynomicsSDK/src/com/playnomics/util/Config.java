@@ -11,7 +11,6 @@ public class Config implements IConfig {
 		bundle = ResourceBundle.getBundle(CONFIG_FILE);
 	}
 
-
 	public String getSdkVersion() {
 		return bundle.getString("sdk.version");
 	}
@@ -20,20 +19,57 @@ public class Config implements IConfig {
 		return bundle.getString("sdk.name");
 	}
 
-	public String getTestEventsUrl() {
+	private String getTestEventsUrl() {
 		return bundle.getString("eventsUrl.test");
 	}
 
-	public String getProdEventsUrl() {
+	private String getProdEventsUrl() {
 		return bundle.getString("eventsUrl.prod");
 	}
 
-	public String getTestMessagingUrl() {
+	private String getTestMessagingUrl() {
 		return bundle.getString("messagingUrl.test");
 	}
 
-	public String getProdMessagingUrl() {
+	private String getProdMessagingUrl() {
 		return bundle.getString("messagingUrl.prod");
+	}
+	
+	private boolean testMode = false;
+
+	public void setTestMode(boolean value) {
+		testMode = value;
+	}
+
+	private String overrideEventsUrl;
+	public void setOverrideEventsUrl(String url) {
+		overrideEventsUrl = url;
+	}
+
+	public String getEventsUrl() {
+		if (!Util.stringIsNullOrEmpty(overrideEventsUrl)) {
+			return overrideEventsUrl;
+		}
+		if (testMode) {
+			return getTestEventsUrl();
+		}
+		return getProdEventsUrl();
+	}
+
+	private String overrideMessagingUrl;
+
+	public void setOverrideMessagingUrl(String url) {
+		overrideMessagingUrl = url;
+	}
+
+	public String getMessagingUrl() {
+		if (!Util.stringIsNullOrEmpty(overrideMessagingUrl)) {
+			return overrideMessagingUrl;
+		}
+		if (testMode) {
+			return getTestMessagingUrl();
+		}
+		return getProdMessagingUrl();
 	}
 
 	public String getApplicationIdKey() {

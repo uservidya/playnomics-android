@@ -88,50 +88,13 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	public void setEnabledPushNotifications(boolean value) {
 		enablePushNotifications = value;
 	}
-
-	private boolean testMode = false;
-
-	public void setTestMode(boolean value) {
-		testMode = value;
-	}
-
-	private String overrideEventsUrl;
-	public void setOverrideEventsUrl(String url) {
-		overrideEventsUrl = url;
-	}
-
-	public String getEventsUrl() {
-		if (!Util.stringIsNullOrEmpty(overrideEventsUrl)) {
-			return overrideEventsUrl;
-		}
-		if (testMode) {
-			return config.getTestEventsUrl();
-		}
-		return config.getProdEventsUrl();
-	}
-
-	private String overrideMessagingUrl;
-
-	public void setOverrideMessagingUrl(String url) {
-		overrideMessagingUrl = url;
-	}
-
-	public String getMessagingUrl() {
-		if (!Util.stringIsNullOrEmpty(overrideMessagingUrl)) {
-			return overrideMessagingUrl;
-		}
-		if (testMode) {
-			return config.getTestMessagingUrl();
-		}
-		return config.getProdMessagingUrl();
-	}
 	
 	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
 		this.config = config;
-		this.eventQueue = new EventQueue(getEventsUrl());
+		this.eventQueue = new EventQueue(config);
 		this.eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 		this.observer = new ActivityObserver(this, this);
 		this.producer = new HeartBeatProducer(this, config);

@@ -6,14 +6,16 @@ public interface IConfig {
 
 	public String getSdkName();
 
-	public String getTestEventsUrl();
-
-	public String getProdEventsUrl();
-
-	public String getTestMessagingUrl();
-
-	public String getProdMessagingUrl();
-
+	public void setTestMode(boolean testMode);
+	
+	public void setOverrideEventsUrl(String eventsUrl);
+	
+	public String getEventsUrl();
+	
+	public void setOverrideMessagingUrl(String messagingUrl);
+	
+	public String getMessagingUrl();
+	
 	public String getApplicationIdKey();
 
 	public String getUserIdKey();
