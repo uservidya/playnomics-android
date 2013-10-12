@@ -6,6 +6,8 @@ public interface SessionStateMachine {
 		NOT_STARTED, STARTED, PAUSED
 	};
 
+	public SessionState getSessionState();
+	
 	void pause();
 
 	void resume();

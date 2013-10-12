@@ -2,9 +2,10 @@ package com.playnomics.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -12,15 +13,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.audiofx.BassBoost.Settings;
-import android.provider.Settings.Secure;
 
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.util.Config;
@@ -37,8 +36,8 @@ public class SessionTest {
 	
 	@Mock 
 	private HttpConnectionFactory factoryMock;
-	@Mock
-	private int httpStatus;
+	@Mock 
+	private HttpURLConnection connectionMock;
 	
 	@Mock 
 	private Util utilMock;
@@ -57,10 +56,6 @@ public class SessionTest {
 	private PackageManager packageManagerMock;
 	@Mock 
 	private PackageInfo packageInfoMock;
-	@Mock
-	private Settings settingsMock;
-	@Mock
-	private Secure secureMock;
 	
 	private Session session;
 	
@@ -77,22 +72,19 @@ public class SessionTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		//data for the application version
 		when(contextMock.getPackageName()).thenReturn("com.playnomics.test");
 		when(contextMock.getPackageManager()).thenReturn(packageManagerMock);
 		when(packageManagerMock.getPackageInfo("com.playnomics.test", 0)).thenReturn(packageInfoMock);
 		
 		//device ID setup
-		when(contextMock.)
-		
+		when(utilMock.getDeviceIdFromContext(any(Context.class))).thenReturn(deviceId);
 		//cache mock setup
 		when(contextMock.getSharedPreferences("com.playnomics.cache", Context.MODE_PRIVATE)).thenReturn(preferencesMock);
-		
-		//in general we don't care about the editor calls
-		when(preferencesMock.edit()).thenReturn(editorMock);
-		Mockito.doNothing().when(editorMock.putInt(any(String.class), anyInt()));
-		Mockito.doNothing().when(editorMock.putString(any(String.class),any(String.class)));
-		Mockito.doNothing().when(editorMock.commit());
+		//the connection just works
+		when(factoryMock.startConnectionForUrl(any(String.class))).thenReturn(connectionMock);
+		when(connectionMock.getResponseCode()).thenReturn(200);
 		
 		Config config = new Config();
 		Logger logger = new Logger(new UnitTestLogWriter());
@@ -115,14 +107,12 @@ public class SessionTest {
 	}
 	
 	@Test
-	public void testStartNewDevice(){
-		
-		
+	public void testStartNewDevice() throws IOException{
 		when(packageInfoMock.versionCode).thenReturn(1);
 		
 		when(preferencesMock.getString("pushId", null)).thenReturn(null);
 		when(preferencesMock.getInt("sessionId", -1)).thenReturn(-1);
-		when(preferencesMock.getInt("appVersion", 0)).thenReturn(-1);
+		when(preferencesMock.getInt("appVersion", 0)).thenReturn(0);
 		when(preferencesMock.getInt("lastEventTime", 0)).thenReturn(0);
 		when(preferencesMock.getInt("sessionStartTime", 0)).thenReturn(0);
 		
@@ -130,7 +120,13 @@ public class SessionTest {
 		
 		assertEquals("Application ID is set", appId, session.getApplicationId());
 		assertEquals("User ID is set", userId, session.getUserId());
-		assertEquals("Breadcrumb ID is set", );
+		assertEquals("Breadcrumb ID is set", deviceId);
+		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
+		
+		//an event for start is sent
+		verify(connectionMock).getResponseCode();
+		//cleans up all of the session resources
+		session.pause();
 	}	
 	
 	@Test
