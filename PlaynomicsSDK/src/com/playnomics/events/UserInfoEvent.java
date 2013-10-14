@@ -11,8 +11,11 @@ public class UserInfoEvent extends ExplicitEvent {
 		super(config, sessionInfo);	
 		appendParameter(config.getUserInfoSourceKey(), source);
 		appendParameter(config.getUserInfoCampaignKey(), campaign);
-		//date should be in EPOCH format
-		appendParameter(config.getUserInfoInstallDateKey(), installDate.getTime());
+		//date should be in EPOCH format 
+		
+		if(installDate != null){
+			appendParameter(config.getUserInfoInstallDateKey(), installDate.getTime());
+		}
 		appendParameter(config.getUserInfoTypeKey(), "update");
 	}
 
