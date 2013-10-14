@@ -38,7 +38,7 @@ public class AppPageEventTest extends PlaynomicsEventTest {
 	@Test
 	public void testAppPage() {
 		IConfig config = new Config();
-		Util util = new Util();
+		Util util = new Util(logger); 
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		

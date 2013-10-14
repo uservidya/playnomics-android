@@ -39,7 +39,7 @@ public class AppPauseEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppPause() {
-		Util util = new Util();
+		Util util = new Util(logger);
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		IConfig config = new Config();

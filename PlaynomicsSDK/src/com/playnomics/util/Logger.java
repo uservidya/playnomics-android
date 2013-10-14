@@ -15,7 +15,7 @@ public class Logger {
 		}
 	}
 	
-	private LogLevel logLevel;
+	private LogLevel logLevel = LogLevel.ERROR;
 	public void setLogLevel(LogLevel level) {
 		this.logLevel = level;
 	}

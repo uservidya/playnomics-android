@@ -5,29 +5,47 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.Context;
 
+import com.playnomics.client.EventWorker;
+import com.playnomics.client.EventQueue;
 import com.playnomics.client.HttpConnectionFactory;
+import com.playnomics.client.IEventQueue;
+import com.playnomics.client.IEventWorker;
 import com.playnomics.client.IHttpConnectionFactory;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.session.IActivityObserver;
+import com.playnomics.session.ActivityObserver;
+import com.playnomics.session.IHeartBeatProducer;
 import com.playnomics.session.Session;
 import com.playnomics.util.AndroidLogger;
 import com.playnomics.util.Config;
+import com.playnomics.util.ContextWrapper;
 import com.playnomics.util.IConfig;
+import com.playnomics.util.LogWriter;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
+import com.playnomics.session.HeartBeatProducer;
 
 public class Playnomics {
 	private static final Object syncLock = new Object();
 	private static Session instance;
+	
+	private static Logger logger;
+	private static Util util;
+	
 	private static Session getInstance() {
 		synchronized (Playnomics.syncLock) {
 			if (instance == null) {
-				AndroidLogger logWriter = new AndroidLogger("PLAYNOMICS");
-				Logger logger = new Logger(logWriter);
+				LogWriter logWriter = new AndroidLogger("PLAYNOMICS");
+				Playnomics.logger = new Logger(logWriter);
 				
 				IHttpConnectionFactory connectionFactory = new HttpConnectionFactory(logger);
 				IConfig config = new Config();
-				Util util = new Util();
-				instance = new Session(config, util, connectionFactory, logger);
+				Playnomics.util = new Util(logger);
+				IEventQueue eventQueue = new EventQueue(config);
+				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
+				IActivityObserver activityObserver = new ActivityObserver();
+				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config);
+				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer);
 			}
 			return instance;
 		}
@@ -35,12 +53,19 @@ public class Playnomics {
 	
 	public static void start(Context context, long applicationId, String userId){
 		Session session = getInstance();
-		session.start(applicationId, userId, context);
+		session.setApplicationId(applicationId);
+		session.setUserId(userId);	
+		ContextWrapper contextWrapper = new ContextWrapper(context, logger, util);
+		session.start(contextWrapper);
 	}
 	
 	public static void start(Context context, long applicationId){
 		Session session = getInstance();
-		session.start(applicationId, context);
+		session.setApplicationId(applicationId);
+		session.setUserId(null);
+		
+		ContextWrapper contextWrapper = new ContextWrapper(context, logger, util);
+		session.start(contextWrapper);
 	}
 	
 	public static void attachActivity(Activity activity){

@@ -37,7 +37,7 @@ public class AppStartEventTest extends PlaynomicsEventTest {
 
 	@Test
 	public void testAppStart() {
-		Util util = new Util();
+		Util util = new Util(logger);
 		IConfig config = new Config();
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();

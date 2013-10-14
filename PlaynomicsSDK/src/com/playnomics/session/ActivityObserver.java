@@ -10,15 +10,17 @@ import android.view.Window;
  * Tracks the life-cycle of Activities as a proxy for session state machine, and user
  * interaction with the Activity.
  */
-public class ActivityObserver {
+public class ActivityObserver implements IActivityObserver {
 	private SessionStateMachine stateMachine;
 	private ConcurrentLinkedQueue<Activity> activities;
-	private TouchEventHandler handler;
 	
-	public ActivityObserver(SessionStateMachine stateMachine,
-			TouchEventHandler eventHandler) {
-		this.stateMachine = stateMachine;
+	public ActivityObserver() {
 		this.activities = new ConcurrentLinkedQueue<Activity>();
+	}
+	
+	
+	public void setStateMachine(SessionStateMachine stateMachine){
+		this.stateMachine = stateMachine;
 	}
 	
 	/**
@@ -26,7 +28,7 @@ public class ActivityObserver {
 	 * Enqueues the activity and attaches a proxy object on the callback so that the SDK can observe and
 	 * track user interaction.
 	 */
-	public void observeNewActivity(Activity activity) {
+	public void observeNewActivity(Activity activity, final TouchEventHandler handler) {
 		Window.Callback currentCallback = activity.getWindow().getCallback();
 		activity.getWindow().setCallback(
 				WindowCallbackProxy.newCallbackProxyForActivity(currentCallback, handler));

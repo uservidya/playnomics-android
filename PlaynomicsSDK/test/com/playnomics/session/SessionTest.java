@@ -1,7 +1,6 @@
 package com.playnomics.session;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
@@ -15,14 +14,17 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.view.ContextMenu;
 
 import com.playnomics.client.HttpConnectionFactory;
+import com.playnomics.client.IEventQueue;
+import com.playnomics.client.IEventWorker;
+import com.playnomics.client.StubEventQueue;
+import com.playnomics.events.AppStartEvent;
+import com.playnomics.events.UserInfoEvent;
 import com.playnomics.util.Config;
+import com.playnomics.util.ContextWrapper;
 import com.playnomics.util.Logger;
 import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
@@ -30,7 +32,7 @@ import com.playnomics.util.Util;
 
 public class SessionTest {
 
-	private long appId = 10;
+	private Long appId = 10L;
 	private String userId = "testUser";
 	private String deviceId = "deviceId";
 	
@@ -38,26 +40,28 @@ public class SessionTest {
 	private HttpConnectionFactory factoryMock;
 	@Mock 
 	private HttpURLConnection connectionMock;
-	
-	@Mock 
-	private Util utilMock;
-	
+
 	@Mock
 	private Context contextMock;
 	
 	@Mock 
-	private ContentResolver contentResolverMock;
+	private Util utilMock;
+	@Mock
+	private ContextWrapper contextWrapperMock;
 	
 	@Mock
-	private SharedPreferences preferencesMock;
+	private IHeartBeatProducer producerMock;
+	
 	@Mock
-	private SharedPreferences.Editor editorMock;
+	private IActivityObserver observerMock;
+	
 	@Mock
-	private PackageManager packageManagerMock;
-	@Mock 
-	private PackageInfo packageInfoMock;
+	private IEventWorker eventWorker;
 	
 	private Session session;
+	private StubEventQueue eventQueue;
+	
+	
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -73,22 +77,24 @@ public class SessionTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		//data for the application version
-		when(contextMock.getPackageName()).thenReturn("com.playnomics.test");
-		when(contextMock.getPackageManager()).thenReturn(packageManagerMock);
-		when(packageManagerMock.getPackageInfo("com.playnomics.test", 0)).thenReturn(packageInfoMock);
 		
+		
+		when(contextWrapperMock.getContext()).thenReturn(contextMock);
 		//device ID setup
-		when(utilMock.getDeviceIdFromContext(any(Context.class))).thenReturn(deviceId);
+		when(utilMock.getDeviceIdFromContext(contextMock)).thenReturn(deviceId);
 		//cache mock setup
-		when(contextMock.getSharedPreferences("com.playnomics.cache", Context.MODE_PRIVATE)).thenReturn(preferencesMock);
+		//when(contextMock.getSharedPreferences("com.playnomics.cache", Context.MODE_PRIVATE)).thenReturn(preferencesMock);
+		//when(preferencesMock.edit()).thenReturn(editorMock);
+		
 		//the connection just works
 		when(factoryMock.startConnectionForUrl(any(String.class))).thenReturn(connectionMock);
 		when(connectionMock.getResponseCode()).thenReturn(200);
 		
+		eventQueue = new StubEventQueue();
+		
 		Config config = new Config();
 		Logger logger = new Logger(new UnitTestLogWriter());
-		session = new Session(config, utilMock, factoryMock, logger);
+		session = new Session(config, utilMock, factoryMock, logger, eventQueue, eventWorker, observerMock, producerMock);
 	}
 
 	@After
@@ -102,31 +108,42 @@ public class SessionTest {
 	 * Should queue one event, appStart
 	 */
 	public void testStartLapse(){
-		
-		
+		fail("Not implemented");
 	}
 	
 	@Test
 	public void testStartNewDevice() throws IOException{
-		when(packageInfoMock.versionCode).thenReturn(1);
+		/*
+		when(utilMock.getApplicationVersionFromContext(contextMock)).thenReturn(1);
 		
 		when(preferencesMock.getString("pushId", null)).thenReturn(null);
 		when(preferencesMock.getInt("sessionId", -1)).thenReturn(-1);
 		when(preferencesMock.getInt("appVersion", 0)).thenReturn(0);
 		when(preferencesMock.getInt("lastEventTime", 0)).thenReturn(0);
 		when(preferencesMock.getInt("sessionStartTime", 0)).thenReturn(0);
-		
-		session.start(appId, userId, contextMock);
+		*/
+		when(contextWrapperMock.getContext()).thenReturn(contextMock);
+		when(contextWrapperMock.getLastEventTime()).thenReturn(null);
+		when(contextWrapperMock.getLastSessionStartTime()).thenReturn(null);
+		when(contextWrapperMock.getPreviousSessionId()).thenReturn(null);
+		when(contextWrapperMock.synchronizeDeviceSettings()).thenReturn(true);
+	
+		session.setApplicationId(appId);
+		session.setUserId(userId);
+		session.start(contextWrapperMock);
 		
 		assertEquals("Application ID is set", appId, session.getApplicationId());
 		assertEquals("User ID is set", userId, session.getUserId());
-		assertEquals("Breadcrumb ID is set", deviceId);
+		assertEquals("Breadcrumb ID is set", deviceId, session.getBreadcrumbId());
 		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
 		
-		//an event for start is sent
-		verify(connectionMock).getResponseCode();
-		//cleans up all of the session resources
-		session.pause();
+		Object event = (AppStartEvent)eventQueue.queue.remove();
+		assertTrue("AppStart queued", event instanceof AppStartEvent);
+		
+		Object nextEvent = (UserInfoEvent)eventQueue.queue.remove();
+		assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
+		//2 events are queued
+		assertTrue("2 events are queued", eventQueue.isEmpty());
 	}	
 	
 	@Test

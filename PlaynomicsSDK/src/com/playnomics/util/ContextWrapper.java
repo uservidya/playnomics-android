@@ -1,14 +1,9 @@
 package com.playnomics.util;
 
-import com.playnomics.util.Logger.LogLevel;
-
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 
-public class DeviceManager {
+public class ContextWrapper {
 
 	static final String CACHE_NAME = "com.playnomics.cache";
 	static final String PUSH_ID_CACHE_KEY = "pushId";
@@ -17,33 +12,37 @@ public class DeviceManager {
 	static final String APP_VERSION_CACHE_KEY = "appVersion";
 	static final String SESSION_ID_KEY = "sessionId";
 
-	private Context context;
-	private ServiceManager manager;
 	private SharedPreferences preferences;
 	private Logger logger;
-
-	public DeviceManager(Context context, ServiceManager serviceManager, Logger logger) {
-		this.context = context;
+	private Util util;
+	private Context context;
+	
+	public ContextWrapper(Context context, Logger logger, Util util) {
 		this.logger = logger;
-		manager = serviceManager; 
+		this.util = util;
+		this.context = context;
 		preferences = context.getSharedPreferences(CACHE_NAME,
 				Context.MODE_PRIVATE);
 	}
 	
+	public Context getContext(){
+		return context;
+	}
+	
 	public EventTime getLastEventTime() {
-		return getEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY);
+		return getEventTimeValue(ContextWrapper.LAST_EVENT_TIME_CACHE_KEY);
 	}
 
 	public void setLastEventTime(EventTime time) {
-		setEventTimeValue(DeviceManager.LAST_EVENT_TIME_CACHE_KEY, time);
+		setEventTimeValue(ContextWrapper.LAST_EVENT_TIME_CACHE_KEY, time);
 	}
 
 	public EventTime getLastSessionStartTime() {
-		return getEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY);
+		return getEventTimeValue(ContextWrapper.SESSION_START_TIME_CACHE_KEY);
 	}
 
 	public void setLastSessionStartTime(EventTime time) {
-		setEventTimeValue(DeviceManager.SESSION_START_TIME_CACHE_KEY, time);
+		setEventTimeValue(ContextWrapper.SESSION_START_TIME_CACHE_KEY, time);
 	}
 
 	public LargeGeneratedId getPreviousSessionId() {
@@ -63,38 +62,27 @@ public class DeviceManager {
 	}
 
 	public String getPushRegistrationId() {
-		return preferences.getString(DeviceManager.PUSH_ID_CACHE_KEY, null);
+		return preferences.getString(ContextWrapper.PUSH_ID_CACHE_KEY, null);
 	}
 
 	public void setPushRegistrationId(String pushId) {
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(DeviceManager.PUSH_ID_CACHE_KEY, pushId);
+		editor.putString(ContextWrapper.PUSH_ID_CACHE_KEY, pushId);
 		editor.commit();
 	}
 
 	public int getApplicationVersion() {
-		return preferences.getInt(DeviceManager.PUSH_ID_CACHE_KEY, -1);
+		return preferences.getInt(ContextWrapper.PUSH_ID_CACHE_KEY, -1);
 	}
 
 	private void setApplicationVersion(int version) {
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putInt(DeviceManager.APP_VERSION_CACHE_KEY, version);
+		editor.putInt(ContextWrapper.APP_VERSION_CACHE_KEY, version);
 		editor.commit();
 	}
 
 	private int getCurrentAppVersion() {
-		try {
-			PackageManager packageManager = manager.getPackageManager();
-			PackageInfo info;
-			info = packageManager.getPackageInfo(context.getPackageName(), 0);
-			return info.versionCode;
-		} catch (NameNotFoundException ex) {
-			// according to Google's docs this should never happen
-			logger.log(LogLevel.WARNING, ex,
-					"Could not obtain the application version from the package manager");
-			// in the event of a failure always return a -1
-			return -1;
-		}
+		return util.getApplicationVersionFromContext(context);
 	}
 
 	public boolean synchronizeDeviceSettings() {
@@ -110,8 +98,12 @@ public class DeviceManager {
 	}
 
 	private EventTime getEventTimeValue(String key) {
-		long lastEventTimeMilliseconds = preferences.getLong(key, 0);
-		return new EventTime(lastEventTimeMilliseconds);
+		long lastEventTimeMilliseconds = preferences.getLong(key, -1);
+		
+		if(lastEventTimeMilliseconds >= 0){
+			return new EventTime(lastEventTimeMilliseconds);
+		}
+		return null;
 	}
 
 	private void setEventTimeValue(String key, EventTime value) {

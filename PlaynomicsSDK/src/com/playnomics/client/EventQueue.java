@@ -9,7 +9,7 @@ import com.playnomics.events.PlaynomicsEvent;
 import com.playnomics.util.IConfig;
 import com.playnomics.util.Util;
 
-public class EventQueue{
+public class EventQueue implements IEventQueue{
 	private IConfig config;
 	private ConcurrentLinkedQueue<String> eventUrlQueue;
 	

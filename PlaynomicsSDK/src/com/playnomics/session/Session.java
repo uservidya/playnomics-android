@@ -7,10 +7,10 @@ import java.util.GregorianCalendar;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
-import android.content.Context;
 
-import com.playnomics.client.EventQueue;
 import com.playnomics.client.EventWorker;
+import com.playnomics.client.IEventQueue;
+import com.playnomics.client.IEventWorker;
 import com.playnomics.client.IHttpConnectionFactory;
 import com.playnomics.util.*;
 import com.playnomics.util.Logger.LogLevel;
@@ -34,25 +34,32 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private Logger logger;
-	private EventWorker eventWorker;
-	private EventQueue eventQueue;
+	private IEventWorker eventWorker;
+	private IEventQueue eventQueue;
 	private Util util;
 	private IConfig config;
-	private ServiceManager serviceManager;
-	private DeviceManager deviceManager;
-	private ActivityObserver observer;
-	private HeartBeatProducer producer;
+	private ContextWrapper contextWrapper;
+	private IActivityObserver observer;
+	private IHeartBeatProducer producer;
 	
 	// session data
-	private long applicationId;
+	private Long applicationId;
 	
-	public long getApplicationId(){
+	public Long getApplicationId(){
 		return applicationId;
+	}
+	
+	public void setApplicationId(long applicationId){
+		this.applicationId = applicationId;
 	}
 	
 	private String userId;
 	public String getUserId(){
 		return userId;
+	}
+	
+	public void setUserId(String userId){
+		this.userId = userId;
 	}
 	
 	private String breadcrumbId;
@@ -89,27 +96,22 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		enablePushNotifications = value;
 	}
 	
-	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger) {
+	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger, 
+			IEventQueue eventQueue, IEventWorker eventWorker, 
+			IActivityObserver activityObserver, IHeartBeatProducer producer) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
 		this.config = config;
-		this.eventQueue = new EventQueue(config);
-		this.eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
-		this.observer = new ActivityObserver(this, this);
-		this.producer = new HeartBeatProducer(this, config);
+		this.eventQueue = eventQueue;
+		this.eventWorker = eventWorker;
+		this.observer = activityObserver;
+		this.producer = producer;
 	}
 	
-	// Session life-cycle
-	public void start(long applicationId, String userId, Context context) {
-		this.userId = userId;
-		start(applicationId, context);
-	}
-
-	public void start(long applicationId, Context context) {
-
+	public void start(ContextWrapper contextWrapper) {
 		try {
-			this.applicationId = applicationId;
+			
 			// session start code here
 			if (sessionState == SessionState.STARTED) {
 				return;
@@ -121,12 +123,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			}
 
 			sessionState = SessionState.STARTED;
+			this.contextWrapper = contextWrapper;
+			boolean settingsChanged = contextWrapper.synchronizeDeviceSettings();
 
-			serviceManager = new ServiceManager(context);
-			deviceManager = new DeviceManager(context, serviceManager, this.logger);
-			boolean settingsChanged = deviceManager.synchronizeDeviceSettings();
-
-			breadcrumbId = util.getDeviceIdFromContext(context);
+			breadcrumbId = util.getDeviceIdFromContext(contextWrapper.getContext());
 
 			if (Util.stringIsNullOrEmpty(userId)) {
 				userId = breadcrumbId;
@@ -140,15 +140,15 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			// start the background UI service
 
 			// send appRunning or appPage
-			LargeGeneratedId lastSessionId = deviceManager
+			LargeGeneratedId lastSessionId = contextWrapper
 					.getPreviousSessionId();
 
-			EventTime lastEventTime = deviceManager.getLastEventTime();
+			EventTime lastEventTime = contextWrapper.getLastEventTime();
 			GregorianCalendar threeMinutesAgo = new GregorianCalendar(
 					Util.TIME_ZONE_GMT);
 			threeMinutesAgo.add(Calendar.MINUTE, -3);
 
-			boolean sessionLapsed = (lastEventTime.compareTo(threeMinutesAgo) < 0)
+			boolean sessionLapsed = (lastEventTime != null && lastEventTime.compareTo(threeMinutesAgo) < 0)
 					|| lastSessionId == null;
 
 			ImplicitEvent implicitEvent;
@@ -159,20 +159,20 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 				implicitEvent = new AppStartEvent(config, getSessionInfo(),
 						instanceId);
 				sessionStartTime = implicitEvent.getEventTime();
-				deviceManager.setLastSessionStartTime(sessionStartTime);
+				contextWrapper.setLastSessionStartTime(sessionStartTime);
 			} else {
 				sessionId = lastSessionId;
 				instanceId = new LargeGeneratedId(util);
 				implicitEvent = new AppPageEvent(config, getSessionInfo(),
 						instanceId);
-				sessionStartTime = deviceManager.getLastSessionStartTime();
+				sessionStartTime = contextWrapper.getLastSessionStartTime();
 			}
 
 			eventQueue.enqueueEvent(implicitEvent);
 			eventWorker.start();
-			producer.start();
+			producer.start(this);
 			if (settingsChanged) {
-				onDeviceSettingsUpdated(context);
+				onDeviceSettingsUpdated();
 			}
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not start session");
@@ -209,7 +209,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					sequence.get());
 			eventQueue.enqueueEvent(event);
 			eventWorker.start();
-			producer.start();
+			producer.start(this);
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
@@ -248,14 +248,14 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	private void onDeviceSettingsUpdated(Context context) throws UnsupportedEncodingException {
+	private void onDeviceSettingsUpdated() throws UnsupportedEncodingException {
 		if (enablePushNotifications
-				&& deviceManager.getPushRegistrationId() == null) {
+				&& contextWrapper.getPushRegistrationId() == null) {
 			registerForPushNotifcations();
 		} else {
 			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
-					deviceManager.getPushRegistrationId(),
-					util.getDeviceIdFromContext(context));
+					contextWrapper.getPushRegistrationId(),
+					util.getDeviceIdFromContext(contextWrapper.getContext()));
 			eventQueue.enqueueEvent(event);
 		}
 	}
@@ -303,7 +303,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	// activity attach/detach
 
 	public void attachActivity(Activity activity) {
-		observer.observeNewActivity(activity);
+		observer.observeNewActivity(activity, this);
 	}
 
 	public void detachActivity() {

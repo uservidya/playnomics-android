@@ -7,14 +7,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Logger.LogLevel;
 
-public class EventWorker {
+public class EventWorker implements IEventWorker {
 	
 	private IHttpConnectionFactory connectionFactory;
-	private EventQueue eventQueue;
+	private IEventQueue eventQueue;
 	private Logger logger;
 	private AtomicBoolean running;
 	
-	public EventWorker(EventQueue eventQueue, IHttpConnectionFactory factory, Logger logger){
+	public EventWorker(IEventQueue eventQueue, IHttpConnectionFactory factory, Logger logger){
 		this.connectionFactory = factory;
 		this.eventQueue = eventQueue;
 		this.logger = logger;

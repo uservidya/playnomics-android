@@ -8,7 +8,7 @@ public interface SessionStateMachine {
 
 	public SessionState getSessionState();
 	
-	void pause();
+	public void pause();
 
-	void resume();
+	public void resume();
 }

@@ -1,30 +1,31 @@
 package com.playnomics.events;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.mockito.*;
+import org.mockito.MockitoAnnotations;
 
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.IConfig;
 import com.playnomics.util.LargeGeneratedId;
+import com.playnomics.util.Logger;
+import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
 
 public class PlaynomicsEventTest {
 
+	protected Logger logger;
+	
 	@Before
 	public void initMocks() {
+		logger = new Logger(new UnitTestLogWriter());
 		MockitoAnnotations.initMocks(this);
 	}
 
 	protected GameSessionInfo getGameSessionInfo() {
-		Util util = new Util();
+		Util util = new Util(logger);
 		LargeGeneratedId sessionId = new LargeGeneratedId(util);
 		return new GameSessionInfo(1L, "userId", "breadcrumId", sessionId);
 	}

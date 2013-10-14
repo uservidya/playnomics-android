@@ -10,6 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UtilTests {
+	private Logger logger = new Logger(new UnitTestLogWriter());
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -28,7 +30,7 @@ public class UtilTests {
 
 	@Test
 	public void testGeneratedLongsAlwaysPositive() {
-		Util util = new Util();
+		Util util = new Util(logger);
 		for (int i = 0; i < 1000; i++) {
 			long num = util.generatePositiveRandomLong();
 			assertTrue(num >= 0);
