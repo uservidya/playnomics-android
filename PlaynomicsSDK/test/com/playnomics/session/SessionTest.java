@@ -1,11 +1,12 @@
 package com.playnomics.session;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.security.acl.LastOwnerException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -18,14 +19,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import android.content.Context;
-import android.view.ContextMenu;
 
 import com.playnomics.client.HttpConnectionFactory;
-import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.StubEventQueue;
 import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppStartEvent;
+import com.playnomics.events.MilestoneEvent;
+import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 import com.playnomics.util.Config;
 import com.playnomics.util.ContextWrapper;
@@ -108,7 +110,7 @@ public class SessionTest {
 	}
 	
 	@Test
-	public void testStartNewDevice() throws IOException{
+	public void testStartNewDevice(){
 		/*
 		when(utilMock.getApplicationVersionFromContext(contextMock)).thenReturn(1);
 		
@@ -164,28 +166,43 @@ public class SessionTest {
 	 * Should queue one event, appPage
 	 */
 	public void testStartNoLapseOldDeviceData(){
-		testOldDevice(true, false);
+		testOldDevice(false, false);
 	}
 	
 	@Test
 	public void testStartNoLapseNewDeviceData(){
-		testOldDevice(true, true);
+		testOldDevice(false, true);
+	}
+	
+	@Test
+	public void testLapseOldDeviceData(){
+		testOldDevice(true, false);
+	}
+	
+	@Test
+	public void testLapseNewDeviceData(){
+		testOldDevice(true, false);
 	}
 	
 	private void testOldDevice(boolean lapsed, boolean deviceDataChanged){
-		long newInstanceId = 2;
-		when(utilMock.generatePositiveRandomLong()).thenReturn(newInstanceId);
+		long nextId = 2;
+		when(utilMock.generatePositiveRandomLong()).thenReturn(nextId);
 		
 		LargeGeneratedId oldSessionId = new LargeGeneratedId(1);
 		
 		GregorianCalendar startTime = new GregorianCalendar();
-		startTime.add(Calendar.MINUTE, -1);
-		EventTime startEventTime = new EventTime(startTime.getTimeInMillis());
+		GregorianCalendar lastTime = new GregorianCalendar();
+		if(lapsed){
+			startTime.add(Calendar.MINUTE, -5);
+			lastTime.add(Calendar.MINUTE, -4);
+		} else {
+			startTime.add(Calendar.MINUTE, -2);
+			lastTime.add(Calendar.MINUTE, -1);
+		}
 		
-		GregorianCalendar lastEventCal = new GregorianCalendar();
-		lastEventCal.add(Calendar.MINUTE, -1);
-		EventTime lastEventTime = new EventTime(lastEventCal.getTimeInMillis());
-
+		EventTime startEventTime = new EventTime(startTime.getTimeInMillis());
+		EventTime lastEventTime = new EventTime(lastTime.getTimeInMillis());
+		
 		when(contextWrapperMock.getLastEventTime()).thenReturn(lastEventTime);
 		when(contextWrapperMock.getLastSessionStartTime()).thenReturn(startEventTime);
 		when(contextWrapperMock.getPreviousSessionId()).thenReturn(oldSessionId);
@@ -199,14 +216,21 @@ public class SessionTest {
 		assertEquals("User ID is set", userId, session.getUserId());
 		assertEquals("Breadcrumb ID is set", deviceId, session.getBreadcrumbId());
 		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
-		assertEquals("Session ID is set from old session", oldSessionId, session.getSessionId());
-		assertEquals("Instance ID is new", newInstanceId, session.getInstanceId().getId());
 		
 		Object event = eventQueue.queue.remove();
-		assertTrue("AppPause queued", event instanceof AppPageEvent);
 		
-		assertEquals("Session start time set", startEventTime, session.getSessionStartTime());
-		
+		if(lapsed){
+			assertTrue("AppStart queued", event instanceof AppStartEvent);
+			assertEquals("Session start time set", ((AppStartEvent)event).getEventTime(), session.getSessionStartTime());
+			assertEquals("Session ID is generated", nextId, session.getSessionId().getId());
+			assertEquals("Session ID = Instance ID", session.getSessionId(), session.getInstanceId());
+		} else {
+			assertTrue("AppPage queued", event instanceof AppPageEvent);
+			assertEquals("Session start time set", startEventTime, session.getSessionStartTime());
+			assertEquals("Session ID is set from old session", oldSessionId, session.getSessionId());
+			assertEquals("Instance ID is new", nextId, session.getInstanceId().getId());
+		}
+	
 		if(deviceDataChanged){
 			Object nextEvent = eventQueue.queue.remove();
 			assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
@@ -222,34 +246,57 @@ public class SessionTest {
 		verify(eventWorker).start();
 	}
 	
-	@Test
-	public void testLapseOldDeviceData(){
-		
-	}
-	
-	@Test
-	public void testLapseNewDeviceData(){
-		
-	}
-	
 	@Test 
 	public void testMilestone(){
-		fail("Not implemented");
+		//start up the session
+		testStartNewDevice();
+		session.milestone(MilestoneType.MilestoneCustom1);
+		
+		Object event = eventQueue.queue.remove();
+		assertTrue("Milestone queued", event instanceof MilestoneEvent);
 	}
 	
 	@Test 
 	public void testMilestoneNoStart(){
-		fail("Not implemented");
+		session.milestone(MilestoneType.MilestoneCustom1);
+		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 	
 
 	@Test
 	public void testTransaction(){
-		fail("Not implemented");
+		testStartNewDevice();
+		
+		float price = .99f;
+		int quantity = 10;
+		session.transactionInUSD(price, quantity);
+		Object event = eventQueue.queue.remove();
+		assertTrue("Transaction queued", event instanceof TransactionEvent);
 	}
 	
 	@Test 
 	public void testTransactionNoStart(){
-		fail("Not implemented");
+		float price = .99f;
+		int quantity = 10;
+		session.transactionInUSD(price, quantity);
+		assertTrue("No events were queued", eventQueue.queue.isEmpty());
+	}
+	
+	@Test
+	public void testAttribution(){
+		testStartNewDevice();
+		String source = "source";
+		String campaign = "campaign";
+		session.attributeInstall(source, campaign, null);
+		Object event = eventQueue.queue.remove();
+		assertTrue("Transaction queued", event instanceof UserInfoEvent);
+	}
+	
+	@Test
+	public void testAttributionNoStart(){
+		String source = "source";
+		String campaign = "campaign";
+		session.attributeInstall(source, campaign, null);
+		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 }
