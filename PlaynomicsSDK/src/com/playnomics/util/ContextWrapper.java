@@ -55,7 +55,7 @@ public class ContextWrapper {
 		return new LargeGeneratedId(sessionId);
 	}
 
-	public void getPreviousSessionId(LargeGeneratedId sessionId) {
+	public void setPreviousSessionId(LargeGeneratedId sessionId) {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putLong(SESSION_ID_KEY, sessionId.getId());
 		editor.commit();

@@ -111,6 +111,9 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	
 	public void start(ContextWrapper contextWrapper) {
 		try {
+			if(applicationId == null){
+				throw new NullPointerException("Application ID must be set");
+			}
 			
 			// session start code here
 			if (sessionState == SessionState.STARTED) {
@@ -160,6 +163,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 						instanceId);
 				sessionStartTime = implicitEvent.getEventTime();
 				contextWrapper.setLastSessionStartTime(sessionStartTime);
+				contextWrapper.setPreviousSessionId(sessionId);
 			} else {
 				sessionId = lastSessionId;
 				instanceId = new LargeGeneratedId(util);

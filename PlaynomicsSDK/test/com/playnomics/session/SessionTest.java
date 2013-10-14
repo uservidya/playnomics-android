@@ -25,6 +25,7 @@ import com.playnomics.events.AppStartEvent;
 import com.playnomics.events.UserInfoEvent;
 import com.playnomics.util.Config;
 import com.playnomics.util.ContextWrapper;
+import com.playnomics.util.EventTime;
 import com.playnomics.util.Logger;
 import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
@@ -140,10 +141,17 @@ public class SessionTest {
 		Object event = (AppStartEvent)eventQueue.queue.remove();
 		assertTrue("AppStart queued", event instanceof AppStartEvent);
 		
+		EventTime startTime = ((AppStartEvent)event).getEventTime();
+		assertEquals("Session start time set", startTime, session.getSessionStartTime());
+		
 		Object nextEvent = (UserInfoEvent)eventQueue.queue.remove();
 		assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
 		//2 events are queued
 		assertTrue("2 events are queued", eventQueue.isEmpty());
+		//verify that contextWrapper is called
+	
+		verify(contextWrapperMock).setLastSessionStartTime(startTime);
+		verify(contextWrapperMock).setPreviousSessionId(session.getSessionId());
 	}	
 	
 	@Test
@@ -174,5 +182,4 @@ public class SessionTest {
 	public void testTransactionNoStart(){
 		fail("Not implemented");
 	}
-	
 }
