@@ -248,8 +248,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private void assertSessionStarted() {
-		if (sessionState != SessionState.STARTED
-				|| sessionState != SessionState.PAUSED) {
+		if (!(sessionState == SessionState.STARTED
+				|| sessionState == SessionState.PAUSED)) {
 			throw new IllegalStateException("Session must be started");
 		}
 	}
