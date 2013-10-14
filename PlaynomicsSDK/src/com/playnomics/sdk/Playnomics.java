@@ -68,12 +68,12 @@ public class Playnomics {
 		session.start(contextWrapper);
 	}
 	
-	public static void attachActivity(Activity activity){
+	public static void onActivityResumed(Activity activity){
 		Session session = getInstance();
 		session.attachActivity(activity);
 	}
 	
-	public static void detachActivity(){
+	public static void onActivityStopped(Activity activity){
 		Session session = getInstance();
 		session.detachActivity();
 	}
