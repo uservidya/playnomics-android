@@ -164,15 +164,15 @@ public class SessionTest {
 	 * Should queue one event, appPage
 	 */
 	public void testStartNoLapseOldDeviceData(){
-		testNoLapse(false);
+		testOldDevice(true, false);
 	}
 	
 	@Test
 	public void testStartNoLapseNewDeviceData(){
-		testNoLapse(true);
+		testOldDevice(true, true);
 	}
 	
-	private void testNoLapse(boolean deviceDataChanged){
+	private void testOldDevice(boolean lapsed, boolean deviceDataChanged){
 		long newInstanceId = 2;
 		when(utilMock.generatePositiveRandomLong()).thenReturn(newInstanceId);
 		
