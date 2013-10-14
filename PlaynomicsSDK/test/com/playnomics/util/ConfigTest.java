@@ -53,7 +53,7 @@ public class ConfigTest {
 		assertEquals("Production Messaging URL", "https://ads.a.playnomics.net/v2/", config.getMessagingUrl());
 	}
 	
-	@Test
+	@Test 
 	public void testTestMessagingUrl() {
 		config.setTestMode(true);
 		assertEquals("Production Messaging URL", "https://ads.b.playnomics.net/v2/", config.getMessagingUrl());
@@ -62,10 +62,10 @@ public class ConfigTest {
 	@Test
 	public void testOverrideMessagingUrl() {
 		config.setTestMode(true);
-		config.setOverrideEventsUrl("https://ads.c.playnomics.net/v1/");
-		assertEquals("Production Events URL", "https://ads.c.playnomics.net/v1/", config.getEventsUrl());
+		config.setOverrideMessagingUrl("https://ads.c.playnomics.net/v1/");
+		assertEquals("Production Events URL", "https://ads.c.playnomics.net/v1/", config.getMessagingUrl());
 		
 		config.setTestMode(false);
-		assertEquals("Production Events URL", "https://ads.c.playnomics.net/v1/", config.getEventsUrl());
+		assertEquals("Production Events URL", "https://ads.c.playnomics.net/v1/", config.getMessagingUrl());
 	}
 }
