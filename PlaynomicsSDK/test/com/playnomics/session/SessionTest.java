@@ -5,6 +5,9 @@ import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.security.acl.LastOwnerException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -21,11 +24,13 @@ import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.StubEventQueue;
+import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppStartEvent;
 import com.playnomics.events.UserInfoEvent;
 import com.playnomics.util.Config;
 import com.playnomics.util.ContextWrapper;
 import com.playnomics.util.EventTime;
+import com.playnomics.util.LargeGeneratedId;
 import com.playnomics.util.Logger;
 import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
@@ -102,16 +107,6 @@ public class SessionTest {
 	public void tearDown() throws Exception {
 	}
 	
-
-
-	@Test
-	/**
-	 * Should queue one event, appStart
-	 */
-	public void testStartLapse(){
-		fail("Not implemented");
-	}
-	
 	@Test
 	public void testStartNewDevice() throws IOException{
 		/*
@@ -123,7 +118,11 @@ public class SessionTest {
 		when(preferencesMock.getInt("lastEventTime", 0)).thenReturn(0);
 		when(preferencesMock.getInt("sessionStartTime", 0)).thenReturn(0);
 		*/
-		when(contextWrapperMock.getContext()).thenReturn(contextMock);
+		
+		long newSessionId = 1;
+		
+		when(utilMock.generatePositiveRandomLong()).thenReturn(newSessionId);
+		
 		when(contextWrapperMock.getLastEventTime()).thenReturn(null);
 		when(contextWrapperMock.getLastSessionStartTime()).thenReturn(null);
 		when(contextWrapperMock.getPreviousSessionId()).thenReturn(null);
@@ -137,29 +136,100 @@ public class SessionTest {
 		assertEquals("User ID is set", userId, session.getUserId());
 		assertEquals("Breadcrumb ID is set", deviceId, session.getBreadcrumbId());
 		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
+		assertEquals("Session ID is generated", newSessionId, session.getSessionId().getId());
+		assertEquals("Session ID = Instance ID", session.getSessionId(), session.getInstanceId());
 		
-		Object event = (AppStartEvent)eventQueue.queue.remove();
+		Object event = eventQueue.queue.remove();
 		assertTrue("AppStart queued", event instanceof AppStartEvent);
 		
 		EventTime startTime = ((AppStartEvent)event).getEventTime();
 		assertEquals("Session start time set", startTime, session.getSessionStartTime());
 		
-		Object nextEvent = (UserInfoEvent)eventQueue.queue.remove();
+		Object nextEvent = eventQueue.queue.remove();
 		assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
 		//2 events are queued
 		assertTrue("2 events are queued", eventQueue.isEmpty());
+		
 		//verify that contextWrapper is called
-	
 		verify(contextWrapperMock).setLastSessionStartTime(startTime);
 		verify(contextWrapperMock).setPreviousSessionId(session.getSessionId());
+		
+		verify(producerMock).start(session);
+		verify(observerMock).setStateMachine(session);
+		verify(eventWorker).start();
 	}	
 	
 	@Test
 	/**
 	 * Should queue one event, appPage
 	 */
-	public void testStartNoLapse(){
-		fail("Not implemented");
+	public void testStartNoLapseOldDeviceData(){
+		testNoLapse(false);
+	}
+	
+	@Test
+	public void testStartNoLapseNewDeviceData(){
+		testNoLapse(true);
+	}
+	
+	private void testNoLapse(boolean deviceDataChanged){
+		long newInstanceId = 2;
+		when(utilMock.generatePositiveRandomLong()).thenReturn(newInstanceId);
+		
+		LargeGeneratedId oldSessionId = new LargeGeneratedId(1);
+		
+		GregorianCalendar startTime = new GregorianCalendar();
+		startTime.add(Calendar.MINUTE, -1);
+		EventTime startEventTime = new EventTime(startTime.getTimeInMillis());
+		
+		GregorianCalendar lastEventCal = new GregorianCalendar();
+		lastEventCal.add(Calendar.MINUTE, -1);
+		EventTime lastEventTime = new EventTime(lastEventCal.getTimeInMillis());
+
+		when(contextWrapperMock.getLastEventTime()).thenReturn(lastEventTime);
+		when(contextWrapperMock.getLastSessionStartTime()).thenReturn(startEventTime);
+		when(contextWrapperMock.getPreviousSessionId()).thenReturn(oldSessionId);
+		when(contextWrapperMock.synchronizeDeviceSettings()).thenReturn(deviceDataChanged);
+		
+		session.setApplicationId(appId);
+		session.setUserId(userId);
+		session.start(contextWrapperMock);
+		
+		assertEquals("Application ID is set", appId, session.getApplicationId());
+		assertEquals("User ID is set", userId, session.getUserId());
+		assertEquals("Breadcrumb ID is set", deviceId, session.getBreadcrumbId());
+		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
+		assertEquals("Session ID is set from old session", oldSessionId, session.getSessionId());
+		assertEquals("Instance ID is new", newInstanceId, session.getInstanceId().getId());
+		
+		Object event = eventQueue.queue.remove();
+		assertTrue("AppPause queued", event instanceof AppPageEvent);
+		
+		assertEquals("Session start time set", startEventTime, session.getSessionStartTime());
+		
+		if(deviceDataChanged){
+			Object nextEvent = eventQueue.queue.remove();
+			assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
+			//2 events are queued
+			assertTrue("2 events are queued", eventQueue.isEmpty());
+		} else {
+			//1 events are queued
+			assertTrue("1 event is queued", eventQueue.isEmpty());
+		}
+		
+		verify(producerMock).start(session);
+		verify(observerMock).setStateMachine(session);
+		verify(eventWorker).start();
+	}
+	
+	@Test
+	public void testLapseOldDeviceData(){
+		
+	}
+	
+	@Test
+	public void testLapseNewDeviceData(){
+		
 	}
 	
 	@Test 

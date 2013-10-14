@@ -175,6 +175,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventQueue.enqueueEvent(implicitEvent);
 			eventWorker.start();
 			producer.start(this);
+			observer.setStateMachine(this);
+			
 			if (settingsChanged) {
 				onDeviceSettingsUpdated();
 			}
