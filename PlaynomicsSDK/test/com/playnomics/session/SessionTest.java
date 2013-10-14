@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -16,8 +17,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.verification.VerificationMode;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.playnomics.client.HttpConnectionFactory;
@@ -65,6 +69,9 @@ public class SessionTest {
 	
 	@Mock
 	private IEventWorker eventWorker;
+	
+	@Mock
+	private Activity activityMock;
 	
 	private Session session;
 	private StubEventQueue eventQueue;
@@ -183,7 +190,7 @@ public class SessionTest {
 	
 	@Test
 	public void testStartNoLapseNewDeviceData(){
-		testOldDevice(false, true);
+		testOldDevice(false, true); 
 	}
 	
 	@Test
@@ -310,5 +317,31 @@ public class SessionTest {
 		String campaign = "campaign";
 		session.attributeInstall(source, campaign, null);
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
+	}
+	
+	@Test
+	public void testAttachActivity(){
+		testStartNewDevice();
+		session.attachActivity(activityMock);
+		verify(observerMock).observeNewActivity(activityMock, session);
+	}
+	
+	@Test
+	public void testAttachActivityNoStart(){
+		session.attachActivity(activityMock);
+		verify(observerMock, Mockito.never()).observeNewActivity(activityMock, session);
+	}
+	
+	@Test
+	public void testDetachActivity(){
+		testStartNewDevice();
+		session.detachActivity();
+		verify(observerMock).forgetLastActivity();
+	}
+	
+	@Test
+	public void testDetachActivityNoStart(){
+		session.detachActivity();
+		verify(observerMock, Mockito.never()).forgetLastActivity();
 	}
 }

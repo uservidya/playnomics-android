@@ -307,12 +307,21 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	// activity attach/detach
-
 	public void attachActivity(Activity activity) {
-		observer.observeNewActivity(activity, this);
+		try{
+			assertSessionStarted();
+			observer.observeNewActivity(activity, this);
+		} catch(Exception ex){
+			logger.log(LogLevel.ERROR, ex, "Could not attach activity");
+		}
 	}
 
 	public void detachActivity() {
-		observer.forgetLastActivity();
+		try{
+			assertSessionStarted();
+			observer.forgetLastActivity();
+		} catch(Exception ex){
+			logger.log(LogLevel.ERROR, ex, "Could not detach activity");
+		}
 	}
 }
