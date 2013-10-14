@@ -109,8 +109,21 @@ public class SessionTest {
 	public void tearDown() throws Exception {
 	}
 	
+	@Test 
+	public void testStartNoApplicationId(){
+		session.start(contextWrapperMock);
+		assertEquals("Session state is not started", SessionStateMachine.SessionState.NOT_STARTED, session.getSessionState());
+		assertTrue("No events were queued", eventQueue.queue.isEmpty());
+	}
+	
+	@Test
+	public void testStartNoUserId(){
+		testNewDevice(null);
+	}
+	
 	@Test
 	public void testStartNewDevice(){
+		testNewDevice(userId);
 		/*
 		when(utilMock.getApplicationVersionFromContext(contextMock)).thenReturn(1);
 		
@@ -120,7 +133,9 @@ public class SessionTest {
 		when(preferencesMock.getInt("lastEventTime", 0)).thenReturn(0);
 		when(preferencesMock.getInt("sessionStartTime", 0)).thenReturn(0);
 		*/
-		
+	}	
+	
+	public void testNewDevice(String userId){
 		long newSessionId = 1;
 		
 		when(utilMock.generatePositiveRandomLong()).thenReturn(newSessionId);
@@ -135,7 +150,7 @@ public class SessionTest {
 		session.start(contextWrapperMock);
 		
 		assertEquals("Application ID is set", appId, session.getApplicationId());
-		assertEquals("User ID is set", userId, session.getUserId());
+		assertEquals("User ID is set", userId == null ? deviceId : userId, session.getUserId());
 		assertEquals("Breadcrumb ID is set", deviceId, session.getBreadcrumbId());
 		assertEquals("Session state is started", SessionStateMachine.SessionState.STARTED, session.getSessionState());
 		assertEquals("Session ID is generated", newSessionId, session.getSessionId().getId());
@@ -159,12 +174,9 @@ public class SessionTest {
 		verify(producerMock).start(session);
 		verify(observerMock).setStateMachine(session);
 		verify(eventWorker).start();
-	}	
+	}
 	
 	@Test
-	/**
-	 * Should queue one event, appPage
-	 */
 	public void testStartNoLapseOldDeviceData(){
 		testOldDevice(false, false);
 	}
