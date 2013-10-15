@@ -2,12 +2,9 @@ package com.playnomics.session;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
-import java.net.HttpURLConnection;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -46,12 +43,10 @@ public class SessionTest {
 	private Long appId = 10L;
 	private String userId = "testUser";
 	private String deviceId = "deviceId";
-	
+
 	@Mock 
 	private HttpConnectionFactory factoryMock;
-	@Mock 
-	private HttpURLConnection connectionMock;
-
+	
 	@Mock
 	private Context contextMock;
 	
@@ -93,13 +88,6 @@ public class SessionTest {
 		when(contextWrapperMock.getContext()).thenReturn(contextMock);
 		//device ID setup
 		when(utilMock.getDeviceIdFromContext(contextMock)).thenReturn(deviceId);
-		//cache mock setup
-		//when(contextMock.getSharedPreferences("com.playnomics.cache", Context.MODE_PRIVATE)).thenReturn(preferencesMock);
-		//when(preferencesMock.edit()).thenReturn(editorMock);
-		
-		//the connection just works
-		when(factoryMock.startConnectionForUrl(any(String.class))).thenReturn(connectionMock);
-		when(connectionMock.getResponseCode()).thenReturn(200);
 		
 		eventQueue = new StubEventQueue();
 		
