@@ -12,6 +12,8 @@ public class ContextWrapper {
 	static final String APP_VERSION_CACHE_KEY = "appVersion";
 	static final String SESSION_ID_KEY = "sessionId";
 
+	static final int DEFAULT_CACHE_VALUE = -1;
+	
 	private SharedPreferences preferences;
 	private Logger logger;
 	private Util util;
@@ -46,7 +48,7 @@ public class ContextWrapper {
 	}
 
 	public LargeGeneratedId getPreviousSessionId() {
-		Long sessionId = preferences.getLong(SESSION_ID_KEY, -1);
+		Long sessionId = preferences.getLong(SESSION_ID_KEY, DEFAULT_CACHE_VALUE);
 		if (sessionId < 0) {
 			// session ID was never saved
 			return null;
@@ -72,7 +74,7 @@ public class ContextWrapper {
 	}
 
 	public int getApplicationVersion() {
-		return preferences.getInt(ContextWrapper.PUSH_ID_CACHE_KEY, -1);
+		return preferences.getInt(ContextWrapper.APP_VERSION_CACHE_KEY, DEFAULT_CACHE_VALUE);
 	}
 
 	private void setApplicationVersion(int version) {
@@ -98,7 +100,7 @@ public class ContextWrapper {
 	}
 
 	private EventTime getEventTimeValue(String key) {
-		long lastEventTimeMilliseconds = preferences.getLong(key, -1);
+		long lastEventTimeMilliseconds = preferences.getLong(key, DEFAULT_CACHE_VALUE);
 		
 		if(lastEventTimeMilliseconds >= 0){
 			return new EventTime(lastEventTimeMilliseconds);
