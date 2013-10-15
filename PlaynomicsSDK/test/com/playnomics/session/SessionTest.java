@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.verification.VerificationMode;
 
 import android.app.Activity;
 import android.content.Context;
@@ -80,8 +79,6 @@ public class SessionTest {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-				
 	}
 
 	@AfterClass
@@ -92,7 +89,6 @@ public class SessionTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
 		
 		when(contextWrapperMock.getContext()).thenReturn(contextMock);
 		//device ID setup
