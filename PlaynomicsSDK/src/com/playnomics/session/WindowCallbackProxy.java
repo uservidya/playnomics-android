@@ -40,10 +40,13 @@ public class WindowCallbackProxy implements InvocationHandler {
 		if (method.getName() == "dispatchTouchEvent") {
 			if (args != null && args.length > 0) {
 				Object event = args[0];
+				
 				if (event != null
 						&& event instanceof MotionEvent
-						&& ((MotionEvent) event).getAction() == MotionEvent.ACTION_DOWN) {
-					eventHandler.onTouchEventReceived();
+						&& (((MotionEvent)event).getActionMasked() == MotionEvent.ACTION_DOWN
+					    	||((MotionEvent)event).getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)) {
+					//if the motion event was for 
+					eventHandler.onTouchEventReceived();  
 				}
 			}
 		}
