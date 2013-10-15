@@ -14,7 +14,10 @@ public class EventWorker implements IEventWorker {
 	private Logger logger;
 	private AtomicBoolean running;
 	
+	private Thread thread;
+	
 	public EventWorker(IEventQueue eventQueue, IHttpConnectionFactory factory, Logger logger){
+		this.running = new AtomicBoolean(false);
 		this.connectionFactory = factory;
 		this.eventQueue = eventQueue;
 		this.logger = logger;
@@ -26,20 +29,29 @@ public class EventWorker implements IEventWorker {
 			return;
 		}
 		
-		new Thread(new Runnable() {
+		thread = new Thread(new Runnable() {
 			public void run() {
 				doWork();
 			}
-		}).start();
+		});
+		thread.start();
 	}
 	
 	public void stop(){
-		running.getAndSet(false);		
+		if(!running.getAndSet(false)){
+			return;
+		}
+		
+		try {
+			thread.join();
+		} catch (InterruptedException ex) {
+			logger.log(LogLevel.WARNING, ex);
+		}
 	}
 	
 	private void doWork(){
 		while(running.get()){
-			while(!eventQueue.isEmpty()){
+			while(!eventQueue.isEmpty() && running.get()){				
 				String url = eventQueue.dequeueEventUrl();
 				
 				boolean successful = false;
@@ -47,8 +59,8 @@ public class EventWorker implements IEventWorker {
 				try {
 					connection = connectionFactory.startConnectionForUrl(url);
 					successful = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
-				} catch (IOException e) {
-					logger.log(LogLevel.WARNING, e, "Event URL Request failed for URL: %s", url);
+				} catch (IOException ex) {
+					logger.log(LogLevel.WARNING, ex, "Event URL Request failed for URL: %s", url);
 				} finally{
 					if(connection != null){
 						connection.disconnect();

@@ -30,6 +30,6 @@ public class EventTime extends GregorianCalendar implements
 
 	@Override
 	public String toString() {
-		return String.format("%l", getTimeInMillis());
+		return String.format("%d", getTimeInMillis());
 	}
 }
