@@ -3,12 +3,16 @@ package com.playnomics.util;
 import java.util.Random;
 import java.util.TimeZone;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.provider.Settings;
+import android.view.Window;
 
+import com.playnomics.session.TouchEventHandler;
+import com.playnomics.session.WindowCallbackProxy;
 import com.playnomics.util.Logger.LogLevel;
 
 public class Util implements IRandomGenerator {
@@ -49,5 +53,16 @@ public class Util implements IRandomGenerator {
 
 	public static boolean stringIsNullOrEmpty(String value) {
 		return (value == null || value.isEmpty());
+	}
+	
+	public void overrideActivityWindowCallback(Activity activity, TouchEventHandler handler){
+		Window.Callback currentCallback = activity.getWindow().getCallback();
+		activity.getWindow().setCallback(
+				WindowCallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
+	}
+	
+	public void removeWindowCallback(Activity activity){
+		WindowCallbackProxy proxy = (WindowCallbackProxy)activity.getWindow().getCallback();
+		activity.getWindow().setCallback(proxy.getOriginalCallback());
 	}
 }

@@ -29,7 +29,7 @@ public class WindowCallbackProxy implements InvocationHandler {
 
 	private WindowCallbackProxy(Window.Callback callback,
 			TouchEventHandler eventHandler) {
-		this.callback = callback;
+		this.callback = callback;  
 		this.eventHandler = eventHandler;
 	}
 

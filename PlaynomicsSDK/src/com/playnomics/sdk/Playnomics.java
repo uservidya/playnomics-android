@@ -43,7 +43,7 @@ public class Playnomics {
 				Playnomics.util = new Util(logger);
 				IEventQueue eventQueue = new EventQueue(config);
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
-				IActivityObserver activityObserver = new ActivityObserver();
+				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config);
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer);
 			}

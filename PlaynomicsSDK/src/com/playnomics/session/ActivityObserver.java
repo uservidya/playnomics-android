@@ -5,6 +5,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import android.app.Activity;
 import android.view.Window;
 
+import com.playnomics.util.Util;
+
 /**
  * @author jaredjenkins
  * Tracks the life-cycle of Activities as a proxy for session state machine, and user
@@ -13,8 +15,10 @@ import android.view.Window;
 public class ActivityObserver implements IActivityObserver {
 	private SessionStateMachine stateMachine;
 	private ConcurrentLinkedQueue<Activity> activities;
+	private Util util;
 	
-	public ActivityObserver() {
+	public ActivityObserver(Util util){
+		this.util = util;
 		this.activities = new ConcurrentLinkedQueue<Activity>();
 	}
 	
@@ -29,11 +33,9 @@ public class ActivityObserver implements IActivityObserver {
 	 * track user interaction.
 	 */
 	public void observeNewActivity(Activity activity, final TouchEventHandler handler) {
-		Window.Callback currentCallback = activity.getWindow().getCallback();
-		activity.getWindow().setCallback(
-				WindowCallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
+		util.overrideActivityWindowCallback(activity, handler);
 		activities.add(activity);
-		stateMachine.resume();
+		stateMachine.resume(); 
 	}
 
 	/**
@@ -42,9 +44,7 @@ public class ActivityObserver implements IActivityObserver {
 	 */
 	public void forgetLastActivity() {
 		Activity activity = activities.remove();
-		WindowCallbackProxy proxy = (WindowCallbackProxy)activity.getWindow().getCallback();
-		activity.getWindow().setCallback(proxy.getOriginalCallback());
-		
+		util.removeWindowCallback(activity);
 		if (activities.isEmpty()) {
 			stateMachine.pause();
 		}
