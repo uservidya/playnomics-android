@@ -42,7 +42,7 @@ public class AppStartEventTest extends PlaynomicsEventTest {
 		LargeGeneratedId instanceId = new LargeGeneratedId(util);
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 
-		AppPageEvent event = new AppPageEvent(config, sessionInfo, instanceId);
+		AppStartEvent event = new AppStartEvent(config, sessionInfo, instanceId);
 		testCommonEventParameters(config, event, sessionInfo);
 
 		Map<String, Object> params = event.getEventParameters();
