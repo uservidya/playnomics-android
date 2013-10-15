@@ -115,15 +115,6 @@ public class SessionTest {
 	@Test
 	public void testStartNewDevice(){
 		testNewDevice(userId);
-		/*
-		when(utilMock.getApplicationVersionFromContext(contextMock)).thenReturn(1);
-		
-		when(preferencesMock.getString("pushId", null)).thenReturn(null);
-		when(preferencesMock.getInt("sessionId", -1)).thenReturn(-1);
-		when(preferencesMock.getInt("appVersion", 0)).thenReturn(0);
-		when(preferencesMock.getInt("lastEventTime", 0)).thenReturn(0);
-		when(preferencesMock.getInt("sessionStartTime", 0)).thenReturn(0);
-		*/
 	}	
 	
 	public void testNewDevice(String userId){
