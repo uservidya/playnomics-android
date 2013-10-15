@@ -44,7 +44,7 @@ public class Playnomics {
 				IEventQueue eventQueue = new EventQueue(config);
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
-				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config);
+				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer);
 			}
 			return instance;

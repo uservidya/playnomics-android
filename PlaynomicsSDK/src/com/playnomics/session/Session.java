@@ -221,7 +221,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	public void onHeartBeat(int heartBeatIntervalSeconds) {
+	public void onHeartBeat(long heartBeatIntervalSeconds) {
 		try {
 			sequence.incrementAndGet();
 			AppRunningEvent event = new AppRunningEvent(config,

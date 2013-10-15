@@ -8,13 +8,14 @@ import com.playnomics.util.IConfig;
 
 public class HeartBeatProducer implements IHeartBeatProducer {
 	private ScheduledThreadPoolExecutor hearbeatSchedule;
-	private IConfig config;
+	private long heartbeatIntervalSeconds;
 
 	private AtomicBoolean started;
 	
-	public HeartBeatProducer(IConfig config) {
+	public HeartBeatProducer(long heartbeatIntervalSeconds) {
 		this.started = new AtomicBoolean(false);
-		hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
+		this.hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
+		this.heartbeatIntervalSeconds = heartbeatIntervalSeconds;
 	}
 
 	public void start(final HeartBeatHandler handler) {
@@ -22,12 +23,16 @@ public class HeartBeatProducer implements IHeartBeatProducer {
 			return;
 		}
 		
-		hearbeatSchedule.scheduleAtFixedRate(new Runnable() {
-			public void run() {
-				handler.onHeartBeat(config.getAppRunningIntervalSeconds());
-			}
-		}, config.getAppRunningIntervalSeconds(),
-				config.getAppRunningIntervalSeconds(), TimeUnit.SECONDS);
+		hearbeatSchedule.scheduleAtFixedRate(
+			new Runnable() {
+				public void run() {
+					handler.onHeartBeat(heartbeatIntervalSeconds);
+				}
+			}, 
+			heartbeatIntervalSeconds, 
+			heartbeatIntervalSeconds, 
+			TimeUnit.SECONDS
+		);
 	}
 
 	public void stop() {
