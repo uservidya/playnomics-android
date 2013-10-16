@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.TreeMap;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -44,16 +45,19 @@ public class EventWorkerTest {
 	public static void tearDownAfterClass() throws Exception {
 	}
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 	
 		when(factoryMock.startConnectionForUrl(any(String.class))).thenReturn(connectionMock);
+		when(factoryMock.buildUrl(any(String.class), any(String.class),
+				any(TreeMap.class))).thenCallRealMethod();
 		
 		Logger logger = new Logger(new UnitTestLogWriter());
 		Config config = new Config();
 		Util util = new Util(logger);
-		queue = new EventQueue(config);
+		queue = new EventQueue(config, factoryMock);
 		worker = new EventWorker(queue, factoryMock, logger);
 		
 		sessionInfo = new GameSessionInfo(1L, "userId", "breadcrumbId", new LargeGeneratedId(10L));

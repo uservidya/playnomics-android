@@ -12,9 +12,18 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-public class EventQueueTest {
+import com.playnomics.util.Logger;
 
+public class HttpConnectionFactoryTest {
+
+	@Mock
+	private Logger loggerMock;
+	
+	private IUrlBuilder builder;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -25,6 +34,8 @@ public class EventQueueTest {
 
 	@Before
 	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+		builder = new HttpConnectionFactory(loggerMock);
 	}
 
 	@After
@@ -35,8 +46,8 @@ public class EventQueueTest {
 	public void testBuildUrlNullParams() throws UnsupportedEncodingException {
 		String url = null;
 		String path = null;
-		Map<String,Object> parameters = null;
-		String result = EventQueue.buildUrl(url, path, parameters);
+		TreeMap<String,Object> parameters = null;
+		String result = builder.buildUrl(url, path, parameters);
 		assertNull("Should be null", result);
 	}
 	
@@ -44,8 +55,8 @@ public class EventQueueTest {
 	public void testBuildUrlNoPathOrParams() throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = null;
-		Map <String, Object> parameters = null;
-		String result = EventQueue.buildUrl(url, path, parameters);
+		TreeMap <String, Object> parameters = null;
+		String result = builder.buildUrl(url, path, parameters);
 		assertEquals(url, result);
 	}
 
@@ -53,8 +64,8 @@ public class EventQueueTest {
 	public void testBuildUrlPathNoSlash() throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = "apple";
-		Map <String, Object> parameters = null;
-		String result = EventQueue.buildUrl(url, path, parameters);
+		TreeMap <String, Object> parameters = null;
+		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple", result);
 	}
 	
@@ -62,8 +73,8 @@ public class EventQueueTest {
 	public void testBuildUrlPathSlash() throws UnsupportedEncodingException {
 		String url = "http://google.com/";
 		String path = "apple";
-		Map <String, Object> parameters = null;
-		String result = EventQueue.buildUrl(url, path, parameters);
+		TreeMap <String, Object> parameters = null;
+		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple", result);
 	}
 	
@@ -74,7 +85,7 @@ public class EventQueueTest {
 		TreeMap <String, Object> parameters = new TreeMap<String, Object>();
 		parameters.put("x", 1);
 		parameters.put("y", "This is my name");
-		String result = EventQueue.buildUrl(url, path, parameters);
+		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple?x=1&y=This+is+my+name", result);
 	}
 	
@@ -84,7 +95,7 @@ public class EventQueueTest {
 		TreeMap <String, Object> parameters = new TreeMap<String, Object>();
 		parameters.put("x", 1);
 		parameters.put("y", "This is my name");
-		String result = EventQueue.buildUrl(url, path, parameters);
+		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple?z=1&x=1&y=This+is+my+name", result);
 	}
 }

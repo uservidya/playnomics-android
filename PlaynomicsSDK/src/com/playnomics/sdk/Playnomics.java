@@ -38,10 +38,10 @@ public class Playnomics {
 				LogWriter logWriter = new AndroidLogger("PLAYNOMICS");
 				Playnomics.logger = new Logger(logWriter);
 				
-				IHttpConnectionFactory connectionFactory = new HttpConnectionFactory(logger);
+				HttpConnectionFactory connectionFactory = new HttpConnectionFactory(logger);
 				IConfig config = new Config();
 				Playnomics.util = new Util(logger);
-				IEventQueue eventQueue = new EventQueue(config);
+				IEventQueue eventQueue = new EventQueue(config, connectionFactory);
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());

@@ -1,10 +1,10 @@
 package com.playnomics.events;
 
-import java.util.Map;
 import java.util.TreeMap;
 
-import com.playnomics.util.*;
 import com.playnomics.session.GameSessionInfo;
+import com.playnomics.util.EventTime;
+import com.playnomics.util.IConfig;
 
 public abstract class PlaynomicsEvent {
 	private TreeMap<String, Object> eventParameters;
@@ -39,7 +39,7 @@ public abstract class PlaynomicsEvent {
 		eventParameters.put(key, value);
 	}
 
-	public Map<String, Object> getEventParameters() {
+	public TreeMap<String, Object> getEventParameters() {
 		return eventParameters;
 	}
 }
