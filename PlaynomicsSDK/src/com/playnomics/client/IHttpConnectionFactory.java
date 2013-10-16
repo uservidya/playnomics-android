@@ -9,6 +9,5 @@ public interface IHttpConnectionFactory {
 	HttpURLConnection startConnectionForUrl(String urlString) throws IOException;
 	
 	public String buildUrl(String url, String path,
-			TreeMap<String, Object> queryParameters)
-			throws UnsupportedEncodingException;
+			TreeMap<String, Object> queryParameters);
 }

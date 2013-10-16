@@ -1,8 +1,5 @@
 package com.playnomics.client;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.playnomics.events.PlaynomicsEvent;
@@ -20,7 +17,7 @@ public class EventQueue implements IEventQueue{
 		this.factory = builder;
 	}
 	
-	public void enqueueEvent(PlaynomicsEvent event) throws UnsupportedEncodingException{
+	public void enqueueEvent(PlaynomicsEvent event){
 		String eventUrl = factory.buildUrl(config.getEventsUrl(), event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}

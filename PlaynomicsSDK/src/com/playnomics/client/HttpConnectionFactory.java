@@ -30,8 +30,7 @@ public class HttpConnectionFactory implements IHttpConnectionFactory {
 	}
 
 	public String buildUrl(String url, String path,
-			TreeMap<String, Object> queryParameters)
-			throws UnsupportedEncodingException {
+			TreeMap<String, Object> queryParameters){
 		if(Util.stringIsNullOrEmpty(url)){
 			return null;
 		}
@@ -42,25 +41,32 @@ public class HttpConnectionFactory implements IHttpConnectionFactory {
 			builder.append(url.endsWith("/") ? path : String.format("/%s", path));
 		}
 		
-		if(queryParameters != null){
-			boolean hasQueryString = builder.toString().contains("?");
-			boolean firstParam = true;
-			
-			for(String key : queryParameters.keySet()){
-				if(Util.stringIsNullOrEmpty(key)){
-					continue;
-				}
+		try {		
+			if(queryParameters != null){
+				boolean hasQueryString = builder.toString().contains("?");
+				boolean firstParam = true;
 				
-				Object value = queryParameters.get(key);
-				if(value == null){
-					continue;
+				for(String key : queryParameters.keySet()){
+					if(Util.stringIsNullOrEmpty(key)){
+						continue;
+					}
+					
+					Object value = queryParameters.get(key);
+					if(value == null){
+						continue;
+					}
+					
+					
+						builder.append((!hasQueryString && firstParam) 
+								? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
+								: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
+					
+					firstParam = false;
 				}
-				
-				builder.append((!hasQueryString && firstParam) 
-						? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
-						: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
-				firstParam = false;
 			}
+		} catch (UnsupportedEncodingException ex) {
+			logger.log(LogLevel.WARNING, ex, "Could not build URL");
+			return null;
 		}
 		return builder.toString();
 	}
