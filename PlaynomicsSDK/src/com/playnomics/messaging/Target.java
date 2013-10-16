@@ -6,9 +6,7 @@ public class Target {
 	public enum TargetType{
 		URL, 
 		EXTERNAL,
-		DATA,
-		NULL,
-		UNKNOWN
+		DATA
 	}
 	
 	private TargetType targetType;

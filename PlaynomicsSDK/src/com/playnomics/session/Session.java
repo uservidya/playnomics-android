@@ -62,9 +62,13 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		this.userId = userId;
 	}
 	
-	private String breadcrumbId;
-	String getBreadcrumbId(){
-		return breadcrumbId;
+	public String getBreadcrumbId(){
+		return deviceId;
+	}
+	
+	private String deviceId;
+	public String getDeviceId(){
+		return deviceId;
 	}
 	
 	private LargeGeneratedId sessionId;
@@ -129,10 +133,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			this.contextWrapper = contextWrapper;
 			boolean settingsChanged = contextWrapper.synchronizeDeviceSettings();
 
-			breadcrumbId = util.getDeviceIdFromContext(contextWrapper.getContext());
+			deviceId = util.getDeviceIdFromContext(contextWrapper.getContext());
 
 			if (Util.stringIsNullOrEmpty(userId)) {
-				userId = breadcrumbId;
+				userId = deviceId;
 			}
 
 			sequence = new AtomicInteger(1);
@@ -243,7 +247,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private GameSessionInfo getSessionInfo() {
-		return new GameSessionInfo(applicationId, userId, breadcrumbId,
+		return new GameSessionInfo(applicationId, userId, deviceId,
 				sessionId);
 	}
 

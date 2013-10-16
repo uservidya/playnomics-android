@@ -240,4 +240,24 @@ public class Config implements IConfig {
 	public String getEventPathAppPause() {
 		return bundle.getString("eventNames.appPause");
 	}
+
+	public String getMessagingPathAds() {
+		return bundle.getString("messaging.adsPath");
+	}
+
+	public String getMessagingFrameIdKey() {
+		return bundle.getString("messaging.frameIdKey");
+	}
+
+	public String getMessagingScreenWidthKey() {
+		return bundle.getString("messaging.screenWidthKey");
+	}
+
+	public String getMessagingScreenHeightKey() {
+		return bundle.getString("messaging.screenHeightKey");
+	}
+	
+	public String getMessagingDeviceIdKey(){
+		return bundle.getString("messaging.deviceIdKey");
+	}
 }

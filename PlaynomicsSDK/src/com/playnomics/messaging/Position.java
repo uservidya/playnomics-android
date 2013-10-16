@@ -6,21 +6,21 @@ public class Position {
 		BANNER
 	}
 	
-	public enum HorizontalPosition{
+	public enum HorizontalGravity{
 		LEFT,
 		CENTER,
 		RIGHT
 	}
 	
-	public enum VerticalPosition{
+	public enum VerticalGravity{
 		TOP,
 		CENTER,
 		BOTTOM
 	}
 	
 	private PositionType positionType;
-	private HorizontalPosition horizontal;
-	private VerticalPosition vertical;
+	private HorizontalGravity horizontal;
+	private VerticalGravity vertical;
 	private Float height;
 	private Float width;
 
@@ -32,19 +32,19 @@ public class Position {
 		this.positionType = positionType;
 	}
 	
-	public HorizontalPosition getHorizontalPosition(){
+	public HorizontalGravity getHorizontalGravity(){
 		return horizontal; 
 	}
 	
-	public void setHorizontalPosition(HorizontalPosition horizontal){
+	public void setHorizontalGravity(HorizontalGravity horizontal){
 		this.horizontal = horizontal;
 	}
 	
-	public VerticalPosition getVerticalPosition(){
+	public VerticalGravity getVerticalGravity(){
 		return vertical; 
 	}
 	
-	public void setVerticalPosition(VerticalPosition vertical){
+	public void setVerticalGravity(VerticalGravity vertical){
 		this.vertical = vertical;
 	}
 	

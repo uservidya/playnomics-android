@@ -99,4 +99,14 @@ public interface IConfig {
 	public String getEventPathAppStart();
 
 	public String getEventPathAppPause();
+	
+	public String getMessagingPathAds();
+	
+	public String getMessagingFrameIdKey();
+	
+	public String getMessagingScreenWidthKey();
+
+	public String getMessagingScreenHeightKey();
+
+	public String getMessagingDeviceIdKey();
 }
