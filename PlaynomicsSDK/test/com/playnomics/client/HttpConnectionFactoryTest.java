@@ -22,7 +22,7 @@ public class HttpConnectionFactoryTest {
 	@Mock
 	private Logger loggerMock;
 	
-	private IUrlBuilder builder;
+	private IHttpConnectionFactory builder;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {

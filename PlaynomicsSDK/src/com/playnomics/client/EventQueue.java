@@ -11,17 +11,17 @@ import com.playnomics.util.Util;
 
 public class EventQueue implements IEventQueue{
 	private IConfig config;
-	private IUrlBuilder builder;
+	private IHttpConnectionFactory factory;
 	private ConcurrentLinkedQueue<String> eventUrlQueue;
 	
-	public EventQueue(IConfig config, IUrlBuilder builder){
+	public EventQueue(IConfig config, IHttpConnectionFactory builder){
 		this.config = config;
 		eventUrlQueue = new ConcurrentLinkedQueue<String>();
-		this.builder = builder;
+		this.factory = builder;
 	}
 	
 	public void enqueueEvent(PlaynomicsEvent event) throws UnsupportedEncodingException{
-		String eventUrl = builder.buildUrl(config.getEventsUrl(), event.getUrlPath(), event.getEventParameters());
+		String eventUrl = factory.buildUrl(config.getEventsUrl(), event.getUrlPath(), event.getEventParameters());
 		enqueueEventUrl(eventUrl);
 	}
 	
