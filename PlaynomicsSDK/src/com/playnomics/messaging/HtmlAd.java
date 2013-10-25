@@ -135,8 +135,8 @@ public class HtmlAd {
 		if(closeButtonType.equals("native")){
 			NativeCloseButton nativeCloseButton = new NativeCloseButton();
 			nativeCloseButton.setCloseImageUrl(closeButtonJSONData.getString("closeImageUrl"));
-			nativeCloseButton.setHeight((float)closeButtonJSONData.getDouble("height"));
-			nativeCloseButton.setWidth((float)closeButtonJSONData.getDouble("width"));
+			nativeCloseButton.setHeight(closeButtonJSONData.getInt("height"));
+			nativeCloseButton.setWidth(closeButtonJSONData.getInt("width"));
 			return nativeCloseButton;
 		} else if(closeButtonType.equals("html")){
 			HtmlCloseButton htmlCloseButton = new HtmlCloseButton();

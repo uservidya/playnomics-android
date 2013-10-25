@@ -1,9 +1,12 @@
 package com.playnomics.messaging;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.playnomics.messaging.Position.PositionType;
 import com.playnomics.messaging.Target.TargetType;
@@ -102,6 +105,9 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		
 		try {
 			webView = new PlayWebView(activity, htmlAd.getHtmlContent(), htmlAd.getContentBaseUrl(), this, logger);
+			dialog = new PlayDialog(activity, webView);
+			
+			
 			if(hasNativeCloseButton()){
 				NativeCloseButton closeButton = (NativeCloseButton)htmlAd.getCloseButton();
 				
@@ -110,7 +116,12 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 				byte[] imageData = closeButton.getImageData();
 				Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
 				imageView.setImageBitmap(bitmap);
+				
+				dialog.showWebView(webView, imageView);
+			} else {
+				dialog.showWebView(webView);
 			}
+			
 			observer.onFrameShown(activity, this);
 		} catch (Exception ex) {
 			logger.log(LogLevel.WARNING, "The frame %s cannot be rendered", frameId);
@@ -176,7 +187,7 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		if(target.getTargetType() == TargetType.URL && Util.stringIsNullOrEmpty(target.getTargetUrl())){
 			util.openUrlInPhoneBrowser(target.getTargetUrl(), activity);
 		}
-	
+	 
 		if(delegate != null){
 			delegate.onTouch(htmlAd.getTarget().getTargetData());
 		}
@@ -188,11 +199,9 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		}
 		
 		observer.onFrameDisposed(activity);
-		
 		if(closedByUser){
 			callbackProcessor.processUrlCallback(htmlAd.getCloseUrl());
 		}
-		
 		if(delegate != null){
 			delegate.onClose(htmlAd.getTarget().getTargetData());
 		}

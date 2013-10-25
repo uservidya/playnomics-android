@@ -1,24 +1,24 @@
 package com.playnomics.messaging;
 
 public class NativeCloseButton extends CloseButton {
-	private Float height;
-	private Float width;
+	private Integer height;
+	private Integer width;
 	private String closeImageUrl;
 	private byte[] imageData;
 	
-	public Float getHeight(){
+	public Integer getHeight(){
 		return height;
 	}
 	
-	public void setHeight(Float height){
+	public void setHeight(Integer height){
 		this.height = height;
 	}
 
-	public Float getWidth(){
+	public Integer getWidth(){
 		return width;
 	}
 	
-	public void setWidth(Float width){
+	public void setWidth(Integer width){
 		this.width = width;
 	}
 	
