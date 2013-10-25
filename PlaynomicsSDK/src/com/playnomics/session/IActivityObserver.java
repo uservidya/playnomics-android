@@ -18,5 +18,4 @@ public interface IActivityObserver {
 	 * we assume that the application has been paused, and can be killed or resumed at some future state.
 	 */
 	public void forgetLastActivity();
-
 }
