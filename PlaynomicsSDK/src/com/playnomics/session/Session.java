@@ -209,6 +209,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventQueue.enqueueEvent(event);
 			eventWorker.stop();
 			producer.stop();
+			sessionState = SessionState.PAUSED;
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not pause session");
 		}
@@ -316,7 +317,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	// activity attach/detach
+	// activity pause/resume
 	public void onActivityResumed(Activity activity) {
 		try{
 			assertSessionStarted();

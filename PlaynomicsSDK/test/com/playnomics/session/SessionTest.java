@@ -24,6 +24,8 @@ import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.StubEventQueue;
 import com.playnomics.events.AppPageEvent;
+import com.playnomics.events.AppPauseEvent;
+import com.playnomics.events.AppResumeEvent;
 import com.playnomics.events.AppStartEvent;
 import com.playnomics.events.MilestoneEvent;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
@@ -326,5 +328,30 @@ public class SessionTest {
 		session.onActivityPaused(activityMock);
 		verify(observerMock, Mockito.never()).forgetLastActivity();
 		verify(messagingManagerMock, Mockito.never()).onActivityPaused(activityMock);
+	}
+	
+	@Test
+	public void testPauseResume(){
+		testStartNewDevice();
+		
+		session.pause();
+		verify(producerMock).stop();
+		verify(eventWorker).stop();
+		
+		session.resume();
+		verify(producerMock).start(session);
+		verify(eventWorker).start();
+		
+		Object pauseEvent = eventQueue.queue.remove();
+		assertTrue("Pause event queued", pauseEvent instanceof AppPauseEvent);
+		Object resumeEvent = eventQueue.queue.remove();
+		assertTrue("Resume event queued", resumeEvent instanceof AppResumeEvent);
+	}
+	
+	@Test
+	public void testPauseResumeNoStart(){
+		session.pause();
+		session.resume();
+		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 }
