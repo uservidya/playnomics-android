@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.After;

@@ -13,7 +13,7 @@ import com.playnomics.util.Util;
 import com.playnomics.util.Logger.LogLevel;
 
 public class HttpConnectionFactory implements IHttpConnectionFactory {
-	Logger logger;
+	private Logger logger;
 	public HttpConnectionFactory(Logger logger){
 		this.logger = logger;
 	}
@@ -56,10 +56,9 @@ public class HttpConnectionFactory implements IHttpConnectionFactory {
 						continue;
 					}
 					
-					
-						builder.append((!hasQueryString && firstParam) 
-								? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
-								: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
+					builder.append((!hasQueryString && firstParam) 
+							? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
+							: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
 					
 					firstParam = false;
 				}

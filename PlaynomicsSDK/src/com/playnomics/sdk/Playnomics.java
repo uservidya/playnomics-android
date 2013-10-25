@@ -7,6 +7,7 @@ import android.content.Context;
 
 import com.playnomics.client.EventWorker;
 import com.playnomics.client.EventQueue;
+import com.playnomics.client.FrameAssetClient;
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
@@ -46,7 +47,8 @@ public class Playnomics {
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
-				MessagingManager messagingManager = new MessagingManager(config,connectionFactory, util, logger); 
+				FrameAssetClient frameAssetClient = new FrameAssetClient(connectionFactory, config, logger);
+				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger);
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
 			}
 			return instance;
