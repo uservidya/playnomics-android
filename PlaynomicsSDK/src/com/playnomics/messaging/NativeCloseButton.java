@@ -4,7 +4,8 @@ public class NativeCloseButton extends CloseButton {
 	private Float height;
 	private Float width;
 	private String closeImageUrl;
-
+	private byte[] imageData;
+	
 	public Float getHeight(){
 		return height;
 	}
@@ -27,5 +28,13 @@ public class NativeCloseButton extends CloseButton {
 	
 	public void setCloseImageUrl(String closeImageUrl){
 		this.closeImageUrl = closeImageUrl;
+	}
+	
+	public byte[] getImageData(){
+		return imageData;
+	}
+	
+	public void setImageData(byte[] imageData){
+		this.imageData = imageData;
 	}
 }

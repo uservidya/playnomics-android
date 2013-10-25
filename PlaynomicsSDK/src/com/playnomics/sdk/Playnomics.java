@@ -12,6 +12,7 @@ import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.IHttpConnectionFactory;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.messaging.MessagingManager;
 import com.playnomics.session.IActivityObserver;
 import com.playnomics.session.ActivityObserver;
 import com.playnomics.session.IHeartBeatProducer;
@@ -45,7 +46,8 @@ public class Playnomics {
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
-				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer);
+				MessagingManager messagingManager = new MessagingManager(config,connectionFactory, util, logger); 
+				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
 			}
 			return instance;
 		}
@@ -70,12 +72,12 @@ public class Playnomics {
 	
 	public static void onActivityResumed(Activity activity){
 		Session session = getInstance();
-		session.attachActivity(activity);
+		session.onActivityResumed(activity);
 	}
 	
-	public static void onActivityStopped(Activity activity){
+	public static void onActivityPaused(Activity activity){
 		Session session = getInstance();
-		session.detachActivity();
+		session.onActivityPaused(activity);
 	}
 	
 	public static void transactionInUSD(float priceInUSD, int quantity){
@@ -101,5 +103,13 @@ public class Playnomics {
 	public static void attributeInstall(String source){
 		Session session = getInstance();
 		session.attributeInstall(source, null, null);
+	}
+	
+	public static void preloadFrameIds(String ... frameIds){
+		
+	}
+	
+	public static void showFrame(String frameId, IPlaynomicsFrameDelegate delegate){
+		
 	}
 }

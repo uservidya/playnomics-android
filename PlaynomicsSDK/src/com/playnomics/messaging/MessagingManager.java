@@ -1,37 +1,42 @@
 package com.playnomics.messaging;
 
-import java.io.UnsupportedEncodingException;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.json.JSONException;
-
+import android.app.Activity;
 import com.playnomics.client.AssetClient;
 import com.playnomics.client.AssetClient.ResponseStatus;
 import com.playnomics.client.IHttpConnectionFactory;
+import com.playnomics.messaging.Frame.FrameState;
+import com.playnomics.messaging.Frame.IFrameStateObserver;
+import com.playnomics.sdk.IPlaynomicsFrameDelegate;
 import com.playnomics.session.Session;
 import com.playnomics.util.IConfig;
 import com.playnomics.util.Logger;
-import com.playnomics.util.Util;
 import com.playnomics.util.Logger.LogLevel;
+import com.playnomics.util.Util;
 
-public class MessagingManager {
+public class MessagingManager implements IFrameStateObserver {	
 	private IConfig config;
 	private Util util;
 	private ConcurrentHashMap<String, Frame> framesById;
+	private ConcurrentHashMap<String, Frame> framesByActivityName;
 	private IHttpConnectionFactory connectionFactory;
 	private Session session;
 	private Logger logger;
 	private AssetClient client;
 	
-	public MessagingManager(Session session, IConfig config, 
+	public void setSession(Session session){
+		this.session = session;
+	}
+	
+	public MessagingManager(IConfig config, 
 			IHttpConnectionFactory connectionFactory, 
 			Util util, Logger logger){
-		this.session = session;
 		this.config = config;
 		this.connectionFactory = connectionFactory;
 		this.util = util;
 		this.framesById = new ConcurrentHashMap<String, Frame>();
+		this.framesByActivityName = new ConcurrentHashMap<String, Frame>();
 		this.client = new AssetClient(connectionFactory);
 		this.logger = logger;
 	}
@@ -42,15 +47,15 @@ public class MessagingManager {
 		}
 	}
 		
-	public void showFrame(String frameId){
+	public void showFrame(String frameId, Activity activity, IPlaynomicsFrameDelegate delegate){
 		Frame frame = getOrAddFrame(frameId);
-		frame.show();
+		frame.show(activity, delegate);
 	}
 	
 	private Frame getOrAddFrame(String frameId){
 		Frame frame;
 		if(!framesById.containsKey(frameId)){
-			frame = new Frame(frameId);
+			frame = new Frame(frameId, session, util, logger, this);
 			loadFrameInBackground(frame);
 			framesById.put(frameId, frame);
 		} else {
@@ -62,6 +67,7 @@ public class MessagingManager {
 	private void loadFrameInBackground(final Frame frame){
 		Runnable task = new Runnable() {
 			public void run() {
+				frame.setState(FrameState.LOAD_STARTED);
 				String messagingApiUrl = config.getMessagingUrl();
 				
 				String adsPath = config.getMessagingPathAds();
@@ -77,17 +83,25 @@ public class MessagingManager {
 				
 				String requestUrl = connectionFactory.buildUrl(messagingApiUrl, adsPath, queryParams);
 				
-				AssetClient.AssetResponse response = client.requestAsset(requestUrl);
-				if(response.getStatus() == ResponseStatus.SUCCESS){
+				AssetClient.AssetResponse jsonResponse = client.requestAsset(requestUrl);
+
+				if(jsonResponse.getStatus() == ResponseStatus.SUCCESS){
 					try {
-						HtmlAd htmlAd = HtmlAd.createFrameFromBytes(response.getData());
-						frame.updateFrameData(htmlAd);
-					} catch (UnsupportedEncodingException ex) {
-						logger.log(LogLevel.WARNING, ex, "Could not fetch ad for frame");
-					} catch (JSONException ex) {
-						logger.log(LogLevel.WARNING, ex, "Could not fetch ad for frame");
-					} catch (Exception ex){
-						logger.log(LogLevel.WARNING, ex, "Could not fetch ad for frame");
+						HtmlAd htmlAd = HtmlAd.createFrameFromBytes(jsonResponse.getData());
+			
+						if(htmlAd.getCloseButton() instanceof NativeCloseButton){
+							NativeCloseButton closeButton = (NativeCloseButton)htmlAd.getCloseButton();
+							AssetClient.AssetResponse imageResponse = client.requestAsset(closeButton.getImageUrl());
+							if(imageResponse.getStatus() == ResponseStatus.SUCCESS){
+								closeButton.setImageData(imageResponse.getData());
+								frame.updateFrameData(htmlAd);
+							}
+						} else {
+							frame.updateFrameData(htmlAd);
+						}
+					} catch (Exception ex) {
+						logger.log(LogLevel.WARNING, ex, "Could not fetch message for frame");
+						frame.setState(FrameState.LOAD_FAILED);
 					}
 				}
 			}
@@ -97,6 +111,37 @@ public class MessagingManager {
 	}
 	
 	public void hideFrame(String frameId){
-		
+		if(framesById.containsKey(frameId)){
+			Frame frame = framesById.get(frameId);
+			frame.hide();
+		}
+	}
+	
+	public void onFrameShown(Activity activity, Frame frame){
+		framesByActivityName.put(getKeyForActivity(activity), frame);
+	}
+	
+	public void onFrameDisposed(Activity activity){
+		framesByActivityName.remove(activity);
+	}
+	
+	public void onActivityResumed(Activity activity){
+		String key = getKeyForActivity(activity);
+		if(framesByActivityName.containsKey(key)){
+			Frame frame = framesByActivityName.get(key);
+			frame.attachActivity(activity);
+		}
+	}
+
+	public void onActivityPaused(Activity activity){
+		String key = getKeyForActivity(activity);
+		if(framesByActivityName.containsKey(key)){
+			Frame frame = framesByActivityName.get(key);
+			frame.detachActivity();
+		}
+	}
+	
+	private String getKeyForActivity(Activity activity){
+		return activity.getClass().getName();
 	}
 }

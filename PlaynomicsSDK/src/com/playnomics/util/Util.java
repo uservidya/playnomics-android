@@ -14,9 +14,11 @@ import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.provider.Settings;
 import android.view.Window;
 
@@ -28,6 +30,7 @@ public class Util implements IRandomGenerator {
 
 	public static final TimeZone TIME_ZONE_GMT = TimeZone.getTimeZone("GMT");
 	public static final String UT8_ENCODING = "UTF-8";
+	public static final String CONTENT_TYPE_HTML = "text/html";
 
 	private Logger logger;
 
@@ -58,6 +61,11 @@ public class Util implements IRandomGenerator {
 			// in the event of a failure always return a -1
 			return -1;
 		}
+	}
+	
+	public void openUrlInPhoneBrowser(String url, Context context){
+		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		context.startActivity(browserIntent);
 	}
 
 	public static boolean stringIsNullOrEmpty(String value) {

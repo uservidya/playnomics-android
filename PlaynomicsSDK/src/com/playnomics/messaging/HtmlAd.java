@@ -6,9 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.playnomics.messaging.Position.HorizontalGravity;
 import com.playnomics.messaging.Position.PositionType;
-import com.playnomics.messaging.Position.VerticalGravity;
 import com.playnomics.messaging.Target.TargetType;
 import com.playnomics.util.Util;
 
@@ -19,7 +17,7 @@ public class HtmlAd {
 	}
 	
 	private CloseButton closeButton;
-	CloseButton getCloseButton(){
+	public CloseButton getCloseButton(){
 		return closeButton;
 	}
 	
@@ -53,6 +51,11 @@ public class HtmlAd {
 		return closeUrl;
 	}
 	
+	private String contentBaseUrl;
+	public String getContentBaseUrl(){
+		return contentBaseUrl;
+	}
+	
 	private String htmlContent;
 	public String getHtmlContent(){
 		return htmlContent;
@@ -83,7 +86,8 @@ public class HtmlAd {
 		ad.impressionUrl = firstAdData.getString("impressionUrl");
 		ad.closeUrl = firstAdData.getString("closeUrl");
 		ad.htmlContent = firstAdData.getString("htmlContent");
-		
+		ad.contentBaseUrl = firstAdData.getString("contentBaseUrl");
+	
 		ad.position = getPositionFromResponse(firstAdData);
 		ad.target = getTargetFromResponse(firstAdData);
 		ad.closeButton = getCloseButtonFromResponse(firstAdData);
@@ -98,22 +102,6 @@ public class HtmlAd {
 		Position position = new Position();
 		if(positionTypeString.equals("fullscreen")){
 			position.setPositionType(PositionType.FULLSCREEN);
-		} else if(positionTypeString.equals("banner")){
-			position.setPositionType(PositionType.BANNER);
-			position.setHeight(((float) positionData.getDouble("height")));
-			position.setWidth(((float) positionData.getDouble("width")));
-			
-			String horizontalGravityString = positionData.optString("horizontalGravity", null);
-			position.setHorizontalGravity(toHorizontalGravity(horizontalGravityString));
-			
-			String verticalGravityString = positionData.optString("verticalGravity", null);
-			position.setVerticalGravity(toVerticalGravity(verticalGravityString));
-			
-			Float height = (float)positionData.getDouble("height");
-			Float width = (float)positionData.getDouble("width");
-			position.setHeight(height);
-			position.setWidth(width);
-		} else {
 			throw new JSONException(String.format("Unsupported positionType: %s", positionTypeString));
 		}
 		return position;
@@ -155,45 +143,6 @@ public class HtmlAd {
 			htmlCloseButton.setCloseLink(closeButtonJSONData.getString("closeLink"));
 		} 
 		throw new JSONException(String.format("Unsupported closeButtonType: %s", closeButtonType));
-	}
-	
-	static HorizontalGravity toHorizontalGravity(String gravityString) throws JSONException{
-		if(gravityString == null){
-			throw new JSONException("horizontalGravity is null");
-		}
-		
-		gravityString = gravityString.toLowerCase();
-		if(gravityString.equals("left")){
-			return HorizontalGravity.LEFT;
-		}
-		
-		if(gravityString.equals("center")){
-			return HorizontalGravity.CENTER;
-		}
-		
-		if(gravityString.equals("right")){
-			return HorizontalGravity.RIGHT;
-		}
-		throw new JSONException(String.format("Unsupported horizontalGravity: %s", gravityString));
-	}
-	
-	static VerticalGravity toVerticalGravity(String gravityString) throws JSONException{
-		if(gravityString == null){
-			throw new JSONException("verticalGravity is null");
-		}
-		
-		gravityString = gravityString.toLowerCase();
-		
-		if(gravityString.equals("top")){
-			return VerticalGravity.TOP;
-		}
-		if(gravityString.equals("center")){
-			return VerticalGravity.CENTER;
-		}
-		if(gravityString.equals("bottom")){
-			return VerticalGravity.BOTTOM;
-		}
-		throw new JSONException(String.format("Unsupported verticalGravity: %s", gravityString));
 	}
 	
 	static TargetType toTargetType(String targetTypeString) throws JSONException{

@@ -12,6 +12,7 @@ import com.playnomics.client.EventWorker;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.IHttpConnectionFactory;
+import com.playnomics.messaging.MessagingManager;
 import com.playnomics.util.*;
 import com.playnomics.util.Logger.LogLevel;
 import com.playnomics.events.AppPageEvent;
@@ -25,7 +26,7 @@ import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 
 public class Session implements SessionStateMachine, TouchEventHandler,
-		HeartBeatHandler {
+		HeartBeatHandler, ICallbackProcessor {
 	// session
 	private SessionState sessionState;
 
@@ -41,6 +42,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private ContextWrapper contextWrapper;
 	private IActivityObserver observer;
 	private IHeartBeatProducer producer;
+	private MessagingManager messagingManager;
 	
 	// session data
 	private Long applicationId;
@@ -102,7 +104,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	
 	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger, 
 			IEventQueue eventQueue, IEventWorker eventWorker, 
-			IActivityObserver activityObserver, IHeartBeatProducer producer) {
+			IActivityObserver activityObserver, IHeartBeatProducer producer, MessagingManager messagingManager) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
@@ -111,6 +113,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		this.eventWorker = eventWorker;
 		this.observer = activityObserver;
 		this.producer = producer;
+		this.messagingManager = messagingManager;
+		//this is done to make Session more testable
+		//we want MessagingManager to be mocked out when we start the session
+		this.messagingManager.setSession(this);
 	}
 	
 	public void start(ContextWrapper contextWrapper) {
@@ -311,21 +317,27 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	// activity attach/detach
-	public void attachActivity(Activity activity) {
+	public void onActivityResumed(Activity activity) {
 		try{
 			assertSessionStarted();
 			observer.observeNewActivity(activity, this);
+			messagingManager.onActivityResumed(activity);
 		} catch(Exception ex){
 			logger.log(LogLevel.ERROR, ex, "Could not attach activity");
 		}
 	}
 
-	public void detachActivity() {
+	public void onActivityPaused(Activity activity) {
 		try{
 			assertSessionStarted();
 			observer.forgetLastActivity();
+			messagingManager.onActivityPaused(activity);
 		} catch(Exception ex){
 			logger.log(LogLevel.ERROR, ex, "Could not detach activity");
 		}
+	}
+	
+	public void processUrlCallback(String url){
+		eventQueue.enqueueEventUrl(url);
 	}
 }

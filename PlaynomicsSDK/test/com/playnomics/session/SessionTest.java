@@ -29,6 +29,7 @@ import com.playnomics.events.MilestoneEvent;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
+import com.playnomics.messaging.MessagingManager;
 import com.playnomics.util.Config;
 import com.playnomics.util.ContextWrapper;
 import com.playnomics.util.EventTime;
@@ -67,6 +68,9 @@ public class SessionTest {
 	@Mock
 	private Activity activityMock;
 	
+	@Mock
+	private MessagingManager messagingManagerMock;
+	
 	private Session session;
 	private StubEventQueue eventQueue;
 	
@@ -93,7 +97,7 @@ public class SessionTest {
 		
 		Config config = new Config();
 		Logger logger = new Logger(new UnitTestLogWriter());
-		session = new Session(config, utilMock, factoryMock, logger, eventQueue, eventWorker, observerMock, producerMock);
+		session = new Session(config, utilMock, factoryMock, logger, eventQueue, eventWorker, observerMock, producerMock, messagingManagerMock);
 	}
 
 	@After
@@ -295,28 +299,32 @@ public class SessionTest {
 	}
 	
 	@Test
-	public void testAttachActivity(){
+	public void testOnActivityResume(){
 		testStartNewDevice();
-		session.attachActivity(activityMock);
+		session.onActivityResumed(activityMock);
 		verify(observerMock).observeNewActivity(activityMock, session);
+		verify(messagingManagerMock).onActivityResumed(activityMock);
 	}
 	
 	@Test
-	public void testAttachActivityNoStart(){
-		session.attachActivity(activityMock);
+	public void testOnActivityResumeNoStart(){
+		session.onActivityResumed(activityMock);
 		verify(observerMock, Mockito.never()).observeNewActivity(activityMock, session);
+		verify(messagingManagerMock, Mockito.never()).onActivityResumed(activityMock);
 	}
 	
 	@Test
-	public void testDetachActivity(){
+	public void testOnActivityPause(){
 		testStartNewDevice();
-		session.detachActivity();
+		session.onActivityPaused(activityMock);
 		verify(observerMock).forgetLastActivity();
+		verify(messagingManagerMock).onActivityPaused(activityMock);
 	}
 	
 	@Test
-	public void testDetachActivityNoStart(){
-		session.detachActivity();
+	public void testOnActivityPauseNoStart(){
+		session.onActivityPaused(activityMock);
 		verify(observerMock, Mockito.never()).forgetLastActivity();
+		verify(messagingManagerMock, Mockito.never()).onActivityPaused(activityMock);
 	}
 }
