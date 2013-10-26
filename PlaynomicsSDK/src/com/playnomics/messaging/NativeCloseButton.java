@@ -37,4 +37,10 @@ public class NativeCloseButton extends CloseButton {
 	public void setImageData(byte[] imageData){
 		this.imageData = imageData;
 	}
+	
+	public NativeCloseButton(Integer height, Integer width, String closeImageUrl){
+		this.height = height;
+		this.width = width;
+		this.closeImageUrl = closeImageUrl;
+	}
 }

@@ -36,4 +36,18 @@ public class Target {
 	public void setTargetData(Map<String, Object> targetData){
 		this.targetData = targetData;
 	}
+	
+	public Target(TargetType targetType){
+		this.targetType = targetType;
+	}
+	
+	public Target(TargetType targetType, Map<String, Object> targetData){
+		this.targetType = targetType;
+		this.targetData = targetData;
+	}
+	
+	public Target(TargetType targetType, String targetUrl){
+		this.targetType = targetType;
+		this.targetUrl = targetUrl;
+	}
 }

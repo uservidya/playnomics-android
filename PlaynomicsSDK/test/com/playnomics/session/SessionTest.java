@@ -339,8 +339,8 @@ public class SessionTest {
 		verify(eventWorker).stop();
 		
 		session.resume();
-		verify(producerMock).start(session);
-		verify(eventWorker).start();
+		verify(producerMock, Mockito.atMost(2)).start(session);
+		verify(eventWorker, Mockito.atMost(2)).start();
 		
 		Object pauseEvent = eventQueue.queue.remove();
 		assertTrue("Pause event queued", pauseEvent instanceof AppPauseEvent);

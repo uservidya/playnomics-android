@@ -5,17 +5,19 @@ import java.util.Date;
 import android.app.Activity;
 import android.content.Context;
 
-import com.playnomics.client.EventWorker;
+import com.playnomics.client.AssetClient;
 import com.playnomics.client.EventQueue;
-import com.playnomics.client.FrameAssetClient;
+import com.playnomics.client.EventWorker;
+import com.playnomics.client.FrameDataClient;
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
-import com.playnomics.client.IHttpConnectionFactory;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.MessagingManager;
-import com.playnomics.session.IActivityObserver;
 import com.playnomics.session.ActivityObserver;
+import com.playnomics.session.HeartBeatProducer;
+import com.playnomics.session.IActivityObserver;
 import com.playnomics.session.IHeartBeatProducer;
 import com.playnomics.session.Session;
 import com.playnomics.util.AndroidLogger;
@@ -25,7 +27,6 @@ import com.playnomics.util.IConfig;
 import com.playnomics.util.LogWriter;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
-import com.playnomics.session.HeartBeatProducer;
 
 public class Playnomics {
 	private static final Object syncLock = new Object();
@@ -47,7 +48,9 @@ public class Playnomics {
 				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
-				FrameAssetClient frameAssetClient = new FrameAssetClient(connectionFactory, config, logger);
+				HtmlAdFactory adFactory = new HtmlAdFactory();
+				AssetClient assetClient = new AssetClient(connectionFactory);
+				FrameDataClient frameAssetClient = new FrameDataClient(assetClient, config, logger, adFactory);
 				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger);
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
 			}

@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.TreeMap;
 
 public class AssetClient {
 	
@@ -45,12 +46,22 @@ public class AssetClient {
 			this.requestUrl = requestUrl;
 			this.data = data;
 		}
+		
+		public AssetResponse(String requestUrl, ResponseStatus status){
+			this.status = status;
+			this.requestUrl = requestUrl;
+		}
 	}
 	
-	private IHttpConnectionFactory connectionFactory;
+	protected IHttpConnectionFactory connectionFactory;
 	
 	public AssetClient(IHttpConnectionFactory connectionFactory){
 		this.connectionFactory = connectionFactory;
+	}
+	
+	public AssetResponse requestAsset(String baseUrl, String path, TreeMap<String, Object> queryParameters){
+		String assetUrl = this.connectionFactory.buildUrl(baseUrl, path, queryParameters);
+		return requestAsset(assetUrl);
 	}
 	
 	public AssetResponse requestAsset(String url){
@@ -59,20 +70,23 @@ public class AssetClient {
 		AssetResponse response;
 		try {
 			connection = connectionFactory.startConnectionForUrl(url);
-			InputStream inputStream = connection.getInputStream();
-			
-			int bufferSize = 1024 * 4;// 4KB
-			
-			bufferedIn = new BufferedInputStream(inputStream, bufferSize);
-			ByteArrayOutputStream bufferedOut = new ByteArrayOutputStream();
-			int read;
-			while((read = bufferedIn.read()) != -1){
-				bufferedOut.write(read);
+			if(connection.getResponseCode() != HttpURLConnection.HTTP_OK){
+				response = new AssetResponse(url, ResponseStatus.FAILURE);
+			} else {
+				InputStream inputStream = connection.getInputStream();			
+				int bufferSize = 1024 * 4;// 4KB
+				
+				bufferedIn = new BufferedInputStream(inputStream, bufferSize);
+				ByteArrayOutputStream bufferedOut = new ByteArrayOutputStream();
+				int read;
+				while((read = bufferedIn.read()) != -1){
+					bufferedOut.write(read);
+				}
+				bufferedIn.close();
+				
+				byte[] data = bufferedOut.toByteArray();
+				response = new AssetResponse(url, data);
 			}
-			bufferedIn.close();
-			
-			byte[] data = bufferedOut.toByteArray();
-			response = new AssetResponse(url, data);
 		} catch (IOException e) {
 			response = new AssetResponse(url, e);
 		} finally {

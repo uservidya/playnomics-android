@@ -1,7 +1,6 @@
 package com.playnomics.messaging;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
@@ -20,7 +19,7 @@ import com.playnomics.util.Logger.LogLevel;
 
 public class Frame implements PlayWebView.IPlayWebViewHandler{
 	
-	interface IFrameStateObserver{
+	public interface IFrameStateObserver{
 		void onFrameShown(Activity activity, Frame frame);
 		
 		void onFrameDisposed(Activity activity);

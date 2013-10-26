@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.Activity;
 
-import com.playnomics.client.FrameAssetClient;
+import com.playnomics.client.FrameDataClient;
 import com.playnomics.messaging.Frame.IFrameStateObserver;
 import com.playnomics.sdk.IPlaynomicsFrameDelegate;
 import com.playnomics.session.ICallbackProcessor;
@@ -17,19 +17,19 @@ public class MessagingManager implements IFrameStateObserver {
 	private Util util;
 	private ConcurrentHashMap<String, Frame> framesById;
 	private ConcurrentHashMap<String, Frame> framesByActivityName;
-	private FrameAssetClient frameAssetClient;
+	private FrameDataClient frameDataClient;
 	private Logger logger;
 	private ICallbackProcessor callbackProcessor;
 	
 	public void setSession(Session session){
 		this.callbackProcessor = session;
-		this.frameAssetClient.setSession(session);
+		this.frameDataClient.setSession(session);
 	}
 	
 	public MessagingManager(IConfig config, 
-			FrameAssetClient frameAssetClient, 
+			FrameDataClient frameDataClient, 
 			Util util, Logger logger){
-		this.frameAssetClient = frameAssetClient;
+		this.frameDataClient = frameDataClient;
 		this.util = util;
 		this.framesById = new ConcurrentHashMap<String, Frame>();
 		this.framesByActivityName = new ConcurrentHashMap<String, Frame>();
@@ -51,7 +51,7 @@ public class MessagingManager implements IFrameStateObserver {
 		Frame frame;
 		if(!framesById.containsKey(frameId)){
 			frame = new Frame(frameId, callbackProcessor, util, logger, this);
-			frameAssetClient.loadFrameInBackground(frame);
+			frameDataClient.loadFrameInBackground(frame);
 			framesById.put(frameId, frame);
 		} else {
 			frame = framesById.get(frameId);

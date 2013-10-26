@@ -53,7 +53,7 @@ public class HttpConnectionFactory implements IHttpConnectionFactory {
 					
 					Object value = queryParameters.get(key);
 					if(value == null){
-						continue;
+						continue; 
 					}
 					
 					builder.append((!hasQueryString && firstParam) 

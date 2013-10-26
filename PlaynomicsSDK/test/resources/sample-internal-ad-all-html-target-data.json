@@ -1,0 +1,23 @@
+{
+   "ads":[
+      {
+         "htmlContent":"<html></html>",
+         "impressionUrl":"http://impressionUrl",
+         "closeUrl":"http://closeUrl",
+         "clickUrl":"http://clickUrl",
+         "clickLink":"pn://click",
+         "contentBaseUrl":"https://ads.a.playnomics.net",
+         "target" : {
+            "targetType" : "data",
+            "targetData" : "{\"key\":\"value\"}"
+         },
+         "closeButton" : {
+            "closeButtonType" : "html",
+            "closeLink" : "pn://close"
+         },
+         "position" : {
+            "positionType" : "fullscreen"
+         }
+      }
+   ]
+}

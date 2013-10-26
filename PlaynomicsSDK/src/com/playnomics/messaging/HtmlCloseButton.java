@@ -10,4 +10,8 @@ public class HtmlCloseButton extends CloseButton {
 	public void setCloseLink(String closeLink){
 		this.closeLink = closeLink;
 	}
+	
+	public HtmlCloseButton(String closeLink){
+		this.closeLink = closeLink;
+	}
 }

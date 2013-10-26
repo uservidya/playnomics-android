@@ -14,4 +14,8 @@ public class Position {
 	public void setPositionType(PositionType positionType){
 		this.positionType = positionType;
 	}
+	
+	public Position(PositionType positionType){
+		this.positionType = positionType;
+	}
 }

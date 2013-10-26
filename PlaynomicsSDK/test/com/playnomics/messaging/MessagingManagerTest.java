@@ -1,10 +1,7 @@
 package com.playnomics.messaging;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -17,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import android.app.Activity;
 
-import com.playnomics.client.FrameAssetClient;
+import com.playnomics.client.FrameDataClient;
 import com.playnomics.util.Config;
 import com.playnomics.util.Logger;
 import com.playnomics.util.UnitTestLogWriter;
@@ -28,7 +25,7 @@ public class MessagingManagerTest {
 	@Mock
 	private Util utilMock;
 	@Mock
-	private FrameAssetClient assetClientMock;
+	private FrameDataClient dataClientMock;
 	
 	@Mock
 	private Activity activityMock;
@@ -50,7 +47,7 @@ public class MessagingManagerTest {
 		Config config = new Config();
 		UnitTestLogWriter writer = new UnitTestLogWriter();
 		Logger logger = new Logger(writer);
-		messagingManager = new MessagingManager(config, assetClientMock, utilMock, logger);
+		messagingManager = new MessagingManager(config, dataClientMock, utilMock, logger);
 	}
 
 	@After
@@ -58,16 +55,23 @@ public class MessagingManagerTest {
 	}
 
 	@Test
-	public void testPreloadFramesLoadsData() {
+	public void testPreloadFramesLoadsRequestsDataOnce() {
 		String[] frameIds = new String[]{"frame1"};
 		messagingManager.preloadFrames(frameIds);
 		messagingManager.showFrame("frame1", activityMock, null);
-		verify(assetClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
+		verify(dataClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
+	}
+
+	@Test
+	public void testPreloadMultipleFrames(){
+		String[] frameIds = new String[]{"frame1", "frame2","frame3"};
+		messagingManager.preloadFrames(frameIds);
+		verify(dataClientMock, Mockito.atLeast(3)).loadFrameInBackground(any(Frame.class));
 	}
 
 	@Test
 	public void testShowFrameNoPreload() {
 		messagingManager.showFrame("frame1", activityMock, null);
-		verify(assetClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
+		verify(dataClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
 	}
 }
