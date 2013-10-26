@@ -117,6 +117,34 @@ public class HtmlAdFactoryTest {
 		assertTrue("Close link is set", closeButton.getCloseLink().equals("pn://close"));
 	}
 	
+	@Test 
+	public void testDeserializeFullscreenAd_ThirdPartyAd() throws IOException, JSONException {
+		byte[] jsonData = getTestJsonResource("sample-third-party-ad.json");
+		HtmlAd ad = adFactory.createDataFromBytes(jsonData);
+		
+		assertTrue("HTML content is set", ad.getHtmlContent().equals("<html>Third party ad here </html>"));
+		assertNull("Click link is null", ad.getClickLink());
+		assertTrue("Click URL is set", ad.getClickUrl().equals("http://clickUrl"));
+		assertTrue("Close URL is set", ad.getCloseUrl().equals("http://closeUrl"));
+		assertTrue("Impression URL is set", ad.getImpressionUrl().equals("http://impressionUrl"));
+		assertTrue("Content Base URL is set", ad.getContentBaseUrl().equals("http://a.applovin.com"));
+
+		Target target = ad.getTarget();
+		assertNotNull("Target is set", target); 
+		assertEquals("Target type is external", TargetType.EXTERNAL, target.getTargetType());
+		assertNull("Target Data is null", target.getTargetData());
+		assertNull("Target URL is null", target.getTargetUrl());
+		
+		Position position = ad.getPosition();
+		assertNotNull("Position is set", position); 
+		assertEquals("Position is fullscreen", PositionType.FULLSCREEN, position.getPositionType());
+		
+		NativeCloseButton closeButton = (NativeCloseButton)ad.getCloseButton();
+		assertTrue("Height is set", closeButton.getHeight().equals(20));
+		assertTrue("Width is set", closeButton.getWidth().equals(30));
+		assertTrue("Image url is set", closeButton.getImageUrl().equals("http://closeImageUrl"));
+	}
+	
 	private byte[] getTestJsonResource(String fileName) throws IOException{
 		URL url = this.getClass().getResource(String.format("/%s", fileName));
 		File sampleJsonFile = new File(url.getFile());

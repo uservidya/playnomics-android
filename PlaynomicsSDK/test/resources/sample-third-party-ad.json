@@ -1,0 +1,24 @@
+{
+   "ads":[
+      {
+         "htmlContent":"<html>Third party ad here </html>",
+         "impressionUrl":"http://impressionUrl",
+         "closeUrl":"http://closeUrl",
+         "clickUrl":"http://clickUrl",
+         "clickLink": null,
+         "contentBaseUrl":"http://a.applovin.com",
+         "target" : {
+            "targetType" : "external"
+         },
+         "closeButton" : {
+            "closeButtonType" : "native",
+            "closeImageUrl"   : "http://closeImageUrl",
+            "height"          : 20,
+            "width"           : 30
+         },
+         "position" : {
+            "positionType" : "fullscreen"
+         }
+      }
+   ]
+}
