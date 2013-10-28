@@ -6,6 +6,7 @@ import android.app.Activity;
 
 import com.playnomics.client.FrameDataClient;
 import com.playnomics.messaging.Frame.IFrameStateObserver;
+import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.sdk.IPlaynomicsFrameDelegate;
 import com.playnomics.session.ICallbackProcessor;
 import com.playnomics.session.Session;
@@ -20,6 +21,7 @@ public class MessagingManager implements IFrameStateObserver {
 	private FrameDataClient frameDataClient;
 	private Logger logger;
 	private ICallbackProcessor callbackProcessor;
+	private IPlayViewFactory viewFactory;
 	
 	public void setSession(Session session){
 		this.callbackProcessor = session;
@@ -28,12 +30,13 @@ public class MessagingManager implements IFrameStateObserver {
 	
 	public MessagingManager(IConfig config, 
 			FrameDataClient frameDataClient, 
-			Util util, Logger logger){
+			Util util, Logger logger, IPlayViewFactory viewFactory){
 		this.frameDataClient = frameDataClient;
 		this.util = util;
 		this.framesById = new ConcurrentHashMap<String, Frame>();
 		this.framesByActivityName = new ConcurrentHashMap<String, Frame>();
 		this.logger = logger;
+		this.viewFactory = viewFactory;
 	}
 
 	public void preloadFrames(String[] frameIds){
@@ -50,7 +53,7 @@ public class MessagingManager implements IFrameStateObserver {
 	private Frame getOrAddFrame(String frameId){
 		Frame frame;
 		if(!framesById.containsKey(frameId)){
-			frame = new Frame(frameId, callbackProcessor, util, logger, this);
+			frame = new Frame(frameId, callbackProcessor, util, logger, this, viewFactory);
 			frameDataClient.loadFrameInBackground(frame);
 			framesById.put(frameId, frame);
 		} else {

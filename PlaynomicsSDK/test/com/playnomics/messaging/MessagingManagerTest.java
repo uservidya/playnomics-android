@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import android.app.Activity;
 
 import com.playnomics.client.FrameDataClient;
+import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.util.Config;
 import com.playnomics.util.Logger;
 import com.playnomics.util.UnitTestLogWriter;
@@ -29,7 +30,9 @@ public class MessagingManagerTest {
 	
 	@Mock
 	private Activity activityMock;
-
+	@Mock
+	private IPlayViewFactory viewFactoryMock;
+	
 	private MessagingManager messagingManager;
 		
 	@BeforeClass
@@ -47,7 +50,7 @@ public class MessagingManagerTest {
 		Config config = new Config();
 		UnitTestLogWriter writer = new UnitTestLogWriter();
 		Logger logger = new Logger(writer);
-		messagingManager = new MessagingManager(config, dataClientMock, utilMock, logger);
+		messagingManager = new MessagingManager(config, dataClientMock, utilMock, logger, viewFactoryMock);
 	}
 
 	@After

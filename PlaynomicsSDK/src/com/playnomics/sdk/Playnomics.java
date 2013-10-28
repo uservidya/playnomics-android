@@ -15,6 +15,7 @@ import com.playnomics.client.IEventWorker;
 import com.playnomics.events.MilestoneEvent.MilestoneType;
 import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.MessagingManager;
+import com.playnomics.messaging.ui.PlayViewFactory;
 import com.playnomics.session.ActivityObserver;
 import com.playnomics.session.HeartBeatProducer;
 import com.playnomics.session.IActivityObserver;
@@ -51,7 +52,9 @@ public class Playnomics {
 				HtmlAdFactory adFactory = new HtmlAdFactory();
 				AssetClient assetClient = new AssetClient(connectionFactory);
 				FrameDataClient frameAssetClient = new FrameDataClient(assetClient, config, logger, adFactory);
-				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger);
+				
+				PlayViewFactory viewFactory = new PlayViewFactory();
+				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger, viewFactory);
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
 			}
 			return instance;

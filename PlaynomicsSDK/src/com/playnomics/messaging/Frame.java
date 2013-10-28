@@ -9,6 +9,7 @@ import android.widget.RelativeLayout.LayoutParams;
 
 import com.playnomics.messaging.Position.PositionType;
 import com.playnomics.messaging.Target.TargetType;
+import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.messaging.ui.PlayDialog;
 import com.playnomics.messaging.ui.PlayWebView;
 import com.playnomics.sdk.IPlaynomicsFrameDelegate;
@@ -41,6 +42,7 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 	private ICallbackProcessor callbackProcessor;
 	private Logger logger;
 	private IFrameStateObserver observer;
+	private IPlayViewFactory viewFactory;
 	
 	private PlayDialog dialog;
 	private PlayWebView webView;
@@ -66,13 +68,14 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 	
 	private HtmlAd htmlAd;
 	
-	public Frame(String frameId, ICallbackProcessor callbackProcessor, Util util, Logger logger, IFrameStateObserver observer){
+	public Frame(String frameId, ICallbackProcessor callbackProcessor, Util util, Logger logger, IFrameStateObserver observer, IPlayViewFactory viewFactory){
 		this.observer = observer;
 		this.frameId = frameId;
 		this.state = FrameState.NOT_LOADED;
 		this.callbackProcessor = callbackProcessor;
 		this.util = util;
 		this.logger = logger;
+		this.viewFactory = viewFactory;
 	}
 
 	public void updateFrameData(HtmlAd htmlAd){
@@ -103,15 +106,14 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		if(!(shouldRender && state == FrameState.LOAD_COMPLETE)){ return; }
 		
 		try {
-			webView = new PlayWebView(activity, htmlAd.getHtmlContent(), htmlAd.getContentBaseUrl(), this, logger);
-			dialog = new PlayDialog(activity, webView);
-			
+			webView = viewFactory.createPlayWebView(activity, htmlAd.getHtmlContent(), htmlAd.getContentBaseUrl(), this, logger);
+			dialog = viewFactory.createPlayDialog(activity, webView);
 			
 			if(hasNativeCloseButton()){
 				NativeCloseButton closeButton = (NativeCloseButton)htmlAd.getCloseButton();
 				
-				imageView = new ImageView(activity);
-				
+				imageView = viewFactory.createImageView(activity);
+	
 				byte[] imageData = closeButton.getImageData();
 				Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
 				imageView.setImageBitmap(bitmap);
