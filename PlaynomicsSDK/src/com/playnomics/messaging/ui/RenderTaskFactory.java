@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.playnomics.messaging.Placement;
 import com.playnomics.messaging.Placement.IPlacementStateObserver;
@@ -23,7 +25,7 @@ public class RenderTaskFactory {
 		this.logger = logger;
 	}
 
-	public Runnable createShowPlacementTask(final Placement placement,
+	public Runnable createLayoutPlacementTask(final Placement placement,
 			final HtmlAd htmlAd, final Activity activity,
 			final IPlayWebViewHandler handler,
 			final IPlacementStateObserver observer) {
@@ -39,21 +41,25 @@ public class RenderTaskFactory {
 
 					placement.setDialog(dialog);
 
+					RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, 
+							LayoutParams.FILL_PARENT);
+					dialog.addContentView(webView, layoutParams);
+					
 					if (htmlAd.getCloseButton() instanceof NativeCloseButton) {
 						NativeCloseButton closeButton = (NativeCloseButton) htmlAd
 								.getCloseButton();
 
-						ImageView imageView = viewFactory
+						ImageView closeButtonView = viewFactory
 								.createImageView(activity);
 
 						byte[] imageData = closeButton.getImageData();
 						Bitmap bitmap = BitmapFactory.decodeByteArray(
 								imageData, 0, imageData.length);
-						imageView.setImageBitmap(bitmap);
-
-						dialog.showWebView(webView, imageView);
-					} else {
-						dialog.showWebView(webView);
+						closeButtonView.setImageBitmap(bitmap);
+						
+						RelativeLayout.LayoutParams params = new LayoutParams(closeButton.getWidth(), closeButton.getHeight());
+						params.addRule(RelativeLayout.ALIGN_PARENT_TOP | RelativeLayout.ALIGN_PARENT_RIGHT);
+						dialog.addContentView(closeButtonView, params);
 					}
 					observer.onPlacementShown(activity, placement);
 				} catch (Exception ex) {
@@ -62,6 +68,14 @@ public class RenderTaskFactory {
 							placement.getPlacementName());
 					logger.log(LogLevel.WARNING, ex);
 				}
+			}
+		};
+	}
+	
+	public Runnable createShowPlacementTask(final PlayDialog dialog){
+		return new Runnable() {
+			public void run() {
+				dialog.show();
 			}
 		};
 	}

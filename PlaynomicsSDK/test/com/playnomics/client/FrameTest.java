@@ -2,10 +2,13 @@ package com.playnomics.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.JSONException;
@@ -15,19 +18,26 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import android.app.Activity;
+import android.webkit.WebView;
 
 import com.playnomics.client.AssetClient.AssetResponse;
 import com.playnomics.client.AssetClient.ResponseStatus;
-import com.playnomics.messaging.Placement;
-import com.playnomics.messaging.Placement.PlacementState;
-import com.playnomics.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.messaging.HtmlAd;
 import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.HtmlCloseButton;
 import com.playnomics.messaging.NativeCloseButton;
-import com.playnomics.messaging.ui.IPlayViewFactory;
+import com.playnomics.messaging.Placement;
+import com.playnomics.messaging.Placement.IPlacementStateObserver;
+import com.playnomics.messaging.Placement.PlacementState;
+import com.playnomics.messaging.Target;
+import com.playnomics.messaging.Target.TargetType;
+import com.playnomics.messaging.ui.PlayDialog;
 import com.playnomics.messaging.ui.RenderTaskFactory;
+import com.playnomics.sdk.IPlaynomicsPlacementDelegate;
 import com.playnomics.session.ICallbackProcessor;
 import com.playnomics.session.Session;
 import com.playnomics.util.Config;
@@ -52,6 +62,9 @@ public class FrameTest {
 	@Mock
 	private HtmlAd adMock;
 	@Mock
+	private Target targetMock;
+	
+	@Mock
 	private AssetClient assetClientMock;
 	@Mock
 	private AssetResponse jsonAssetResponseMock;
@@ -59,12 +72,22 @@ public class FrameTest {
 	private AssetResponse imageAssetResponseMock;
 	@Mock
 	private RenderTaskFactory renderTaskFactoryMock;
+	@Mock
+	private Activity activityMock;
+
+	@Mock
+	private IPlaynomicsPlacementDelegate delegateMock;
 
 	@Mock
 	private NativeCloseButton nativeCloseMock;
 
 	@Mock
 	private HtmlCloseButton htmlCloseMock;
+
+	@Mock
+	private Runnable layoutPlacementTaskMock;
+	@Mock
+	private Runnable showPlacementTaskMock;
 
 	private PlacementDataClient dataClient;
 	private Placement placement;
@@ -97,7 +120,8 @@ public class FrameTest {
 		when(
 				assetClientMock.requestAsset(any(String.class),
 						any(String.class), any(TreeMap.class))).thenReturn(
-				jsonAssetResponseMock);
+
+		jsonAssetResponseMock);
 
 		dataClient = new PlacementDataClient(assetClientMock, config, logger,
 				htmlAdFactory);
@@ -125,8 +149,7 @@ public class FrameTest {
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
 
-		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
-				placement.getState());
+		verifyPlacementState(PlacementState.LOAD_COMPLETE);
 	}
 
 	@Test
@@ -153,8 +176,7 @@ public class FrameTest {
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
 
-		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
-				placement.getState());
+		verifyPlacementState(PlacementState.LOAD_COMPLETE);
 	}
 
 	@Test
@@ -180,8 +202,7 @@ public class FrameTest {
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
 
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
-				placement.getState());
+		verifyPlacementState(PlacementState.LOAD_FAILED);
 	}
 
 	@Test
@@ -194,9 +215,7 @@ public class FrameTest {
 				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
-				placement.getState());
+		verifyPlacementState(PlacementState.LOAD_FAILED);
 	}
 
 	@Test
@@ -214,9 +233,8 @@ public class FrameTest {
 				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
-				placement.getState());
+		
+		verifyPlacementState(PlacementState.LOAD_FAILED);
 	}
 
 	@Test
@@ -234,8 +252,125 @@ public class FrameTest {
 				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
+		
+		verifyPlacementState(PlacementState.LOAD_FAILED);
+	}
 
+	private void verifyPlacementState(PlacementState state) {
+		if (state == PlacementState.LOAD_COMPLETE) {
+			when(
+					renderTaskFactoryMock.createLayoutPlacementTask(placement,
+							adMock, activityMock, placement, observerMock))
+					.thenReturn(layoutPlacementTaskMock);
+			
+			assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
+					placement.getState());
+
+			placement.show(activityMock, delegateMock);
+			verify(utilMock).runTaskOnActivityUIThread(layoutPlacementTaskMock, activityMock);
+		} else if (state == PlacementState.LOAD_FAILED) {
+			assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
+					placement.getState());
+
+			placement.show(activityMock, delegateMock);
+			verify(utilMock, Mockito.never()).runTaskOnActivityUIThread(layoutPlacementTaskMock, activityMock);
+			verify(delegateMock).onRenderFailed();
+		}
+	}
+	
+	@Test
+	public void testWebViewLoadSuccess() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		when(renderTaskFactoryMock.createShowPlacementTask(any(PlayDialog.class))).thenReturn(showPlacementTaskMock);
+		
+		String impressionUrl = "http://impressionUrl";
+		Map<String, Object> data = new HashMap<String, Object>();
+		
+		when(adMock.getImpressionUrl()).thenReturn(impressionUrl);
+		when(adMock.getTarget()).thenReturn(targetMock);
+		when(targetMock.getTargetData()).thenReturn(data);
+		
+		placement.onLoadComplete();
+		//simulate a rotation
+		placement.onLoadComplete();
+		
+		verify(utilMock, Mockito.atLeast(2)).runTaskOnActivityUIThread(showPlacementTaskMock, activityMock);
+		verify(processorMock).processUrlCallback(impressionUrl);
+		verify(delegateMock).onShow(data);
+	}
+	
+	@Test
+	public void testWebViewLoadFailed() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		placement.onLoadFailure(1);	
 		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
 				placement.getState());
+		verify(delegateMock).onRenderFailed();
+	}
+	
+	@Test
+	public void testWebViewTouchTargetData() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		
+		String clickUrl = "http://clickUrl";
+		String clickLink = "pn://clickLink";
+		
+		when(adMock.getClickUrl()).thenReturn(clickUrl);
+		when(adMock.getClickLink()).thenReturn(clickLink);
+		when(adMock.getTarget()).thenReturn(targetMock);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		when(targetMock.getTargetData()).thenReturn(data);
+		when(targetMock.getTargetType()).thenReturn(TargetType.DATA);
+	
+		placement.onUrlLoading(clickLink);
+		
+		verify(processorMock).processUrlCallback(clickUrl);
+		verify(delegateMock).onTouch(data);
+	}
+	
+	@Test
+	public void testWebViewTouchTargetUrl() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		
+		String clickUrl = "http://clickUrl";
+		String clickLink = "pn://clickLink";
+		String targetUrl = "http://targetUrl";
+		
+		when(adMock.getClickUrl()).thenReturn(clickUrl);
+		when(adMock.getClickLink()).thenReturn(clickLink);
+		when(adMock.getTarget()).thenReturn(targetMock);
+		when(adMock.getTarget()).thenReturn(targetMock);
+		
+		when(targetMock.getTargetUrl()).thenReturn(targetUrl);
+		when(targetMock.getTargetType()).thenReturn(TargetType.URL);
+		
+		placement.onUrlLoading(clickLink);
+		
+		verify(processorMock).processUrlCallback(clickUrl);
+		verify(utilMock).openUrlInPhoneBrowser(targetUrl, activityMock);
+	}
+	
+	@Test
+	public void testWebViewTouchNullTarget() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		
+		String clickUrl = "http://clickUrl";
+		String clickLink = "pn://clickLink";
+		String targetUrl = null;
+		
+		when(adMock.getClickUrl()).thenReturn(clickUrl);
+		when(adMock.getClickLink()).thenReturn(clickLink);
+		when(adMock.getTarget()).thenReturn(targetMock);
+		when(adMock.getTarget()).thenReturn(targetMock);
+
+		when(targetMock.getTargetUrl()).thenReturn(targetUrl);
+		when(targetMock.getTargetType()).thenReturn(TargetType.URL);
+		
+		placement.onUrlLoading(clickLink);
+		
+		verify(processorMock).processUrlCallback(clickUrl);
+		verify(utilMock, Mockito.never()).openUrlInPhoneBrowser(targetUrl,
+				activityMock);
 	}
 }

@@ -114,19 +114,10 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 			return;
 		}
 
-		Runnable renderTask = renderTaskFactory.createShowPlacementTask(this,
+		Runnable renderTask = renderTaskFactory.createLayoutPlacementTask(this,
 				htmlAd, activity, this, observer);
 		// make sure we run this task on the UI thread
-		activity.runOnUiThread(renderTask);
-
-		if (!impressionLogged) {
-			impressionLogged = false;
-			callbackProcessor.processUrlCallback(htmlAd.getImpressionUrl());
-		}
-
-		if (delegate != null) {
-			delegate.onShow(htmlAd.getTarget().getTargetData());
-		}
+		util.runTaskOnActivityUIThread(renderTask, activity);
 	}
 
 	public void hide() {
@@ -146,8 +137,17 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 
 	public void onLoadComplete() {
 		state = PlacementState.LOAD_COMPLETE;
-		if (htmlAd.getPosition().getPositionType() == PositionType.FULLSCREEN) {
-			loadWebView();
+		
+		Runnable showTask = renderTaskFactory.createShowPlacementTask(dialog);
+		util.runTaskOnActivityUIThread(showTask, activity);
+		
+		if (!impressionLogged) {
+			impressionLogged = true;
+			callbackProcessor.processUrlCallback(htmlAd.getImpressionUrl());
+		
+			if (delegate != null) {
+				delegate.onShow(htmlAd.getTarget().getTargetData());
+			}
 		}
 	}
 
@@ -176,7 +176,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 		Target target = htmlAd.getTarget();
 
 		if (target.getTargetType() == TargetType.URL
-				&& Util.stringIsNullOrEmpty(target.getTargetUrl())) {
+				&& !Util.stringIsNullOrEmpty(target.getTargetUrl())) {
 			util.openUrlInPhoneBrowser(target.getTargetUrl(), activity);
 		}
 
@@ -189,7 +189,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 		if (dialog != null) {
 			Runnable hideTask = renderTaskFactory
 					.createHidePlacementTask(dialog);
-			activity.runOnUiThread(hideTask);
+			util.runTaskOnActivityUIThread(hideTask, activity);
 		}
 
 		observer.onPlacementDisposed(activity);
@@ -210,7 +210,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 		if (dialog != null) {
 			Runnable hideTask = renderTaskFactory
 					.createHidePlacementTask(dialog);
-			activity.runOnUiThread(hideTask);
+			util.runTaskOnActivityUIThread(hideTask, activity);
 		}
 		this.activity = null;
 	}

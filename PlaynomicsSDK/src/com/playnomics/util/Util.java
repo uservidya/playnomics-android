@@ -127,4 +127,8 @@ public class Util implements IRandomGenerator {
 				.getCallback();
 		activity.getWindow().setCallback(proxy.getOriginalCallback());
 	}
+	
+	public void runTaskOnActivityUIThread(Runnable task, Activity activity){
+		activity.runOnUiThread(task);
+	}
 }
