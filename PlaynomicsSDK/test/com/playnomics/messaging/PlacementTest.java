@@ -1,4 +1,4 @@
-package com.playnomics.client;
+package com.playnomics.messaging;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -24,6 +24,8 @@ import org.mockito.MockitoAnnotations;
 import android.app.Activity;
 import android.webkit.WebView;
 
+import com.playnomics.client.AssetClient;
+import com.playnomics.client.PlacementDataClient;
 import com.playnomics.client.AssetClient.AssetResponse;
 import com.playnomics.client.AssetClient.ResponseStatus;
 import com.playnomics.messaging.HtmlAd;
@@ -47,7 +49,7 @@ import com.playnomics.util.Logger.LogLevel;
 import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
 
-public class FrameTest {
+public class PlacementTest {
 
 	@Mock
 	private Util utilMock;
