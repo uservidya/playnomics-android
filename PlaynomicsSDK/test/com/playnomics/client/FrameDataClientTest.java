@@ -27,6 +27,7 @@ import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.HtmlCloseButton;
 import com.playnomics.messaging.NativeCloseButton;
 import com.playnomics.messaging.ui.IPlayViewFactory;
+import com.playnomics.messaging.ui.RenderTaskFactory;
 import com.playnomics.session.ICallbackProcessor;
 import com.playnomics.session.Session;
 import com.playnomics.util.Config;
@@ -57,9 +58,7 @@ public class FrameDataClientTest {
 	@Mock
 	private AssetResponse imageAssetResponseMock;
 	@Mock
-	private IPlayViewFactory viewFactoryMock;
-	
-	
+	private RenderTaskFactory renderTaskFactoryMock;
 	
 	@Mock 
 	private NativeCloseButton nativeCloseMock;
@@ -70,6 +69,7 @@ public class FrameDataClientTest {
 	private FrameDataClient dataClient;
 	private Frame frame;
 	private Logger logger;
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		
@@ -116,7 +116,7 @@ public class FrameDataClientTest {
 
 		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		
@@ -138,7 +138,7 @@ public class FrameDataClientTest {
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		
@@ -159,7 +159,7 @@ public class FrameDataClientTest {
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		
@@ -170,7 +170,7 @@ public class FrameDataClientTest {
 	public void testFailedJsonRequest() throws IOException, InterruptedException{
 		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.FAILURE);
 		
-		Frame frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		Frame frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		
@@ -185,7 +185,7 @@ public class FrameDataClientTest {
 		
 		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new UnsupportedEncodingException("Failed"));
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		
@@ -200,7 +200,7 @@ public class FrameDataClientTest {
 		
 		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new JSONException("Failed"));
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, viewFactoryMock);
+		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadFrameInBackground(frame);
 		thread.join();
 		

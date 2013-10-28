@@ -12,6 +12,7 @@ import com.playnomics.messaging.Target.TargetType;
 import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.messaging.ui.PlayDialog;
 import com.playnomics.messaging.ui.PlayWebView;
+import com.playnomics.messaging.ui.RenderTaskFactory;
 import com.playnomics.sdk.IPlaynomicsFrameDelegate;
 import com.playnomics.session.ICallbackProcessor;
 import com.playnomics.util.Logger;
@@ -42,7 +43,7 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 	private ICallbackProcessor callbackProcessor;
 	private Logger logger;
 	private IFrameStateObserver observer;
-	private IPlayViewFactory viewFactory;
+	private RenderTaskFactory renderTaskFactory;
 	
 	private PlayDialog dialog;
 	private PlayWebView webView;
@@ -68,14 +69,14 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 	
 	private HtmlAd htmlAd;
 	
-	public Frame(String frameId, ICallbackProcessor callbackProcessor, Util util, Logger logger, IFrameStateObserver observer, IPlayViewFactory viewFactory){
+	public Frame(String frameId, ICallbackProcessor callbackProcessor, Util util, Logger logger, IFrameStateObserver observer, RenderTaskFactory renderTaskFactory){
 		this.observer = observer;
 		this.frameId = frameId;
 		this.state = FrameState.NOT_LOADED;
 		this.callbackProcessor = callbackProcessor;
 		this.util = util;
 		this.logger = logger;
-		this.viewFactory = viewFactory;
+		this.renderTaskFactory = renderTaskFactory;
 	}
 
 	public void updateFrameData(HtmlAd htmlAd){
@@ -94,13 +95,7 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		shouldRender = true;
 		
 		if(state == FrameState.LOAD_COMPLETE){
-			//make sure we run this code on the UI thread
-			Runnable runnable = new Runnable() {
-				public void run() {
-					loadWebView();
-				}
-			};
-			activity.runOnUiThread(runnable);
+			loadWebView();
 		} else if (state == FrameState.LOAD_FAILED) {
 			if(delegate != null){
 				delegate.onRenderFailed();
@@ -111,29 +106,9 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 	private void loadWebView(){
 		if(!(shouldRender && state == FrameState.LOAD_COMPLETE)){ return; }
 		
-		try {
-			webView = viewFactory.createPlayWebView(activity, htmlAd.getHtmlContent(), htmlAd.getContentBaseUrl(), this, logger);
-			dialog = viewFactory.createPlayDialog(activity, webView);
-			
-			if(hasNativeCloseButton()){
-				NativeCloseButton closeButton = (NativeCloseButton)htmlAd.getCloseButton();
-				
-				imageView = viewFactory.createImageView(activity);
-	
-				byte[] imageData = closeButton.getImageData();
-				Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-				imageView.setImageBitmap(bitmap);
-				
-				dialog.showWebView(webView, imageView);
-			} else {
-				dialog.showWebView(webView);
-			}
-			
-			observer.onFrameShown(activity, this);
-		} catch (Exception ex) {
-			logger.log(LogLevel.WARNING, "The frame %s cannot be rendered", frameId);
-			logger.log(LogLevel.WARNING, ex);
-		}
+		Runnable renderTask = renderTaskFactory.createRenderTask(this, htmlAd, activity, this, observer);
+		//make sure we run this task on the UI thread
+		activity.runOnUiThread(renderTask);
 	}
 	
 	public void hide(){
