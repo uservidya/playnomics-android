@@ -37,7 +37,7 @@ import com.playnomics.util.Logger.LogLevel;
 import com.playnomics.util.UnitTestLogWriter;
 import com.playnomics.util.Util;
 
-public class FrameDataClientTest {
+public class FrameTest {
 
 	@Mock
 	private Util utilMock;
