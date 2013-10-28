@@ -262,7 +262,6 @@ public class SessionTest {
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 	
-
 	@Test
 	public void testTransaction(){
 		testStartNewDevice();

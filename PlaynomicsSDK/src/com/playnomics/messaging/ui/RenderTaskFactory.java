@@ -5,8 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
-import com.playnomics.messaging.Frame;
-import com.playnomics.messaging.Frame.IFrameStateObserver;
+import com.playnomics.messaging.Placement;
+import com.playnomics.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.messaging.HtmlAd;
 import com.playnomics.messaging.NativeCloseButton;
 import com.playnomics.messaging.ui.PlayWebView.IPlayWebViewHandler;
@@ -23,8 +23,8 @@ public class RenderTaskFactory{
 		this.logger = logger;
 	}
 	
-	public Runnable createRenderTask(final Frame frame, final HtmlAd htmlAd, final Activity activity, 
-			final IPlayWebViewHandler handler, final IFrameStateObserver observer){
+	public Runnable createRenderTask(final Placement frame, final HtmlAd htmlAd, final Activity activity, 
+			final IPlayWebViewHandler handler, final IPlacementStateObserver observer){
 		
 		return new Runnable() {
 			public void run() {
@@ -45,9 +45,9 @@ public class RenderTaskFactory{
 					} else {
 						dialog.showWebView(webView);
 					}
-					observer.onFrameShown(activity, frame);
+					observer.onPlacementShown(activity, frame);
 				} catch (Exception ex) {
-					logger.log(LogLevel.WARNING, "The frame %s cannot be rendered", frame.getFrameId());
+					logger.log(LogLevel.WARNING, "The frame %s cannot be rendered", frame.getPlacementName());
 					logger.log(LogLevel.WARNING, ex);
 				}	
 			}

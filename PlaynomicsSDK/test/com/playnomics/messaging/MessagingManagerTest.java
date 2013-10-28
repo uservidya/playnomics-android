@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import android.app.Activity;
 
-import com.playnomics.client.FrameDataClient;
+import com.playnomics.client.PlacementDataClient;
 import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.util.Config;
 import com.playnomics.util.Logger;
@@ -26,7 +26,7 @@ public class MessagingManagerTest {
 	@Mock
 	private Util utilMock;
 	@Mock
-	private FrameDataClient dataClientMock;
+	private PlacementDataClient dataClientMock;
 	
 	@Mock
 	private Activity activityMock;
@@ -60,21 +60,21 @@ public class MessagingManagerTest {
 	@Test
 	public void testPreloadFramesLoadsRequestsDataOnce() {
 		String[] frameIds = new String[]{"frame1"};
-		messagingManager.preloadFrames(frameIds);
-		messagingManager.showFrame("frame1", activityMock, null);
-		verify(dataClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
+		messagingManager.preloadPlacements(frameIds);
+		messagingManager.showPlacement("frame1", activityMock, null);
+		verify(dataClientMock, Mockito.atMost(1)).loadPlacementInBackground(any(Placement.class));
 	}
 
 	@Test
 	public void testPreloadMultipleFrames(){
 		String[] frameIds = new String[]{"frame1", "frame2","frame3"};
-		messagingManager.preloadFrames(frameIds);
-		verify(dataClientMock, Mockito.atLeast(3)).loadFrameInBackground(any(Frame.class));
+		messagingManager.preloadPlacements(frameIds);
+		verify(dataClientMock, Mockito.atLeast(3)).loadPlacementInBackground(any(Placement.class));
 	}
 
 	@Test
 	public void testShowFrameNoPreload() {
-		messagingManager.showFrame("frame1", activityMock, null);
-		verify(dataClientMock, Mockito.atMost(1)).loadFrameInBackground(any(Frame.class));
+		messagingManager.showPlacement("frame1", activityMock, null);
+		verify(dataClientMock, Mockito.atMost(1)).loadPlacementInBackground(any(Placement.class));
 	}
 }

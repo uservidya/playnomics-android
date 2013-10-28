@@ -4,93 +4,93 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.app.Activity;
 
-import com.playnomics.client.FrameDataClient;
-import com.playnomics.messaging.Frame.IFrameStateObserver;
+import com.playnomics.client.PlacementDataClient;
+import com.playnomics.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.messaging.ui.RenderTaskFactory;
-import com.playnomics.sdk.IPlaynomicsFrameDelegate;
+import com.playnomics.sdk.IPlaynomicsPlacementDelegate;
 import com.playnomics.session.ICallbackProcessor;
 import com.playnomics.session.Session;
 import com.playnomics.util.IConfig;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
 
-public class MessagingManager implements IFrameStateObserver {	
+public class MessagingManager implements IPlacementStateObserver {	
 	private Util util;
-	private ConcurrentHashMap<String, Frame> framesById;
-	private ConcurrentHashMap<String, Frame> framesByActivityName;
-	private FrameDataClient frameDataClient;
+	private ConcurrentHashMap<String, Placement> placementsByName;
+	private ConcurrentHashMap<String, Placement> placementsByActivityName;
+	private PlacementDataClient placementDataClient;
 	private Logger logger;
 	private ICallbackProcessor callbackProcessor;
 	private RenderTaskFactory renderTaskFactory;
 	
 	public void setSession(Session session){
 		this.callbackProcessor = session;
-		this.frameDataClient.setSession(session);
+		this.placementDataClient.setSession(session);
 	}
 	
 	public MessagingManager(IConfig config, 
-			FrameDataClient frameDataClient, 
+			PlacementDataClient frameDataClient, 
 			Util util, Logger logger, IPlayViewFactory viewFactory){
-		this.frameDataClient = frameDataClient;
+		this.placementDataClient = frameDataClient;
 		this.util = util;
-		this.framesById = new ConcurrentHashMap<String, Frame>();
-		this.framesByActivityName = new ConcurrentHashMap<String, Frame>();
+		this.placementsByName = new ConcurrentHashMap<String, Placement>();
+		this.placementsByActivityName = new ConcurrentHashMap<String, Placement>();
 		this.logger = logger;
 		this.renderTaskFactory = new RenderTaskFactory(viewFactory, logger);
 	}
 
-	public void preloadFrames(String[] frameIds){
-		for(String frameId : frameIds){
-			getOrAddFrame(frameId);
+	public void preloadPlacements(String[] frameNames){
+		for(String frameName : frameNames){
+			getOrAddPlacement(frameName);
 		}
 	}
 		
-	public void showFrame(String frameId, Activity activity, IPlaynomicsFrameDelegate delegate){
-		Frame frame = getOrAddFrame(frameId);
-		frame.show(activity, delegate);
+	public void showPlacement(String frameId, Activity activity, IPlaynomicsPlacementDelegate delegate){
+		Placement placement = getOrAddPlacement(frameId);
+		placement.show(activity, delegate);
 	}
 	
-	private Frame getOrAddFrame(String frameId){
-		Frame frame;
-		if(!framesById.containsKey(frameId)){
-			frame = new Frame(frameId, callbackProcessor, util, logger, this, renderTaskFactory);
-			frameDataClient.loadFrameInBackground(frame);
-			framesById.put(frameId, frame);
+	private Placement getOrAddPlacement(String placementName){
+		Placement placement;
+		if(!placementsByName.containsKey(placementName)){
+			placement = new Placement(placementName, callbackProcessor, util, logger, this, renderTaskFactory);
+			placementDataClient.loadPlacementInBackground(placement);
+			placementsByName.put(placementName, placement);
 		} else {
-			frame = framesById.get(frameId);
+			placement = placementsByName.get(placementName);
 		}
-		return frame;
+		return placement;
 	}
 	
-	public void hideFrame(String frameId){
-		if(framesById.containsKey(frameId)){
-			Frame frame = framesById.get(frameId);
+	public void hidePlacement(String placementName){
+		if(placementsByName.containsKey(placementName)){
+			Placement frame = placementsByName.get(placementName);
 			frame.hide();
 		}
 	}
 	
-	public void onFrameShown(Activity activity, Frame frame){
-		framesByActivityName.put(getKeyForActivity(activity), frame);
+	public void onPlacementShown(Activity activity, Placement frame){
+		placementsByActivityName.put(getKeyForActivity(activity), frame);
 	}
 	
-	public void onFrameDisposed(Activity activity){
-		framesByActivityName.remove(activity);
+	public void onPlacementDisposed(Activity activity){
+		placementsByActivityName.remove(activity);
 	}
 	
 	public void onActivityResumed(Activity activity){
 		String key = getKeyForActivity(activity);
-		if(framesByActivityName.containsKey(key)){
-			Frame frame = framesByActivityName.get(key);
-			frame.attachActivity(activity);
+		if(placementsByActivityName.containsKey(key)){
+			Placement placement = placementsByActivityName.get(key);
+			placement.attachActivity(activity);
 		}
 	}
 
 	public void onActivityPaused(Activity activity){
 		String key = getKeyForActivity(activity);
-		if(framesByActivityName.containsKey(key)){
-			Frame frame = framesByActivityName.get(key);
-			frame.detachActivity();
+		if(placementsByActivityName.containsKey(key)){
+			Placement placement = placementsByActivityName.get(key);
+			placement.detachActivity();
 		}
 	}
 	

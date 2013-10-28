@@ -8,7 +8,7 @@ import android.content.Context;
 import com.playnomics.client.AssetClient;
 import com.playnomics.client.EventQueue;
 import com.playnomics.client.EventWorker;
-import com.playnomics.client.FrameDataClient;
+import com.playnomics.client.PlacementDataClient;
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
@@ -51,7 +51,7 @@ public class Playnomics {
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
 				HtmlAdFactory adFactory = new HtmlAdFactory();
 				AssetClient assetClient = new AssetClient(connectionFactory);
-				FrameDataClient frameAssetClient = new FrameDataClient(assetClient, config, logger, adFactory);
+				PlacementDataClient frameAssetClient = new PlacementDataClient(assetClient, config, logger, adFactory);
 				
 				PlayViewFactory viewFactory = new PlayViewFactory();
 				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger, viewFactory);
@@ -113,11 +113,11 @@ public class Playnomics {
 		session.attributeInstall(source, null, null);
 	}
 	
-	public static void preloadFrameIds(String ... frameIds){
+	public static void preloadPlacement(String ... placementNames){
 		
 	}
 	
-	public static void showFrame(String frameId, IPlaynomicsFrameDelegate delegate){
+	public static void showPlacement(String placementName, IPlaynomicsPlacementDelegate delegate){
 		
 	}
 }

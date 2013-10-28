@@ -3,8 +3,8 @@ package com.playnomics.client;
 import java.util.TreeMap;
 
 import com.playnomics.client.AssetClient.ResponseStatus;
-import com.playnomics.messaging.Frame;
-import com.playnomics.messaging.Frame.FrameState;
+import com.playnomics.messaging.Placement;
+import com.playnomics.messaging.Placement.PlacementState;
 import com.playnomics.messaging.HtmlAd;
 import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.NativeCloseButton;
@@ -13,7 +13,7 @@ import com.playnomics.util.IConfig;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Logger.LogLevel;
 
-public class FrameDataClient {
+public class PlacementDataClient {
 	private IConfig config;
 	private Session session;
 	private Logger logger;
@@ -24,23 +24,23 @@ public class FrameDataClient {
 		this.session = session;
 	}
 
-	public FrameDataClient(AssetClient assetClient, IConfig config, Logger logger, HtmlAdFactory adFactory) {
+	public PlacementDataClient(AssetClient assetClient, IConfig config, Logger logger, HtmlAdFactory adFactory) {
 		this.logger = logger;
 		this.config = config;
 		this.adFactory = adFactory;
 		this.assetClient = assetClient;
 	}
 		
-	public Thread loadFrameInBackground(final Frame frame){
+	public Thread loadPlacementInBackground(final Placement frame){
 		Runnable task = new Runnable() {
 			public void run() {
-				frame.setState(FrameState.LOAD_STARTED);
+				frame.setState(PlacementState.LOAD_STARTED);
 				String messagingApiUrl = config.getMessagingUrl();
 				
 				String adsPath = config.getMessagingPathAds();
 				
 				TreeMap<String, Object> queryParams = new TreeMap<String, Object>();
-				queryParams.put(config.getMessagingFrameIdKey(), frame.getFrameId());
+				queryParams.put(config.getMessagingFrameIdKey(), frame.getPlacementName());
 				queryParams.put(config.getBreadcrumbIdKey(), session.getBreadcrumbId());
 				queryParams.put(config.getMessagingDeviceIdKey(), session.getDeviceId());
 				queryParams.put(config.getApplicationIdKey(), session.getApplicationId());
@@ -59,19 +59,19 @@ public class FrameDataClient {
 							AssetClient.AssetResponse imageResponse = assetClient.requestAsset(closeButton.getImageUrl());
 							if(imageResponse.getStatus() == ResponseStatus.SUCCESS){
 								closeButton.setImageData(imageResponse.getData());
-								frame.updateFrameData(htmlAd);
+								frame.updatePlacementData(htmlAd);
 							} else {
-								frame.setState(FrameState.LOAD_FAILED);
+								frame.setState(PlacementState.LOAD_FAILED);
 							}
 						} else {
-							frame.updateFrameData(htmlAd);
+							frame.updatePlacementData(htmlAd);
 						}
 					} catch (Exception ex) {
 						logger.log(LogLevel.WARNING, ex, "Could not fetch message for frame");
-						frame.setState(FrameState.LOAD_FAILED);
+						frame.setState(PlacementState.LOAD_FAILED);
 					}
 				} else {
-					frame.setState(FrameState.LOAD_FAILED);
+					frame.setState(PlacementState.LOAD_FAILED);
 				}
 			}
 		};

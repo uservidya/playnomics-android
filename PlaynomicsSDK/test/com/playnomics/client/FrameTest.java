@@ -19,9 +19,9 @@ import org.mockito.MockitoAnnotations;
 
 import com.playnomics.client.AssetClient.AssetResponse;
 import com.playnomics.client.AssetClient.ResponseStatus;
-import com.playnomics.messaging.Frame;
-import com.playnomics.messaging.Frame.FrameState;
-import com.playnomics.messaging.Frame.IFrameStateObserver;
+import com.playnomics.messaging.Placement;
+import com.playnomics.messaging.Placement.PlacementState;
+import com.playnomics.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.messaging.HtmlAd;
 import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.HtmlCloseButton;
@@ -46,7 +46,7 @@ public class FrameTest {
 	@Mock
 	private Session sessionMock;
 	@Mock
-	private IFrameStateObserver observerMock;
+	private IPlacementStateObserver observerMock;
 	@Mock 
 	private HtmlAdFactory htmlAdFactory;
 	@Mock
@@ -66,8 +66,8 @@ public class FrameTest {
 	@Mock 
 	private HtmlCloseButton htmlCloseMock;
 		
-	private FrameDataClient dataClient;
-	private Frame frame;
+	private PlacementDataClient dataClient;
+	private Placement frame;
 	private Logger logger;
 	
 	@BeforeClass
@@ -98,7 +98,7 @@ public class FrameTest {
 		when(assetClientMock.requestAsset(any(String.class), any(String.class),
 				any(TreeMap.class))).thenReturn(jsonAssetResponseMock);
 		
-		dataClient = new FrameDataClient(assetClientMock, config, logger, htmlAdFactory);
+		dataClient = new PlacementDataClient(assetClientMock, config, logger, htmlAdFactory);
 		dataClient.setSession(sessionMock);
 	}
 
@@ -116,11 +116,11 @@ public class FrameTest {
 
 		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame loaded", FrameState.LOAD_COMPLETE, frame.getState());
+		assertEquals("Frame loaded", PlacementState.LOAD_COMPLETE, frame.getState());
 	}
 	
 	@Test
@@ -138,11 +138,11 @@ public class FrameTest {
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame loaded", FrameState.LOAD_COMPLETE, frame.getState());
+		assertEquals("Frame loaded", PlacementState.LOAD_COMPLETE, frame.getState());
 	}
 	
 	@Test
@@ -159,22 +159,22 @@ public class FrameTest {
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame not loaded", FrameState.LOAD_FAILED, frame.getState());
+		assertEquals("Frame not loaded", PlacementState.LOAD_FAILED, frame.getState());
 	}
 	
 	@Test
 	public void testFailedJsonRequest() throws IOException, InterruptedException{
 		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.FAILURE);
 		
-		Frame frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		Placement frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame not loaded", FrameState.LOAD_FAILED, frame.getState());
+		assertEquals("Frame not loaded", PlacementState.LOAD_FAILED, frame.getState());
 	}
 	
 	@Test
@@ -185,11 +185,11 @@ public class FrameTest {
 		
 		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new UnsupportedEncodingException("Failed"));
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame not loaded", FrameState.LOAD_FAILED, frame.getState());
+		assertEquals("Frame not loaded", PlacementState.LOAD_FAILED, frame.getState());
 	}
 	
 	@Test
@@ -200,10 +200,10 @@ public class FrameTest {
 		
 		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new JSONException("Failed"));
 		
-		frame = new Frame("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
-		Thread thread = dataClient.loadFrameInBackground(frame);
+		frame = new Placement("frameId", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		Thread thread = dataClient.loadPlacementInBackground(frame);
 		thread.join();
 		
-		assertEquals("Frame not loaded", FrameState.LOAD_FAILED, frame.getState());
+		assertEquals("Frame not loaded", PlacementState.LOAD_FAILED, frame.getState());
 	}
 }
