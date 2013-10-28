@@ -31,16 +31,16 @@ public class PlacementDataClient {
 		this.assetClient = assetClient;
 	}
 		
-	public Thread loadPlacementInBackground(final Placement frame){
+	public Thread loadPlacementInBackground(final Placement placement){
 		Runnable task = new Runnable() {
 			public void run() {
-				frame.setState(PlacementState.LOAD_STARTED);
+				placement.setState(PlacementState.LOAD_STARTED);
 				String messagingApiUrl = config.getMessagingUrl();
 				
 				String adsPath = config.getMessagingPathAds();
 				
 				TreeMap<String, Object> queryParams = new TreeMap<String, Object>();
-				queryParams.put(config.getMessagingFrameIdKey(), frame.getPlacementName());
+				queryParams.put(config.getMessagingPlacementNameKey(), placement.getPlacementName());
 				queryParams.put(config.getBreadcrumbIdKey(), session.getBreadcrumbId());
 				queryParams.put(config.getMessagingDeviceIdKey(), session.getDeviceId());
 				queryParams.put(config.getApplicationIdKey(), session.getApplicationId());
@@ -59,19 +59,19 @@ public class PlacementDataClient {
 							AssetClient.AssetResponse imageResponse = assetClient.requestAsset(closeButton.getImageUrl());
 							if(imageResponse.getStatus() == ResponseStatus.SUCCESS){
 								closeButton.setImageData(imageResponse.getData());
-								frame.updatePlacementData(htmlAd);
+								placement.updatePlacementData(htmlAd);
 							} else {
-								frame.setState(PlacementState.LOAD_FAILED);
+								placement.setState(PlacementState.LOAD_FAILED);
 							}
 						} else {
-							frame.updatePlacementData(htmlAd);
+							placement.updatePlacementData(htmlAd);
 						}
 					} catch (Exception ex) {
-						logger.log(LogLevel.WARNING, ex, "Could not fetch message for frame");
-						frame.setState(PlacementState.LOAD_FAILED);
+						logger.log(LogLevel.WARNING, ex, "Could not fetch message for placement");
+						placement.setState(PlacementState.LOAD_FAILED);
 					}
 				} else {
-					frame.setState(PlacementState.LOAD_FAILED);
+					placement.setState(PlacementState.LOAD_FAILED);
 				}
 			}
 		};

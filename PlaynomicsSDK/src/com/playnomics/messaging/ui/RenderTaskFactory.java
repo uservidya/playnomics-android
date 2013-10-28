@@ -23,7 +23,7 @@ public class RenderTaskFactory{
 		this.logger = logger;
 	}
 	
-	public Runnable createRenderTask(final Placement frame, final HtmlAd htmlAd, final Activity activity, 
+	public Runnable createRenderTask(final Placement placement, final HtmlAd htmlAd, final Activity activity, 
 			final IPlayWebViewHandler handler, final IPlacementStateObserver observer){
 		
 		return new Runnable() {
@@ -31,7 +31,7 @@ public class RenderTaskFactory{
 				try {
 					PlayWebView webView = viewFactory.createPlayWebView(activity, htmlAd.getHtmlContent(), htmlAd.getContentBaseUrl(), handler, logger);
 					PlayDialog dialog = viewFactory.createPlayDialog(activity, webView);
-					
+					placement.setDialog(dialog);
 					if(htmlAd.getCloseButton() instanceof NativeCloseButton){
 						NativeCloseButton closeButton = (NativeCloseButton)htmlAd.getCloseButton();
 						
@@ -45,9 +45,9 @@ public class RenderTaskFactory{
 					} else {
 						dialog.showWebView(webView);
 					}
-					observer.onPlacementShown(activity, frame);
+					observer.onPlacementShown(activity, placement);
 				} catch (Exception ex) {
-					logger.log(LogLevel.WARNING, "The frame %s cannot be rendered", frame.getPlacementName());
+					logger.log(LogLevel.WARNING, "The placement %s cannot be rendered", placement.getPlacementName());
 					logger.log(LogLevel.WARNING, ex);
 				}	
 			}

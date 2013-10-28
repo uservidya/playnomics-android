@@ -51,10 +51,10 @@ public class Playnomics {
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
 				HtmlAdFactory adFactory = new HtmlAdFactory();
 				AssetClient assetClient = new AssetClient(connectionFactory);
-				PlacementDataClient frameAssetClient = new PlacementDataClient(assetClient, config, logger, adFactory);
+				PlacementDataClient placementDataClient = new PlacementDataClient(assetClient, config, logger, adFactory);
 				
 				PlayViewFactory viewFactory = new PlayViewFactory();
-				MessagingManager messagingManager = new MessagingManager(config, frameAssetClient, util, logger, viewFactory);
+				MessagingManager messagingManager = new MessagingManager(config, placementDataClient, util, logger, viewFactory);
 				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
 			}
 			return instance;

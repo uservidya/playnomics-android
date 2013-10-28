@@ -58,23 +58,23 @@ public class MessagingManagerTest {
 	}
 
 	@Test
-	public void testPreloadFramesLoadsRequestsDataOnce() {
-		String[] frameIds = new String[]{"frame1"};
-		messagingManager.preloadPlacements(frameIds);
-		messagingManager.showPlacement("frame1", activityMock, null);
+	public void testPreloadPlacementsLoadsRequestsDataOnce() {
+		String[] placementNames = new String[]{"placement1"};
+		messagingManager.preloadPlacements(placementNames);
+		messagingManager.showPlacement("placement1", activityMock, null);
 		verify(dataClientMock, Mockito.atMost(1)).loadPlacementInBackground(any(Placement.class));
 	}
 
 	@Test
-	public void testPreloadMultipleFrames(){
-		String[] frameIds = new String[]{"frame1", "frame2","frame3"};
-		messagingManager.preloadPlacements(frameIds);
+	public void testPreloadMultiplePlacements(){
+		String[] placementNames = new String[]{"placement1", "placement2","placement3"};
+		messagingManager.preloadPlacements(placementNames);
 		verify(dataClientMock, Mockito.atLeast(3)).loadPlacementInBackground(any(Placement.class));
 	}
 
 	@Test
-	public void testShowFrameNoPreload() {
-		messagingManager.showPlacement("frame1", activityMock, null);
+	public void testShowPlacementNoPreload() {
+		messagingManager.showPlacement("placement1", activityMock, null);
 		verify(dataClientMock, Mockito.atMost(1)).loadPlacementInBackground(any(Placement.class));
 	}
 }

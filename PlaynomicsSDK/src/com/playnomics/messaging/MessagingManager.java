@@ -30,9 +30,9 @@ public class MessagingManager implements IPlacementStateObserver {
 	}
 	
 	public MessagingManager(IConfig config, 
-			PlacementDataClient frameDataClient, 
+			PlacementDataClient placementDataClient, 
 			Util util, Logger logger, IPlayViewFactory viewFactory){
-		this.placementDataClient = frameDataClient;
+		this.placementDataClient = placementDataClient;
 		this.util = util;
 		this.placementsByName = new ConcurrentHashMap<String, Placement>();
 		this.placementsByActivityName = new ConcurrentHashMap<String, Placement>();
@@ -40,14 +40,14 @@ public class MessagingManager implements IPlacementStateObserver {
 		this.renderTaskFactory = new RenderTaskFactory(viewFactory, logger);
 	}
 
-	public void preloadPlacements(String[] frameNames){
-		for(String frameName : frameNames){
-			getOrAddPlacement(frameName);
+	public void preloadPlacements(String[] placementNames){
+		for(String placementName : placementNames){
+			getOrAddPlacement(placementName);
 		}
 	}
 		
-	public void showPlacement(String frameId, Activity activity, IPlaynomicsPlacementDelegate delegate){
-		Placement placement = getOrAddPlacement(frameId);
+	public void showPlacement(String placementName, Activity activity, IPlaynomicsPlacementDelegate delegate){
+		Placement placement = getOrAddPlacement(placementName);
 		placement.show(activity, delegate);
 	}
 	
@@ -65,13 +65,13 @@ public class MessagingManager implements IPlacementStateObserver {
 	
 	public void hidePlacement(String placementName){
 		if(placementsByName.containsKey(placementName)){
-			Placement frame = placementsByName.get(placementName);
-			frame.hide();
+			Placement placement = placementsByName.get(placementName);
+			placement.hide();
 		}
 	}
 	
-	public void onPlacementShown(Activity activity, Placement frame){
-		placementsByActivityName.put(getKeyForActivity(activity), frame);
+	public void onPlacementShown(Activity activity, Placement placement){
+		placementsByActivityName.put(getKeyForActivity(activity), placement);
 	}
 	
 	public void onPlacementDisposed(Activity activity){

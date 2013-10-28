@@ -102,7 +102,7 @@ public interface IConfig {
 	
 	public String getMessagingPathAds();
 	
-	public String getMessagingFrameIdKey();
+	public String getMessagingPlacementNameKey();
 	
 	public String getMessagingScreenWidthKey();
 

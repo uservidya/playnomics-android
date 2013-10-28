@@ -245,8 +245,8 @@ public class Config implements IConfig {
 		return bundle.getString("messaging.adsPath");
 	}
 
-	public String getMessagingFrameIdKey() {
-		return bundle.getString("messaging.frameIdKey");
+	public String getMessagingPlacementNameKey() {
+		return bundle.getString("messaging.placementNameKey");
 	}
 
 	public String getMessagingScreenWidthKey() {
