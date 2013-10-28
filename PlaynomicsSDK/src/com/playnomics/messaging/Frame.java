@@ -94,7 +94,13 @@ public class Frame implements PlayWebView.IPlayWebViewHandler{
 		shouldRender = true;
 		
 		if(state == FrameState.LOAD_COMPLETE){
-			loadWebView();
+			//make sure we run this code on the UI thread
+			Runnable runnable = new Runnable() {
+				public void run() {
+					loadWebView();
+				}
+			};
+			activity.runOnUiThread(runnable);
 		} else if (state == FrameState.LOAD_FAILED) {
 			if(delegate != null){
 				delegate.onRenderFailed();
