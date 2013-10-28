@@ -17,7 +17,7 @@ public class HeartBeatProducerTest {
 
 	@Mock
 	private HeartBeatHandler handler;
-	
+
 	private HeartBeatProducer producer;
 	private int intervalSeconds;
 
@@ -43,7 +43,7 @@ public class HeartBeatProducerTest {
 	@Test
 	public void testProducer() throws InterruptedException {
 		producer.start(handler);
-		Thread.sleep((long)(intervalSeconds * 1.5 * 1000));
+		Thread.sleep((long) (intervalSeconds * 1.5 * 1000));
 		producer.stop();
 		verify(handler, Mockito.atLeastOnce()).onHeartBeat(intervalSeconds);
 	}

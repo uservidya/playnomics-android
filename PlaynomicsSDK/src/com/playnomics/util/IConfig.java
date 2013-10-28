@@ -1,21 +1,21 @@
 package com.playnomics.util;
 
 public interface IConfig {
-	
+
 	public String getSdkVersion();
 
 	public String getSdkName();
 
 	public void setTestMode(boolean testMode);
-	
+
 	public void setOverrideEventsUrl(String eventsUrl);
-	
+
 	public String getEventsUrl();
-	
+
 	public void setOverrideMessagingUrl(String messagingUrl);
-	
+
 	public String getMessagingUrl();
-	
+
 	public String getApplicationIdKey();
 
 	public String getUserIdKey();
@@ -99,11 +99,11 @@ public interface IConfig {
 	public String getEventPathAppStart();
 
 	public String getEventPathAppPause();
-	
+
 	public String getMessagingPathAds();
-	
+
 	public String getMessagingPlacementNameKey();
-	
+
 	public String getMessagingScreenWidthKey();
 
 	public String getMessagingScreenHeightKey();

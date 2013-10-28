@@ -8,10 +8,11 @@ import com.playnomics.events.PlaynomicsEvent;
 public class StubEventQueue implements IEventQueue {
 
 	public ConcurrentLinkedQueue<Object> queue;
-	public StubEventQueue(){
+
+	public StubEventQueue() {
 		this.queue = new ConcurrentLinkedQueue<Object>();
 	}
-	
+
 	public void enqueueEvent(PlaynomicsEvent event)
 			throws UnsupportedEncodingException {
 		this.queue.add(event);

@@ -19,24 +19,21 @@ import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
 import com.playnomics.util.Logger.LogLevel;
 
-public class Placement implements PlayWebView.IPlayWebViewHandler{
-	
-	public interface IPlacementStateObserver{
+public class Placement implements PlayWebView.IPlayWebViewHandler {
+
+	public interface IPlacementStateObserver {
 		void onPlacementShown(Activity activity, Placement placement);
-		
+
 		void onPlacementDisposed(Activity activity);
 	}
-	
-	public enum PlacementState{
-		NOT_LOADED,
-		LOAD_STARTED,
-		LOAD_COMPLETE,
-		LOAD_FAILED
+
+	public enum PlacementState {
+		NOT_LOADED, LOAD_STARTED, LOAD_COMPLETE, LOAD_FAILED
 	}
-	
+
 	private boolean shouldRender;
 	private boolean impressionLogged;
-	
+
 	private Util util;
 	private IPlaynomicsPlacementDelegate delegate;
 	private Activity activity;
@@ -44,34 +41,40 @@ public class Placement implements PlayWebView.IPlayWebViewHandler{
 	private Logger logger;
 	private IPlacementStateObserver observer;
 	private RenderTaskFactory renderTaskFactory;
-	
+
 	private PlayDialog dialog;
 
 	private String placementName;
-	public String getPlacementName(){
+
+	public String getPlacementName() {
 		return placementName;
 	}
-	
+
 	private PlacementState state;
-	public PlacementState getState(){
+
+	public PlacementState getState() {
 		return state;
 	}
-	
-	public void setState(PlacementState state){
+
+	public void setState(PlacementState state) {
 		this.state = state;
 	}
-	
-	public void setDialog(PlayDialog dialog){
+
+	public void setDialog(PlayDialog dialog) {
 		this.dialog = dialog;
 	}
-	
-	private boolean hasNativeCloseButton(){
-		return htmlAd != null && htmlAd.getCloseButton() instanceof NativeCloseButton;
+
+	private boolean hasNativeCloseButton() {
+		return htmlAd != null
+				&& htmlAd.getCloseButton() instanceof NativeCloseButton;
 	}
-	
+
 	private HtmlAd htmlAd;
-	
-	public Placement(String placementName, ICallbackProcessor callbackProcessor, Util util, Logger logger, IPlacementStateObserver observer, RenderTaskFactory renderTaskFactory){
+
+	public Placement(String placementName,
+			ICallbackProcessor callbackProcessor, Util util, Logger logger,
+			IPlacementStateObserver observer,
+			RenderTaskFactory renderTaskFactory) {
 		this.observer = observer;
 		this.placementName = placementName;
 		this.state = PlacementState.NOT_LOADED;
@@ -81,124 +84,132 @@ public class Placement implements PlayWebView.IPlayWebViewHandler{
 		this.renderTaskFactory = renderTaskFactory;
 	}
 
-	public void updatePlacementData(HtmlAd htmlAd){
+	public void updatePlacementData(HtmlAd htmlAd) {
 		this.htmlAd = htmlAd;
 		state = PlacementState.LOAD_COMPLETE;
 		impressionLogged = false;
-		if(shouldRender){
+		if (shouldRender) {
 			loadWebView();
 		}
 	}
-	
-	public void show(final Activity activity, IPlaynomicsPlacementDelegate delegate){
+
+	public void show(final Activity activity,
+			IPlaynomicsPlacementDelegate delegate) {
 		this.delegate = delegate;
 		this.activity = activity;
 
 		shouldRender = true;
-		
-		if(state == PlacementState.LOAD_COMPLETE){
+
+		if (state == PlacementState.LOAD_COMPLETE) {
 			loadWebView();
 		} else if (state == PlacementState.LOAD_FAILED) {
-			if(delegate != null){
+			if (delegate != null) {
 				delegate.onRenderFailed();
 			}
 		}
 	}
-	
-	private void loadWebView(){
-		if(!(shouldRender && state == PlacementState.LOAD_COMPLETE)){ return; }
-		
-		Runnable renderTask = renderTaskFactory.createShowPlacementTask(this, htmlAd, activity, this, observer);
-		//make sure we run this task on the UI thread
+
+	private void loadWebView() {
+		if (!(shouldRender && state == PlacementState.LOAD_COMPLETE)) {
+			return;
+		}
+
+		Runnable renderTask = renderTaskFactory.createShowPlacementTask(this,
+				htmlAd, activity, this, observer);
+		// make sure we run this task on the UI thread
 		activity.runOnUiThread(renderTask);
-		
-		if(!impressionLogged){
+
+		if (!impressionLogged) {
 			impressionLogged = false;
 			callbackProcessor.processUrlCallback(htmlAd.getImpressionUrl());
 		}
-		
-		if(delegate != null){
+
+		if (delegate != null) {
 			delegate.onShow(htmlAd.getTarget().getTargetData());
 		}
 	}
-	
-	public void hide(){
+
+	public void hide() {
 		onAdClosed(false);
 	}
-	
+
 	public void onLoadFailure(int errorCode) {
 		onLoadFailure();
 	}
-	
-	private void onLoadFailure(){
+
+	private void onLoadFailure() {
 		state = PlacementState.LOAD_FAILED;
-		if(delegate != null){
+		if (delegate != null) {
 			delegate.onRenderFailed();
 		}
 	}
 
 	public void onLoadComplete() {
 		state = PlacementState.LOAD_COMPLETE;
-		if(htmlAd.getPosition().getPositionType() == PositionType.FULLSCREEN){
+		if (htmlAd.getPosition().getPositionType() == PositionType.FULLSCREEN) {
 			loadWebView();
 		}
 	}
 
 	public void onUrlLoading(String url) {
 		hide();
-		if(!Util.stringIsNullOrEmpty(url)){
-			if(!hasNativeCloseButton()){
-				HtmlCloseButton htmlClose = (HtmlCloseButton)htmlAd.getCloseButton();
-				if(url.equals(htmlClose.getCloseLink())){
+		if (!Util.stringIsNullOrEmpty(url)) {
+			if (!hasNativeCloseButton()) {
+				HtmlCloseButton htmlClose = (HtmlCloseButton) htmlAd
+						.getCloseButton();
+				if (url.equals(htmlClose.getCloseLink())) {
 					onAdClosed(true);
 					return;
 				}
 			}
-			
-			if(url.equals(htmlAd.getClickLink())){
+
+			if (url.equals(htmlAd.getClickLink())) {
 				onAdTouched();
 				return;
 			}
 			util.openUrlInPhoneBrowser(url, activity);
-		}	
+		}
 	}
 
 	private void onAdTouched() {
 		callbackProcessor.processUrlCallback(htmlAd.getClickUrl());
 		Target target = htmlAd.getTarget();
-		
-		if(target.getTargetType() == TargetType.URL && Util.stringIsNullOrEmpty(target.getTargetUrl())){
+
+		if (target.getTargetType() == TargetType.URL
+				&& Util.stringIsNullOrEmpty(target.getTargetUrl())) {
 			util.openUrlInPhoneBrowser(target.getTargetUrl(), activity);
 		}
-	 
-		if(delegate != null){
+
+		if (delegate != null) {
 			delegate.onTouch(htmlAd.getTarget().getTargetData());
 		}
 	}
 
 	private void onAdClosed(boolean closedByUser) {
-		if(dialog != null){
-			Runnable hideTask = renderTaskFactory.createHidePlacementTask(dialog);
+		if (dialog != null) {
+			Runnable hideTask = renderTaskFactory
+					.createHidePlacementTask(dialog);
 			activity.runOnUiThread(hideTask);
 		}
-		
+
 		observer.onPlacementDisposed(activity);
-		if(closedByUser){
+		if (closedByUser) {
 			callbackProcessor.processUrlCallback(htmlAd.getCloseUrl());
 		}
-		if(delegate != null){
+		if (delegate != null) {
 			delegate.onClose(htmlAd.getTarget().getTargetData());
 		}
 	}
-	
-	public void attachActivity(Activity activity){
+
+	public void attachActivity(Activity activity) {
 		this.activity = activity;
 		loadWebView();
 	}
-	
-	public void detachActivity(){
-		if(dialog != null){
-			Runnable hideTask = renderTaskFactory.createHidePlacementTask(dialog);
+
+	public void detachActivity() {
+		if (dialog != null) {
+			Runnable hideTask = renderTaskFactory
+					.createHidePlacementTask(dialog);
 			activity.runOnUiThread(hideTask);
 		}
 		this.activity = null;

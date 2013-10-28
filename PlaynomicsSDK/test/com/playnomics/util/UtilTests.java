@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class UtilTests {
 	private Logger logger = new Logger(new UnitTestLogWriter());
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -36,12 +36,12 @@ public class UtilTests {
 			assertTrue(num >= 0);
 		}
 	}
-	
+
 	@Test
-	public void testStringIsEmptyOrNull(){
+	public void testStringIsEmptyOrNull() {
 		assertTrue(Util.stringIsNullOrEmpty(null));
 		assertTrue(Util.stringIsNullOrEmpty(""));
 		assertFalse(Util.stringIsNullOrEmpty("test"));
 	}
-	
+
 }

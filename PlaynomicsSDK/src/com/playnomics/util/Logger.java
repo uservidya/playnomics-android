@@ -14,22 +14,24 @@ public class Logger {
 			return level;
 		}
 	}
-	
+
 	private LogLevel logLevel = LogLevel.ERROR;
+
 	public void setLogLevel(LogLevel level) {
 		this.logLevel = level;
 	}
 
 	private LogWriter logWriter;
-	public Logger(LogWriter logWriter){
+
+	public Logger(LogWriter logWriter) {
 		this.logWriter = logWriter;
 	}
-	
+
 	public void log(LogLevel logLevel, String format, Object... args) {
 		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			//can log the the message
+			// can log the the message
 			logWriter.writeLog(logLevel, format, args);
 		}
 	}
@@ -38,7 +40,7 @@ public class Logger {
 		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			//can log the the message
+			// can log the the message
 			logWriter.writeLog(logLevel, ex);
 		}
 	}
@@ -48,7 +50,7 @@ public class Logger {
 		int authorizedLogLevel = this.logLevel.level();
 		int targetLogLevel = logLevel.level();
 		if (authorizedLogLevel <= targetLogLevel) {
-			//can log the the message
+			// can log the the message
 			logWriter.writeLog(logLevel, message, args);
 			logWriter.writeLog(logLevel, ex);
 		}

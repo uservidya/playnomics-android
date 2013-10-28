@@ -47,7 +47,7 @@ public class FrameTest {
 	private Session sessionMock;
 	@Mock
 	private IPlacementStateObserver observerMock;
-	@Mock 
+	@Mock
 	private HtmlAdFactory htmlAdFactory;
 	@Mock
 	private HtmlAd adMock;
@@ -59,21 +59,20 @@ public class FrameTest {
 	private AssetResponse imageAssetResponseMock;
 	@Mock
 	private RenderTaskFactory renderTaskFactoryMock;
-	
-	@Mock 
+
+	@Mock
 	private NativeCloseButton nativeCloseMock;
-	
-	@Mock 
+
+	@Mock
 	private HtmlCloseButton htmlCloseMock;
-		
+
 	private PlacementDataClient dataClient;
 	private Placement placement;
 	private Logger logger;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		
-		
+
 	}
 
 	@AfterClass
@@ -82,23 +81,26 @@ public class FrameTest {
 
 	@SuppressWarnings("unchecked")
 	@Before
-	public void setUp() throws Exception {			
+	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		
+
 		when(sessionMock.getApplicationId()).thenReturn(1L);
 		when(sessionMock.getBreadcrumbId()).thenReturn("breadcrumb");
 		when(sessionMock.getDeviceId()).thenReturn("deviceId");
 		when(sessionMock.getUserId()).thenReturn("userId");
 
 		IConfig config = new Config();
-	
+
 		logger = new Logger(new UnitTestLogWriter());
 		logger.setLogLevel(LogLevel.VERBOSE);
-		
-		when(assetClientMock.requestAsset(any(String.class), any(String.class),
-				any(TreeMap.class))).thenReturn(jsonAssetResponseMock);
-		
-		dataClient = new PlacementDataClient(assetClientMock, config, logger, htmlAdFactory);
+
+		when(
+				assetClientMock.requestAsset(any(String.class),
+						any(String.class), any(TreeMap.class))).thenReturn(
+				jsonAssetResponseMock);
+
+		dataClient = new PlacementDataClient(assetClientMock, config, logger,
+				htmlAdFactory);
 		dataClient.setSession(sessionMock);
 	}
 
@@ -107,103 +109,133 @@ public class FrameTest {
 	}
 
 	@Test
-	public void testSuccessJsonWithHtmlCloseButton() throws IOException, InterruptedException, JSONException {
+	public void testSuccessJsonWithHtmlCloseButton() throws IOException,
+			InterruptedException, JSONException {
 		byte[] data = new byte[1];
 		when(jsonAssetResponseMock.getData()).thenReturn(data);
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
 		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE, placement.getState());
+
+		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
+				placement.getState());
 	}
-	
+
 	@Test
-	public void testSuccessJsonWithNativeCloseButton() throws IOException, InterruptedException, JSONException {
-		when(assetClientMock.requestAsset(any(String.class))).thenReturn(imageAssetResponseMock);
-		
+	public void testSuccessJsonWithNativeCloseButton() throws IOException,
+			InterruptedException, JSONException {
+		when(assetClientMock.requestAsset(any(String.class))).thenReturn(
+				imageAssetResponseMock);
+
 		byte[] data = new byte[1];
 		when(jsonAssetResponseMock.getData()).thenReturn(data);
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
 		when(imageAssetResponseMock.getData()).thenReturn(data);
-		when(imageAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
+		when(imageAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
 		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE, placement.getState());
+
+		assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
+				placement.getState());
 	}
-	
+
 	@Test
-	public void testSuccessJsonRequestWithNativeFailure() throws IOException, InterruptedException, JSONException{
-		when(assetClientMock.requestAsset(any(String.class))).thenReturn(imageAssetResponseMock);
-		
+	public void testSuccessJsonRequestWithNativeFailure() throws IOException,
+			InterruptedException, JSONException {
+		when(assetClientMock.requestAsset(any(String.class))).thenReturn(
+				imageAssetResponseMock);
+
 		byte[] data = new byte[1];
 		when(jsonAssetResponseMock.getData()).thenReturn(data);
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
-		when(imageAssetResponseMock.getStatus()).thenReturn(ResponseStatus.FAILURE);
-		
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
+		when(imageAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.FAILURE);
+
 		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED, placement.getState());
+
+		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
+				placement.getState());
 	}
-	
+
 	@Test
-	public void testFailedJsonRequest() throws IOException, InterruptedException{
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.FAILURE);
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+	public void testFailedJsonRequest() throws IOException,
+			InterruptedException {
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.FAILURE);
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED, placement.getState());
+
+		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
+				placement.getState());
 	}
-	
+
 	@Test
-	public void testFailEncodingException() throws IOException, InterruptedException, UnsupportedEncodingException, JSONException{
+	public void testFailEncodingException() throws IOException,
+			InterruptedException, UnsupportedEncodingException, JSONException {
 		byte[] data = new byte[1];
 		when(jsonAssetResponseMock.getData()).thenReturn(data);
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
-		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new UnsupportedEncodingException("Failed"));
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
+		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(
+				new UnsupportedEncodingException("Failed"));
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED, placement.getState());
+
+		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
+				placement.getState());
 	}
-	
+
 	@Test
-	public void testFailJSONException() throws IOException, InterruptedException, UnsupportedEncodingException, JSONException{
+	public void testFailJSONException() throws IOException,
+			InterruptedException, UnsupportedEncodingException, JSONException {
 		byte[] data = new byte[1];
 		when(jsonAssetResponseMock.getData()).thenReturn(data);
-		when(jsonAssetResponseMock.getStatus()).thenReturn(ResponseStatus.SUCCESS);
-		
-		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(new JSONException("Failed"));
-		
-		placement = new Placement("placementName", processorMock, utilMock, logger, observerMock, renderTaskFactoryMock);
+		when(jsonAssetResponseMock.getStatus()).thenReturn(
+				ResponseStatus.SUCCESS);
+
+		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(
+				new JSONException("Failed"));
+
+		placement = new Placement("placementName", processorMock, utilMock,
+				logger, observerMock, renderTaskFactoryMock);
 		Thread thread = dataClient.loadPlacementInBackground(placement);
 		thread.join();
-		
-		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED, placement.getState());
+
+		assertEquals("Placement not loaded", PlacementState.LOAD_FAILED,
+				placement.getState());
 	}
 }

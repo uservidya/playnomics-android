@@ -24,72 +24,75 @@ import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Window.class, MotionEvent.class})
+@PrepareForTest({ Window.class, MotionEvent.class })
 public class WindowCallbackProxyTest {
-	
+
 	private static int touchCount = 0;
-	private static Window.Callback stubCallback;	
+	private static Window.Callback stubCallback;
 	private MotionEvent motionEventMock;
 	@Mock
 	private TouchEventHandler handlerMock;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		stubCallback = new Window.Callback() {
-			public void onWindowFocusChanged(boolean arg0) {	
+			public void onWindowFocusChanged(boolean arg0) {
 			}
+
 			public void onWindowAttributesChanged(LayoutParams arg0) {
 			}
+
 			public boolean onSearchRequested() {
 				return false;
 			}
-			
+
 			public boolean onPreparePanel(int arg0, View arg1, Menu arg2) {
 				return false;
 			}
-			
+
 			public void onPanelClosed(int arg0, Menu arg1) {
 			}
-			
+
 			public boolean onMenuOpened(int arg0, Menu arg1) {
 				return false;
 			}
-			
+
 			public boolean onMenuItemSelected(int arg0, MenuItem arg1) {
 				return false;
 			}
-			
+
 			public void onDetachedFromWindow() {
-				
+
 			}
-			
+
 			public View onCreatePanelView(int arg0) {
 				return null;
 			}
-			
+
 			public boolean onCreatePanelMenu(int arg0, Menu arg1) {
 				return false;
 			}
-			
+
 			public void onContentChanged() {
 			}
-			
-			public void onAttachedToWindow() {	
+
+			public void onAttachedToWindow() {
 			}
-			
+
 			public boolean dispatchTrackballEvent(MotionEvent arg0) {
 				return false;
 			}
-			
+
 			public boolean dispatchTouchEvent(MotionEvent arg0) {
-				touchCount ++;
+				touchCount++;
 				return false;
 			}
-			
-			public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent arg0) {
+
+			public boolean dispatchPopulateAccessibilityEvent(
+					AccessibilityEvent arg0) {
 				return false;
 			}
-			
+
 			public boolean dispatchKeyEvent(KeyEvent arg0) {
 				return false;
 			}
@@ -112,33 +115,39 @@ public class WindowCallbackProxyTest {
 
 	@Test
 	public void testTouchSingleEventDownReceived() {
-		Mockito.when(motionEventMock.getActionMasked()).thenReturn(MotionEvent.ACTION_DOWN);
-		
-		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(stubCallback, handlerMock);
+		Mockito.when(motionEventMock.getActionMasked()).thenReturn(
+				MotionEvent.ACTION_DOWN);
+
+		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(
+				stubCallback, handlerMock);
 		stubCallback.dispatchTouchEvent(motionEventMock);
-	
+
 		assertEquals("Touch event received in original callback", 1, touchCount);
 		Mockito.verify(handlerMock).onTouchEventReceived();
 	}
-	
+
 	@Test
 	public void testTouchMultiTouchDownReceived() {
-		Mockito.when(motionEventMock.getActionMasked()).thenReturn(MotionEvent.ACTION_POINTER_DOWN);
-		
-		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(stubCallback, handlerMock);
+		Mockito.when(motionEventMock.getActionMasked()).thenReturn(
+				MotionEvent.ACTION_POINTER_DOWN);
+
+		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(
+				stubCallback, handlerMock);
 		stubCallback.dispatchTouchEvent(motionEventMock);
-	
+
 		assertEquals("Touch event received in original callback", 1, touchCount);
 		Mockito.verify(handlerMock).onTouchEventReceived();
-	} 
-	
+	}
+
 	@Test
 	public void testTouchTouchUpNotReceived() {
-		Mockito.when(motionEventMock.getActionMasked()).thenReturn(MotionEvent.ACTION_UP);
-		
-		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(stubCallback, handlerMock);
+		Mockito.when(motionEventMock.getActionMasked()).thenReturn(
+				MotionEvent.ACTION_UP);
+
+		stubCallback = WindowCallbackProxy.newCallbackProxyForActivity(
+				stubCallback, handlerMock);
 		stubCallback.dispatchTouchEvent(motionEventMock);
-	
+
 		assertEquals("Touch event received in original callback", 1, touchCount);
 		Mockito.verify(handlerMock, Mockito.never()).onTouchEventReceived();
 	}

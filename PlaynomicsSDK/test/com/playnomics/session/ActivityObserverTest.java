@@ -24,9 +24,9 @@ public class ActivityObserverTest {
 	private SessionStateMachine stateMachineMock;
 	@Mock
 	private Util utilMock;
-	
+
 	private ActivityObserver observer;
-	
+
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
@@ -35,7 +35,7 @@ public class ActivityObserverTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		observer = new ActivityObserver(utilMock);
-		observer.setStateMachine(stateMachineMock); 
+		observer.setStateMachine(stateMachineMock);
 	}
 
 	@After
@@ -46,11 +46,11 @@ public class ActivityObserverTest {
 	public void testSingleActivityLifecycle() {
 		observer.observeNewActivity(activityMock, handlerMock);
 		verify(stateMachineMock).resume();
-	
+
 		observer.forgetLastActivity();
 		verify(stateMachineMock).pause();
 	}
-	
+
 	@Test
 	public void testMultipleActivitiesLifecycle() {
 		observer.observeNewActivity(activityMock, handlerMock);

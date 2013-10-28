@@ -17,7 +17,7 @@ import com.playnomics.util.Util;
 public class PlaynomicsEventTest {
 
 	protected Logger logger;
-	
+
 	@Before
 	public void initMocks() {
 		logger = new Logger(new UnitTestLogWriter());
@@ -58,9 +58,10 @@ public class PlaynomicsEventTest {
 		if (event instanceof AppPageEvent) {
 			assertEquals("Has correct URL Path", "appPage", event.getUrlPath());
 		} else if (event instanceof AppStartEvent) {
-			assertEquals("Has correct URL Path", "appStart", event.getUrlPath()); 
-		} else if (event instanceof AppRunningEvent){
-			assertEquals("Has correct URL Path", "appRunning", event.getUrlPath()); 
+			assertEquals("Has correct URL Path", "appStart", event.getUrlPath());
+		} else if (event instanceof AppRunningEvent) {
+			assertEquals("Has correct URL Path", "appRunning",
+					event.getUrlPath());
 		} else if (event instanceof AppPauseEvent) {
 			assertEquals("Has correct URL Path", "appPause", event.getUrlPath());
 		} else if (event instanceof AppResumeEvent) {

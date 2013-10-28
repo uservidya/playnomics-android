@@ -43,56 +43,62 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private IActivityObserver observer;
 	private IHeartBeatProducer producer;
 	private MessagingManager messagingManager;
-	
+
 	// session data
 	private Long applicationId;
-	
-	public Long getApplicationId(){
+
+	public Long getApplicationId() {
 		return applicationId;
 	}
-	
-	public void setApplicationId(long applicationId){
+
+	public void setApplicationId(long applicationId) {
 		this.applicationId = applicationId;
 	}
-	
+
 	private String userId;
-	public String getUserId(){
+
+	public String getUserId() {
 		return userId;
 	}
-	
-	public void setUserId(String userId){
+
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
-	public String getBreadcrumbId(){
+
+	public String getBreadcrumbId() {
 		return deviceId;
 	}
-	
+
 	private String deviceId;
-	public String getDeviceId(){
+
+	public String getDeviceId() {
 		return deviceId;
 	}
-	
+
 	private LargeGeneratedId sessionId;
-	LargeGeneratedId getSessionId(){
+
+	LargeGeneratedId getSessionId() {
 		return sessionId;
 	}
-	
+
 	private LargeGeneratedId instanceId;
-	LargeGeneratedId getInstanceId(){
+
+	LargeGeneratedId getInstanceId() {
 		return instanceId;
 	}
-	
+
 	private EventTime sessionStartTime;
-	EventTime getSessionStartTime(){
+
+	EventTime getSessionStartTime() {
 		return sessionStartTime;
 	}
-	
+
 	private EventTime sessionPauseTime;
-	EventTime getSessionPauseTime(){
+
+	EventTime getSessionPauseTime() {
 		return sessionPauseTime;
 	}
-	
+
 	private AtomicInteger sequence;
 	private AtomicInteger touchEvents;
 	private AtomicInteger allTouchEvents;
@@ -101,10 +107,12 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	public void setEnabledPushNotifications(boolean value) {
 		enablePushNotifications = value;
 	}
-	
-	public Session(IConfig config, Util util, IHttpConnectionFactory connectionFactory, Logger logger, 
-			IEventQueue eventQueue, IEventWorker eventWorker, 
-			IActivityObserver activityObserver, IHeartBeatProducer producer, MessagingManager messagingManager) {
+
+	public Session(IConfig config, Util util,
+			IHttpConnectionFactory connectionFactory, Logger logger,
+			IEventQueue eventQueue, IEventWorker eventWorker,
+			IActivityObserver activityObserver, IHeartBeatProducer producer,
+			MessagingManager messagingManager) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
@@ -114,17 +122,17 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		this.observer = activityObserver;
 		this.producer = producer;
 		this.messagingManager = messagingManager;
-		//this is done to make Session more testable
-		//we want MessagingManager to be mocked out when we start the session
+		// this is done to make Session more testable
+		// we want MessagingManager to be mocked out when we start the session
 		this.messagingManager.setSession(this);
 	}
-	
+
 	public void start(ContextWrapper contextWrapper) {
 		try {
-			if(applicationId == null){
+			if (applicationId == null) {
 				throw new NullPointerException("Application ID must be set");
 			}
-			
+
 			// session start code here
 			if (sessionState == SessionState.STARTED) {
 				return;
@@ -137,7 +145,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 			sessionState = SessionState.STARTED;
 			this.contextWrapper = contextWrapper;
-			boolean settingsChanged = contextWrapper.synchronizeDeviceSettings();
+			boolean settingsChanged = contextWrapper
+					.synchronizeDeviceSettings();
 
 			deviceId = util.getDeviceIdFromContext(contextWrapper.getContext());
 
@@ -161,8 +170,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					Util.TIME_ZONE_GMT);
 			threeMinutesAgo.add(Calendar.MINUTE, -3);
 
-			boolean sessionLapsed = (lastEventTime != null && lastEventTime.compareTo(threeMinutesAgo) < 0)
-					|| lastSessionId == null;
+			boolean sessionLapsed = (lastEventTime != null && lastEventTime
+					.compareTo(threeMinutesAgo) < 0) || lastSessionId == null;
 
 			ImplicitEvent implicitEvent;
 			if (sessionLapsed) {
@@ -186,7 +195,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.start();
 			producer.start(this);
 			observer.setStateMachine(this);
-			
+
 			if (settingsChanged) {
 				onDeviceSettingsUpdated();
 			}
@@ -254,13 +263,11 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	private GameSessionInfo getSessionInfo() {
-		return new GameSessionInfo(applicationId, userId, deviceId,
-				sessionId);
+		return new GameSessionInfo(applicationId, userId, deviceId, sessionId);
 	}
 
 	private void assertSessionStarted() {
-		if (!(sessionState == SessionState.STARTED
-				|| sessionState == SessionState.PAUSED)) {
+		if (!(sessionState == SessionState.STARTED || sessionState == SessionState.PAUSED)) {
 			throw new IllegalStateException("Session must be started");
 		}
 	}
@@ -309,8 +316,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	public void customEvent(CustomEvent.CustomEventType customEventType) {
 		try {
 			assertSessionStarted();
-			CustomEvent event = new CustomEvent(config, util,
-					getSessionInfo(), customEventType);
+			CustomEvent event = new CustomEvent(config, util, getSessionInfo(),
+					customEventType);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not send custom event");
@@ -319,26 +326,26 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 	// activity pause/resume
 	public void onActivityResumed(Activity activity) {
-		try{
+		try {
 			assertSessionStarted();
 			observer.observeNewActivity(activity, this);
 			messagingManager.onActivityResumed(activity);
-		} catch(Exception ex){
+		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not attach activity");
 		}
 	}
 
 	public void onActivityPaused(Activity activity) {
-		try{
+		try {
 			assertSessionStarted();
 			observer.forgetLastActivity();
 			messagingManager.onActivityPaused(activity);
-		} catch(Exception ex){
+		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not detach activity");
 		}
 	}
-	
-	public void processUrlCallback(String url){
+
+	public void processUrlCallback(String url) {
 		eventQueue.enqueueEventUrl(url);
 	}
 }

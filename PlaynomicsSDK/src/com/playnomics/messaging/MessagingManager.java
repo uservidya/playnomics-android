@@ -15,7 +15,7 @@ import com.playnomics.util.IConfig;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
 
-public class MessagingManager implements IPlacementStateObserver {	
+public class MessagingManager implements IPlacementStateObserver {
 	private Util util;
 	private ConcurrentHashMap<String, Placement> placementsByName;
 	private ConcurrentHashMap<String, Placement> placementsByActivityName;
@@ -23,15 +23,15 @@ public class MessagingManager implements IPlacementStateObserver {
 	private Logger logger;
 	private ICallbackProcessor callbackProcessor;
 	private RenderTaskFactory renderTaskFactory;
-	
-	public void setSession(Session session){
+
+	public void setSession(Session session) {
 		this.callbackProcessor = session;
 		this.placementDataClient.setSession(session);
 	}
-	
-	public MessagingManager(IConfig config, 
-			PlacementDataClient placementDataClient, 
-			Util util, Logger logger, IPlayViewFactory viewFactory){
+
+	public MessagingManager(IConfig config,
+			PlacementDataClient placementDataClient, Util util, Logger logger,
+			IPlayViewFactory viewFactory) {
 		this.placementDataClient = placementDataClient;
 		this.util = util;
 		this.placementsByName = new ConcurrentHashMap<String, Placement>();
@@ -40,21 +40,23 @@ public class MessagingManager implements IPlacementStateObserver {
 		this.renderTaskFactory = new RenderTaskFactory(viewFactory, logger);
 	}
 
-	public void preloadPlacements(String[] placementNames){
-		for(String placementName : placementNames){
+	public void preloadPlacements(String[] placementNames) {
+		for (String placementName : placementNames) {
 			getOrAddPlacement(placementName);
 		}
 	}
-		
-	public void showPlacement(String placementName, Activity activity, IPlaynomicsPlacementDelegate delegate){
+
+	public void showPlacement(String placementName, Activity activity,
+			IPlaynomicsPlacementDelegate delegate) {
 		Placement placement = getOrAddPlacement(placementName);
 		placement.show(activity, delegate);
 	}
-	
-	private Placement getOrAddPlacement(String placementName){
+
+	private Placement getOrAddPlacement(String placementName) {
 		Placement placement;
-		if(!placementsByName.containsKey(placementName)){
-			placement = new Placement(placementName, callbackProcessor, util, logger, this, renderTaskFactory);
+		if (!placementsByName.containsKey(placementName)) {
+			placement = new Placement(placementName, callbackProcessor, util,
+					logger, this, renderTaskFactory);
 			placementDataClient.loadPlacementInBackground(placement);
 			placementsByName.put(placementName, placement);
 		} else {
@@ -62,39 +64,39 @@ public class MessagingManager implements IPlacementStateObserver {
 		}
 		return placement;
 	}
-	
-	public void hidePlacement(String placementName){
-		if(placementsByName.containsKey(placementName)){
+
+	public void hidePlacement(String placementName) {
+		if (placementsByName.containsKey(placementName)) {
 			Placement placement = placementsByName.get(placementName);
 			placement.hide();
 		}
 	}
-	
-	public void onPlacementShown(Activity activity, Placement placement){
+
+	public void onPlacementShown(Activity activity, Placement placement) {
 		placementsByActivityName.put(getKeyForActivity(activity), placement);
 	}
-	
-	public void onPlacementDisposed(Activity activity){
+
+	public void onPlacementDisposed(Activity activity) {
 		placementsByActivityName.remove(activity);
 	}
-	
-	public void onActivityResumed(Activity activity){
+
+	public void onActivityResumed(Activity activity) {
 		String key = getKeyForActivity(activity);
-		if(placementsByActivityName.containsKey(key)){
+		if (placementsByActivityName.containsKey(key)) {
 			Placement placement = placementsByActivityName.get(key);
 			placement.attachActivity(activity);
 		}
 	}
 
-	public void onActivityPaused(Activity activity){
+	public void onActivityPaused(Activity activity) {
 		String key = getKeyForActivity(activity);
-		if(placementsByActivityName.containsKey(key)){
+		if (placementsByActivityName.containsKey(key)) {
 			Placement placement = placementsByActivityName.get(key);
 			placement.detachActivity();
 		}
 	}
-	
-	private String getKeyForActivity(Activity activity){
+
+	private String getKeyForActivity(Activity activity) {
 		return activity.getClass().getName();
 	}
 }

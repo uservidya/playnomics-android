@@ -14,52 +14,58 @@ import com.playnomics.util.Logger.LogLevel;
 
 public class HttpConnectionFactory implements IHttpConnectionFactory {
 	private Logger logger;
-	public HttpConnectionFactory(Logger logger){
+
+	public HttpConnectionFactory(Logger logger) {
 		this.logger = logger;
 	}
-	
-	public HttpURLConnection startConnectionForUrl(String urlString) 
+
+	public HttpURLConnection startConnectionForUrl(String urlString)
 			throws IOException {
-		try{
+		try {
 			URL url = new URL(urlString);
 			return ((HttpURLConnection) url.openConnection());
-		} catch(MalformedURLException ex){
-			logger.log(LogLevel.WARNING, ex, "Could not generate a valid URL from this String %s", urlString);
+		} catch (MalformedURLException ex) {
+			logger.log(LogLevel.WARNING, ex,
+					"Could not generate a valid URL from this String %s",
+					urlString);
 			return null;
-		}		
+		}
 	}
 
 	public String buildUrl(String url, String path,
-			TreeMap<String, Object> queryParameters){
-		if(Util.stringIsNullOrEmpty(url)){
+			TreeMap<String, Object> queryParameters) {
+		if (Util.stringIsNullOrEmpty(url)) {
 			return null;
 		}
-		
+
 		StringBuilder builder = new StringBuilder(url);
-		
-		if(!Util.stringIsNullOrEmpty(path)){
-			builder.append(url.endsWith("/") ? path : String.format("/%s", path));
+
+		if (!Util.stringIsNullOrEmpty(path)) {
+			builder.append(url.endsWith("/") ? path : String
+					.format("/%s", path));
 		}
-		
-		try {		
-			if(queryParameters != null){
+
+		try {
+			if (queryParameters != null) {
 				boolean hasQueryString = builder.toString().contains("?");
 				boolean firstParam = true;
-				
-				for(String key : queryParameters.keySet()){
-					if(Util.stringIsNullOrEmpty(key)){
+
+				for (String key : queryParameters.keySet()) {
+					if (Util.stringIsNullOrEmpty(key)) {
 						continue;
 					}
-					
+
 					Object value = queryParameters.get(key);
-					if(value == null){
-						continue; 
+					if (value == null) {
+						continue;
 					}
-					
-					builder.append((!hasQueryString && firstParam) 
-							? String.format("?%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING))
-							: String.format("&%s=%s", key, URLEncoder.encode(value.toString(), Util.UT8_ENCODING)));
-					
+
+					builder.append((!hasQueryString && firstParam) ? String
+							.format("?%s=%s", key, URLEncoder.encode(
+									value.toString(), Util.UT8_ENCODING))
+							: String.format("&%s=%s", key, URLEncoder.encode(
+									value.toString(), Util.UT8_ENCODING)));
+
 					firstParam = false;
 				}
 			}
@@ -69,6 +75,5 @@ public class HttpConnectionFactory implements IHttpConnectionFactory {
 		}
 		return builder.toString();
 	}
-	
-	
+
 }

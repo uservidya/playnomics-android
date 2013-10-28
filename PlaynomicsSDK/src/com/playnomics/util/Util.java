@@ -34,21 +34,21 @@ public class Util implements IRandomGenerator {
 
 	private Logger logger;
 
-	public Util(Logger logger){
+	public Util(Logger logger) {
 		this.logger = logger;
 	}
-	
+
 	public long generatePositiveRandomLong() {
 		Random rand = new Random();
 		return Math.abs(rand.nextLong());
 	}
-	
-	public String getDeviceIdFromContext(Context context){
+
+	public String getDeviceIdFromContext(Context context) {
 		return Settings.Secure.getString(context.getContentResolver(),
 				Settings.Secure.ANDROID_ID);
 	}
-	
-	public int getApplicationVersionFromContext(Context context){
+
+	public int getApplicationVersionFromContext(Context context) {
 		try {
 			PackageManager packageManager = context.getPackageManager();
 			PackageInfo info;
@@ -62,8 +62,8 @@ public class Util implements IRandomGenerator {
 			return -1;
 		}
 	}
-	
-	public void openUrlInPhoneBrowser(String url, Context context){
+
+	public void openUrlInPhoneBrowser(String url, Context context) {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		context.startActivity(browserIntent);
 	}
@@ -71,55 +71,60 @@ public class Util implements IRandomGenerator {
 	public static boolean stringIsNullOrEmpty(String value) {
 		return (value == null || value.isEmpty());
 	}
-	
-    public static boolean isEmptyObject(JSONObject object) {
-        return object.names() == null;
-    }
- 
-    public static Map<String, Object> getMap(JSONObject object, String key) throws JSONException {
-        return toMap(object.getJSONObject(key));
-    }
- 
-    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
-        Map<String, Object> map = new HashMap<String, Object>();
-        @SuppressWarnings("rawtypes")
-		Iterator keys =  object.keys();
-        while (keys.hasNext()) {
-            String key = (String) keys.next();
-            map.put(key, fromJson(object.get(key)));
-        }
-        return map;
-    }
- 
-    @SuppressWarnings({ "rawtypes", "unchecked"})
+
+	public static boolean isEmptyObject(JSONObject object) {
+		return object.names() == null;
+	}
+
+	public static Map<String, Object> getMap(JSONObject object, String key)
+			throws JSONException {
+		return toMap(object.getJSONObject(key));
+	}
+
+	public static Map<String, Object> toMap(JSONObject object)
+			throws JSONException {
+		Map<String, Object> map = new HashMap<String, Object>();
+		@SuppressWarnings("rawtypes")
+		Iterator keys = object.keys();
+		while (keys.hasNext()) {
+			String key = (String) keys.next();
+			map.put(key, fromJson(object.get(key)));
+		}
+		return map;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List toList(JSONArray array) throws JSONException {
 		List list = new ArrayList();
-        for (int i = 0; i < array.length(); i++) {
-            list.add(fromJson(array.get(i)));
-        }
-        return list;
-    }
- 
-    private static Object fromJson(Object json) throws JSONException {
-        if (json == JSONObject.NULL) {
-            return null;
-        } else if (json instanceof JSONObject) {
-            return toMap((JSONObject) json);
-        } else if (json instanceof JSONArray) {
-            return toList((JSONArray) json);
-        } else {
-            return json;
-        }
-    }
-    
-	public void overrideActivityWindowCallback(Activity activity, TouchEventHandler handler){
+		for (int i = 0; i < array.length(); i++) {
+			list.add(fromJson(array.get(i)));
+		}
+		return list;
+	}
+
+	private static Object fromJson(Object json) throws JSONException {
+		if (json == JSONObject.NULL) {
+			return null;
+		} else if (json instanceof JSONObject) {
+			return toMap((JSONObject) json);
+		} else if (json instanceof JSONArray) {
+			return toList((JSONArray) json);
+		} else {
+			return json;
+		}
+	}
+
+	public void overrideActivityWindowCallback(Activity activity,
+			TouchEventHandler handler) {
 		Window.Callback currentCallback = activity.getWindow().getCallback();
 		activity.getWindow().setCallback(
-				WindowCallbackProxy.newCallbackProxyForActivity(currentCallback, handler));
+				WindowCallbackProxy.newCallbackProxyForActivity(
+						currentCallback, handler));
 	}
-	
-	public void removeWindowCallback(Activity activity){
-		WindowCallbackProxy proxy = (WindowCallbackProxy)activity.getWindow().getCallback();
+
+	public void removeWindowCallback(Activity activity) {
+		WindowCallbackProxy proxy = (WindowCallbackProxy) activity.getWindow()
+				.getCallback();
 		activity.getWindow().setCallback(proxy.getOriginalCallback());
 	}
 }

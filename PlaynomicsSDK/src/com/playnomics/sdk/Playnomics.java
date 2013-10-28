@@ -32,92 +32,104 @@ import com.playnomics.util.Util;
 public class Playnomics {
 	private static final Object syncLock = new Object();
 	private static Session instance;
-	
+
 	private static Logger logger;
 	private static Util util;
-	
+
 	private static Session getInstance() {
 		synchronized (Playnomics.syncLock) {
 			if (instance == null) {
 				LogWriter logWriter = new AndroidLogger("PLAYNOMICS");
 				Playnomics.logger = new Logger(logWriter);
-				
-				HttpConnectionFactory connectionFactory = new HttpConnectionFactory(logger);
+
+				HttpConnectionFactory connectionFactory = new HttpConnectionFactory(
+						logger);
 				IConfig config = new Config();
 				Playnomics.util = new Util(logger);
-				IEventQueue eventQueue = new EventQueue(config, connectionFactory);
-				IEventWorker eventWorker = new EventWorker(eventQueue, connectionFactory, logger);
+				IEventQueue eventQueue = new EventQueue(config,
+						connectionFactory);
+				IEventWorker eventWorker = new EventWorker(eventQueue,
+						connectionFactory, logger);
 				IActivityObserver activityObserver = new ActivityObserver(util);
-				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(config.getAppRunningIntervalSeconds());
+				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(
+						config.getAppRunningIntervalSeconds());
 				HtmlAdFactory adFactory = new HtmlAdFactory();
 				AssetClient assetClient = new AssetClient(connectionFactory);
-				PlacementDataClient placementDataClient = new PlacementDataClient(assetClient, config, logger, adFactory);
-				
+				PlacementDataClient placementDataClient = new PlacementDataClient(
+						assetClient, config, logger, adFactory);
+
 				PlayViewFactory viewFactory = new PlayViewFactory();
-				MessagingManager messagingManager = new MessagingManager(config, placementDataClient, util, logger, viewFactory);
-				instance = new Session(config, util, connectionFactory, logger, eventQueue, eventWorker, activityObserver, heartbeatProducer, messagingManager);
+				MessagingManager messagingManager = new MessagingManager(
+						config, placementDataClient, util, logger, viewFactory);
+				instance = new Session(config, util, connectionFactory, logger,
+						eventQueue, eventWorker, activityObserver,
+						heartbeatProducer, messagingManager);
 			}
 			return instance;
 		}
 	}
-	
-	public static void start(Context context, long applicationId, String userId){
+
+	public static void start(Context context, long applicationId, String userId) {
 		Session session = getInstance();
 		session.setApplicationId(applicationId);
-		session.setUserId(userId);	
-		ContextWrapper contextWrapper = new ContextWrapper(context, logger, util);
+		session.setUserId(userId);
+		ContextWrapper contextWrapper = new ContextWrapper(context, logger,
+				util);
 		session.start(contextWrapper);
 	}
-	
-	public static void start(Context context, long applicationId){
+
+	public static void start(Context context, long applicationId) {
 		Session session = getInstance();
 		session.setApplicationId(applicationId);
 		session.setUserId(null);
-		
-		ContextWrapper contextWrapper = new ContextWrapper(context, logger, util);
+
+		ContextWrapper contextWrapper = new ContextWrapper(context, logger,
+				util);
 		session.start(contextWrapper);
 	}
-	
-	public static void onActivityResumed(Activity activity){
+
+	public static void onActivityResumed(Activity activity) {
 		Session session = getInstance();
 		session.onActivityResumed(activity);
 	}
-	
-	public static void onActivityPaused(Activity activity){
+
+	public static void onActivityPaused(Activity activity) {
 		Session session = getInstance();
 		session.onActivityPaused(activity);
 	}
-	
-	public static void transactionInUSD(float priceInUSD, int quantity){
+
+	public static void transactionInUSD(float priceInUSD, int quantity) {
 		Session session = getInstance();
 		session.transactionInUSD(priceInUSD, quantity);
 	}
-	
-	public static void customEvent(CustomEventType customEventType){
+
+	public static void customEvent(CustomEventType customEventType) {
 		Session session = getInstance();
 		session.customEvent(customEventType);
 	}
-	
-	public static void attributeInstall(String source, String campaign, Date installDateUtc){
+
+	public static void attributeInstall(String source, String campaign,
+			Date installDateUtc) {
 		Session session = getInstance();
 		session.attributeInstall(source, campaign, installDateUtc);
 	}
-	
-	public static void attributeInstall(String source, String campaign){
+
+	public static void attributeInstall(String source, String campaign) {
 		Session session = getInstance();
 		session.attributeInstall(source, campaign, null);
 	}
-	
-	public static void attributeInstall(String source){
+
+	public static void attributeInstall(String source) {
 		Session session = getInstance();
 		session.attributeInstall(source, null, null);
 	}
-	
-	public static void preloadPlacement(String ... placementNames){
-		
+
+	public static void preloadPlacement(String... placementNames) {
+
 	}
-	
-	public static void showPlacement(String placementName, IPlaynomicsPlacementDelegate delegate){
-		
+
+	public static void showPlacement(String placementName,
+			IPlaynomicsPlacementDelegate delegate) {
+
 	}
 }

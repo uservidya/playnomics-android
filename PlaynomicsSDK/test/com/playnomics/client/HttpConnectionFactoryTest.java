@@ -20,9 +20,9 @@ public class HttpConnectionFactoryTest {
 
 	@Mock
 	private Logger loggerMock;
-	
+
 	private IHttpConnectionFactory builder;
-	
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -45,16 +45,17 @@ public class HttpConnectionFactoryTest {
 	public void testBuildUrlNullParams() throws UnsupportedEncodingException {
 		String url = null;
 		String path = null;
-		TreeMap<String,Object> parameters = null;
+		TreeMap<String, Object> parameters = null;
 		String result = builder.buildUrl(url, path, parameters);
 		assertNull("Should be null", result);
 	}
-	
+
 	@Test
-	public void testBuildUrlNoPathOrParams() throws UnsupportedEncodingException {
+	public void testBuildUrlNoPathOrParams()
+			throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = null;
-		TreeMap <String, Object> parameters = null;
+		TreeMap<String, Object> parameters = null;
 		String result = builder.buildUrl(url, path, parameters);
 		assertEquals(url, result);
 	}
@@ -63,38 +64,40 @@ public class HttpConnectionFactoryTest {
 	public void testBuildUrlPathNoSlash() throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = "apple";
-		TreeMap <String, Object> parameters = null;
+		TreeMap<String, Object> parameters = null;
 		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple", result);
 	}
-	
+
 	@Test
 	public void testBuildUrlPathSlash() throws UnsupportedEncodingException {
 		String url = "http://google.com/";
 		String path = "apple";
-		TreeMap <String, Object> parameters = null;
+		TreeMap<String, Object> parameters = null;
 		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple", result);
 	}
-	
+
 	@Test
 	public void testBuildUrlAllFields() throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = "apple";
-		TreeMap <String, Object> parameters = new TreeMap<String, Object>();
+		TreeMap<String, Object> parameters = new TreeMap<String, Object>();
 		parameters.put("x", 1);
 		parameters.put("y", "This is my name");
 		String result = builder.buildUrl(url, path, parameters);
 		assertEquals("http://google.com/apple?x=1&y=This+is+my+name", result);
 	}
-	
-	public void testBuildUrlPrexistingQueryString() throws UnsupportedEncodingException {
+
+	public void testBuildUrlPrexistingQueryString()
+			throws UnsupportedEncodingException {
 		String url = "http://google.com";
 		String path = "apple?z=1";
-		TreeMap <String, Object> parameters = new TreeMap<String, Object>();
+		TreeMap<String, Object> parameters = new TreeMap<String, Object>();
 		parameters.put("x", 1);
 		parameters.put("y", "This is my name");
 		String result = builder.buildUrl(url, path, parameters);
-		assertEquals("http://google.com/apple?z=1&x=1&y=This+is+my+name", result);
+		assertEquals("http://google.com/apple?z=1&x=1&y=This+is+my+name",
+				result);
 	}
 }
