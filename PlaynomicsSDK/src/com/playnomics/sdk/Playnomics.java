@@ -12,7 +12,7 @@ import com.playnomics.client.FrameDataClient;
 import com.playnomics.client.HttpConnectionFactory;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
-import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.events.CustomEvent.CustomEventType;
 import com.playnomics.messaging.HtmlAdFactory;
 import com.playnomics.messaging.MessagingManager;
 import com.playnomics.messaging.ui.PlayViewFactory;
@@ -93,9 +93,9 @@ public class Playnomics {
 		session.transactionInUSD(priceInUSD, quantity);
 	}
 	
-	public static void milestone(MilestoneType milestoneType){
+	public static void customEvent(CustomEventType customEventType){
 		Session session = getInstance();
-		session.milestone(milestoneType);
+		session.customEvent(customEventType);
 	}
 	
 	public static void attributeInstall(String source, String campaign, Date installDateUtc){

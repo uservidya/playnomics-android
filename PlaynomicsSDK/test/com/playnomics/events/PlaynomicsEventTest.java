@@ -69,7 +69,7 @@ public class PlaynomicsEventTest {
 		} else if (event instanceof TransactionEvent) {
 			assertEquals("Has correct URL Path", "transaction",
 					event.getUrlPath());
-		} else if (event instanceof MilestoneEvent) {
+		} else if (event instanceof CustomEvent) {
 			assertEquals("Has correct URL Path", "milestone",
 					event.getUrlPath());
 		} else if (event instanceof UserInfoEvent) {

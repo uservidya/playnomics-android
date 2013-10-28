@@ -16,8 +16,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.playnomics.events.MilestoneEvent;
-import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.events.CustomEvent;
+import com.playnomics.events.CustomEvent.CustomEventType;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.Config;
 import com.playnomics.util.LargeGeneratedId;
@@ -35,7 +35,7 @@ public class EventWorkerTest {
 	private EventQueue queue;
 	private EventWorker worker;
 	private GameSessionInfo sessionInfo;
-	private MilestoneEvent event;
+	private CustomEvent event;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -61,7 +61,7 @@ public class EventWorkerTest {
 		worker = new EventWorker(queue, factoryMock, logger);
 		
 		sessionInfo = new GameSessionInfo(1L, "userId", "breadcrumbId", new LargeGeneratedId(10L));
-		event = new MilestoneEvent(config, util, sessionInfo, MilestoneType.MilestoneCustom1);
+		event = new CustomEvent(config, util, sessionInfo, CustomEventType.CUSTOM_EVENT_1);
 	}
 
 	@After

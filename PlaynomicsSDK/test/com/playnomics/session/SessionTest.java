@@ -27,8 +27,8 @@ import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppPauseEvent;
 import com.playnomics.events.AppResumeEvent;
 import com.playnomics.events.AppStartEvent;
-import com.playnomics.events.MilestoneEvent;
-import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.events.CustomEvent;
+import com.playnomics.events.CustomEvent.CustomEventType;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 import com.playnomics.messaging.MessagingManager;
@@ -250,15 +250,15 @@ public class SessionTest {
 	public void testMilestone(){
 		//start up the session
 		testStartNewDevice();
-		session.milestone(MilestoneType.MilestoneCustom1);
+		session.customEvent(CustomEventType.CUSTOM_EVENT_1);
 		
 		Object event = eventQueue.queue.remove();
-		assertTrue("Milestone queued", event instanceof MilestoneEvent);
+		assertTrue("Milestone queued", event instanceof CustomEvent);
 	}
 	
 	@Test 
 	public void testMilestoneNoStart(){
-		session.milestone(MilestoneType.MilestoneCustom1);
+		session.customEvent(CustomEventType.CUSTOM_EVENT_1);
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 	

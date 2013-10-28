@@ -21,7 +21,7 @@ import com.playnomics.events.AppResumeEvent;
 import com.playnomics.events.AppRunningEvent;
 import com.playnomics.events.AppStartEvent;
 import com.playnomics.events.ImplicitEvent;
-import com.playnomics.events.MilestoneEvent;
+import com.playnomics.events.CustomEvent;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 
@@ -306,14 +306,14 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	public void milestone(MilestoneEvent.MilestoneType milestoneType) {
+	public void customEvent(CustomEvent.CustomEventType customEventType) {
 		try {
 			assertSessionStarted();
-			MilestoneEvent event = new MilestoneEvent(config, util,
-					getSessionInfo(), milestoneType);
+			CustomEvent event = new CustomEvent(config, util,
+					getSessionInfo(), customEventType);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, ex, "Could not send milestone");
+			logger.log(LogLevel.ERROR, ex, "Could not send custom event");
 		}
 	}
 

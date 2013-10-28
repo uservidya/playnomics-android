@@ -12,13 +12,13 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import java.util.Map;
 
-import com.playnomics.events.MilestoneEvent.MilestoneType;
+import com.playnomics.events.CustomEvent.CustomEventType;
 import com.playnomics.session.GameSessionInfo;
 import com.playnomics.util.IConfig;
 import com.playnomics.util.Util;
 import com.playnomics.util.Config;
 
-public class MilestoneEventTest extends PlaynomicsEventTest {
+public class CustomEventTest extends PlaynomicsEventTest {
 
 	@Mock
 	private Util utilMock;
@@ -41,15 +41,15 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 	}
 
 	@Test
-	public void testMilestoneToString() {
-		MilestoneType milestoneType = MilestoneType.MilestoneCustom1;
+	public void testCustomEventToString() {
+		CustomEventType milestoneType = CustomEventType.CUSTOM_EVENT_1;
 		assertEquals("MilestoneType has correct string representation", "CUSTOM1", milestoneType.toString());
 	}
 	
 	@Test
-	public void testMilestoneEvent(){
+	public void testCustomEvent(){
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		MilestoneType milestone25 = MilestoneType.MilestoneCustom25;
+		CustomEventType milestone25 = CustomEventType.CUSTOM_EVENT_25;
 
 		long milestoneId = 100L;
 
@@ -57,7 +57,7 @@ public class MilestoneEventTest extends PlaynomicsEventTest {
 
 		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 		
-		MilestoneEvent event = new MilestoneEvent(config, utilMock, sessionInfo, milestone25);
+		CustomEvent event = new CustomEvent(config, utilMock, sessionInfo, milestone25);
 		testCommonEventParameters(config, event, sessionInfo);
 		
 		Map<String, Object> params = event.getEventParameters();
