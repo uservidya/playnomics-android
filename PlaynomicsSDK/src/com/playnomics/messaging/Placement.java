@@ -108,7 +108,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler{
 	private void loadWebView(){
 		if(!(shouldRender && state == PlacementState.LOAD_COMPLETE)){ return; }
 		
-		Runnable renderTask = renderTaskFactory.createRenderTask(this, htmlAd, activity, this, observer);
+		Runnable renderTask = renderTaskFactory.createShowPlacementTask(this, htmlAd, activity, this, observer);
 		//make sure we run this task on the UI thread
 		activity.runOnUiThread(renderTask);
 		
@@ -178,7 +178,8 @@ public class Placement implements PlayWebView.IPlayWebViewHandler{
 
 	private void onAdClosed(boolean closedByUser) {
 		if(dialog != null){
-			dialog.dismiss();
+			Runnable hideTask = renderTaskFactory.createHidePlacementTask(dialog);
+			activity.runOnUiThread(hideTask);
 		}
 		
 		observer.onPlacementDisposed(activity);
@@ -197,7 +198,8 @@ public class Placement implements PlayWebView.IPlayWebViewHandler{
 	
 	public void detachActivity(){
 		if(dialog != null){
-			dialog.dismiss();
+			Runnable hideTask = renderTaskFactory.createHidePlacementTask(dialog);
+			activity.runOnUiThread(hideTask);
 		}
 		this.activity = null;
 	}
