@@ -262,7 +262,7 @@ public class PlacementTest {
 		if (state == PlacementState.LOAD_COMPLETE) {
 			when(
 					renderTaskFactoryMock.createLayoutPlacementTask(placement,
-							adMock, activityMock, placement, observerMock))
+							adMock, activityMock, placement, placement, observerMock))
 					.thenReturn(layoutPlacementTaskMock);
 			
 			assertEquals("Placement loaded", PlacementState.LOAD_COMPLETE,
@@ -364,7 +364,6 @@ public class PlacementTest {
 		when(adMock.getClickUrl()).thenReturn(clickUrl);
 		when(adMock.getClickLink()).thenReturn(clickLink);
 		when(adMock.getTarget()).thenReturn(targetMock);
-		when(adMock.getTarget()).thenReturn(targetMock);
 
 		when(targetMock.getTargetUrl()).thenReturn(targetUrl);
 		when(targetMock.getTargetType()).thenReturn(TargetType.URL);
@@ -374,5 +373,27 @@ public class PlacementTest {
 		verify(processorMock).processUrlCallback(clickUrl);
 		verify(utilMock, Mockito.never()).openUrlInPhoneBrowser(targetUrl,
 				activityMock);
+	}
+	
+	@Test
+	public void testWebViewTouchCloseLink() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithHtmlCloseButton();
+		
+		String closeLink = "pn://close";
+		String closeUrl = "http://closeUrl";
+		when(adMock.getCloseUrl()).thenReturn(closeUrl);
+		when(htmlCloseMock.getCloseLink()).thenReturn(closeLink);
+		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
+		
+		when(adMock.getTarget()).thenReturn(targetMock);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		when(targetMock.getTargetData()).thenReturn(data);
+		when(targetMock.getTargetType()).thenReturn(TargetType.DATA);
+		
+		placement.onUrlLoading(closeLink);
+		
+		verify(processorMock).processUrlCallback(closeUrl);
+		verify(delegateMock).onClose(data);
 	}
 }

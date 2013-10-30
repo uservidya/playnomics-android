@@ -11,6 +11,7 @@ import com.playnomics.messaging.Position.PositionType;
 import com.playnomics.messaging.Target.TargetType;
 import com.playnomics.messaging.ui.IPlayViewFactory;
 import com.playnomics.messaging.ui.PlayDialog;
+import com.playnomics.messaging.ui.PlayViewFactory.IImageViewHandler;
 import com.playnomics.messaging.ui.PlayWebView;
 import com.playnomics.messaging.ui.RenderTaskFactory;
 import com.playnomics.sdk.IPlaynomicsPlacementDelegate;
@@ -19,7 +20,7 @@ import com.playnomics.util.Logger;
 import com.playnomics.util.Util;
 import com.playnomics.util.Logger.LogLevel;
 
-public class Placement implements PlayWebView.IPlayWebViewHandler {
+public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHandler {
 
 	public interface IPlacementStateObserver {
 		void onPlacementShown(Activity activity, Placement placement);
@@ -115,13 +116,17 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 		}
 
 		Runnable renderTask = renderTaskFactory.createLayoutPlacementTask(this,
-				htmlAd, activity, this, observer);
+				htmlAd, activity, this, this, observer);
 		// make sure we run this task on the UI thread
 		util.runTaskOnActivityUIThread(renderTask, activity);
 	}
 
 	public void hide() {
-		onAdClosed(false);
+		if (dialog != null) {
+			Runnable hideTask = renderTaskFactory
+					.createHidePlacementTask(dialog);
+			util.runTaskOnActivityUIThread(hideTask, activity);
+		}
 	}
 
 	public void onLoadFailure(int errorCode) {
@@ -163,11 +168,10 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 				}
 			}
 
-			if (url.equals(htmlAd.getClickLink())) {
-				onAdTouched();
-				return;
+			onAdTouched();
+			if (!url.equals(htmlAd.getClickLink())) {
+				util.openUrlInPhoneBrowser(url, activity);
 			}
-			util.openUrlInPhoneBrowser(url, activity);
 		}
 	}
 
@@ -186,12 +190,6 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 	}
 
 	private void onAdClosed(boolean closedByUser) {
-		if (dialog != null) {
-			Runnable hideTask = renderTaskFactory
-					.createHidePlacementTask(dialog);
-			util.runTaskOnActivityUIThread(hideTask, activity);
-		}
-
 		observer.onPlacementDisposed(activity);
 		if (closedByUser) {
 			callbackProcessor.processUrlCallback(htmlAd.getCloseUrl());
@@ -213,5 +211,10 @@ public class Placement implements PlayWebView.IPlayWebViewHandler {
 			util.runTaskOnActivityUIThread(hideTask, activity);
 		}
 		this.activity = null;
+	}
+
+	public void onTouch() {
+		hide();
+		onAdClosed(true);
 	}
 }

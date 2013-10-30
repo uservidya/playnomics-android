@@ -11,6 +11,7 @@ import com.playnomics.messaging.Placement;
 import com.playnomics.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.messaging.HtmlAd;
 import com.playnomics.messaging.NativeCloseButton;
+import com.playnomics.messaging.ui.PlayViewFactory.IImageViewHandler;
 import com.playnomics.messaging.ui.PlayWebView.IPlayWebViewHandler;
 import com.playnomics.util.Logger;
 import com.playnomics.util.Logger.LogLevel;
@@ -24,10 +25,13 @@ public class RenderTaskFactory {
 		this.viewFactory = viewFactory;
 		this.logger = logger;
 	}
+	
+
 
 	public Runnable createLayoutPlacementTask(final Placement placement,
 			final HtmlAd htmlAd, final Activity activity,
 			final IPlayWebViewHandler handler,
+			final IImageViewHandler imageViewHandler,
 			final IPlacementStateObserver observer) {
 
 		return new Runnable() {
@@ -50,7 +54,7 @@ public class RenderTaskFactory {
 								.getCloseButton();
 
 						ImageView closeButtonView = viewFactory
-								.createImageView(activity);
+								.createImageView(activity, imageViewHandler);
 
 						byte[] imageData = closeButton.getImageData();
 						Bitmap bitmap = BitmapFactory.decodeByteArray(
