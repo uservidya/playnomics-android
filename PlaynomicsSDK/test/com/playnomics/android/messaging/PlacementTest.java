@@ -113,6 +113,8 @@ public class PlacementTest {
 		when(sessionMock.getAndroidId()).thenReturn("deviceId");
 		when(sessionMock.getUserId()).thenReturn("userId");
 
+		when(utilMock.getDeviceLanguage()).thenReturn("en");
+		
 		IConfig config = new Config();
 
 		logger = new Logger(new UnitTestLogWriter());
@@ -125,7 +127,7 @@ public class PlacementTest {
 		jsonAssetResponseMock);
 
 		dataClient = new PlacementDataClient(assetClientMock, config, logger,
-				htmlAdFactory);
+				htmlAdFactory, utilMock);
 		dataClient.setSession(sessionMock);
 	}
 

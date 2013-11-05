@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
@@ -66,6 +67,14 @@ public class Util implements IRandomGenerator {
 	public void openUrlInPhoneBrowser(String url, Context context) {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		context.startActivity(browserIntent);
+	}
+	
+	public String getDeviceLanguage(){
+		Locale defaultLocale = Locale.getDefault();
+		if(defaultLocale == null){
+			return null;
+		}
+		return defaultLocale.getLanguage();
 	}
 
 	public static boolean stringIsNullOrEmpty(String value) {

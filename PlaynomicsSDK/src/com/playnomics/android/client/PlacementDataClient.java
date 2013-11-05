@@ -12,6 +12,7 @@ import com.playnomics.android.session.Session;
 import com.playnomics.android.util.IConfig;
 import com.playnomics.android.util.Logger;
 import com.playnomics.android.util.Logger.LogLevel;
+import com.playnomics.android.util.Util;
 
 public class PlacementDataClient {
 	private IConfig config;
@@ -19,17 +20,19 @@ public class PlacementDataClient {
 	private Logger logger;
 	private HtmlAdFactory adFactory;
 	private AssetClient assetClient;
+	private Util util;
 
 	public void setSession(Session session) {
 		this.session = session;
 	}
 
 	public PlacementDataClient(AssetClient assetClient, IConfig config,
-			Logger logger, HtmlAdFactory adFactory) {
+			Logger logger, HtmlAdFactory adFactory, Util util) {
 		this.logger = logger;
 		this.config = config;
 		this.adFactory = adFactory;
 		this.assetClient = assetClient;
+		this.util = util;
 	}
 
 	public Thread loadPlacementInBackground(final Placement placement) {
@@ -47,6 +50,8 @@ public class PlacementDataClient {
 						session.getBreadcrumbId());
 				queryParams.put(config.getMessagingDeviceIdKey(),
 						session.getAndroidId());
+				queryParams.put(config.getMessagingLanguageKey(), 
+						util.getDeviceLanguage());
 				queryParams.put(config.getApplicationIdKey(),
 						session.getApplicationId());
 				queryParams.put(config.getUserIdKey(), session.getUserId());

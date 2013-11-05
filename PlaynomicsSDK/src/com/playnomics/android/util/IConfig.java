@@ -109,4 +109,6 @@ public interface IConfig {
 	public String getMessagingScreenHeightKey();
 
 	public String getMessagingDeviceIdKey();
+	
+	public String getMessagingLanguageKey();
 }

@@ -260,4 +260,9 @@ public class Config implements IConfig {
 	public String getMessagingDeviceIdKey(){
 		return bundle.getString("messaging.deviceIdKey");
 	}
+
+	public String getMessagingLanguageKey(){
+		return bundle.getString("messaging.languageKey");
+	}
 }
+

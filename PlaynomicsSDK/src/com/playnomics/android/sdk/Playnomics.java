@@ -55,7 +55,7 @@ public class Playnomics {
 				HtmlAdFactory adFactory = new HtmlAdFactory();
 				AssetClient assetClient = new AssetClient(connectionFactory);
 				PlacementDataClient placementDataClient = new PlacementDataClient(
-						assetClient, config, logger, adFactory);
+						assetClient, config, logger, adFactory, util);
 
 				PlayViewFactory viewFactory = new PlayViewFactory();
 				MessagingManager messagingManager = new MessagingManager(
