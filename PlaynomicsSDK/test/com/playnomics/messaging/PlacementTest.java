@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import android.app.Activity;
-import android.webkit.WebView;
 
 import com.playnomics.client.AssetClient;
 import com.playnomics.client.PlacementDataClient;
@@ -348,7 +347,7 @@ public class PlacementTest {
 		when(targetMock.getTargetType()).thenReturn(TargetType.URL);
 		
 		placement.onUrlLoading(clickLink);
-		
+
 		verify(processorMock).processUrlCallback(clickUrl);
 		verify(utilMock).openUrlInPhoneBrowser(targetUrl, activityMock);
 	}
@@ -383,7 +382,6 @@ public class PlacementTest {
 		String closeUrl = "http://closeUrl";
 		when(adMock.getCloseUrl()).thenReturn(closeUrl);
 		when(htmlCloseMock.getCloseLink()).thenReturn(closeLink);
-		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
 		
 		when(adMock.getTarget()).thenReturn(targetMock);
 		
@@ -392,6 +390,25 @@ public class PlacementTest {
 		when(targetMock.getTargetType()).thenReturn(TargetType.DATA);
 		
 		placement.onUrlLoading(closeLink);
+
+		verify(processorMock).processUrlCallback(closeUrl);
+		verify(delegateMock).onClose(data);
+	}
+	
+	@Test
+	public void testNativeCloseButtonTouched() throws IOException, InterruptedException, JSONException{
+		testSuccessJsonWithNativeCloseButton();
+		
+		String closeUrl = "http://closeUrl";
+		when(adMock.getCloseUrl()).thenReturn(closeUrl);
+		
+		when(adMock.getTarget()).thenReturn(targetMock);
+		
+		Map<String, Object> data = new HashMap<String, Object>();
+		when(targetMock.getTargetData()).thenReturn(data);
+		when(targetMock.getTargetType()).thenReturn(TargetType.DATA);
+		
+		placement.onTouch();
 		
 		verify(processorMock).processUrlCallback(closeUrl);
 		verify(delegateMock).onClose(data);
