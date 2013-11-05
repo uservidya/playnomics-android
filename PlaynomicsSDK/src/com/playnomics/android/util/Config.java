@@ -257,8 +257,8 @@ public class Config implements IConfig {
 		return bundle.getString("messaging.screenHeightKey");
 	}
 	
-	public String getMessagingDeviceIdKey(){
-		return bundle.getString("messaging.deviceIdKey");
+	public String getMessagingAndroidIdKey(){
+		return bundle.getString("messaging.androidIdKey");
 	}
 
 	public String getMessagingLanguageKey(){

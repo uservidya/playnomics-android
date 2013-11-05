@@ -48,7 +48,7 @@ public class PlacementDataClient {
 						placement.getPlacementName());
 				queryParams.put(config.getBreadcrumbIdKey(),
 						session.getBreadcrumbId());
-				queryParams.put(config.getMessagingDeviceIdKey(),
+				queryParams.put(config.getMessagingAndroidIdKey(),
 						session.getAndroidId());
 				queryParams.put(config.getMessagingLanguageKey(), 
 						util.getDeviceLanguage());
