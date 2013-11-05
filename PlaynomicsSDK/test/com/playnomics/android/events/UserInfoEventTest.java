@@ -64,14 +64,14 @@ public class UserInfoEventTest extends PlaynomicsEventTest {
 		IConfig config = new Config();
 
 		String pushRegistrationId = "pushId";
-		String deviceId = "deviceId";
+		String androidId = "androidId";
 
 		UserInfoEvent event = new UserInfoEvent(config, sessionInfo,
-				pushRegistrationId, deviceId);
+				pushRegistrationId, androidId);
 		testCommonEventParameters(config, event, sessionInfo);
 
 		Map<String, Object> params = event.getEventParameters();
-		assertEquals("Device ID is set", deviceId, params.get("deviceId"));
+		assertEquals("Device ID is set", androidId, params.get("androidId"));
 		assertEquals("Push ID is set", pushRegistrationId,
 				params.get("pushTok"));
 	}
