@@ -67,7 +67,17 @@ public class Playnomics {
 			return instance;
 		}
 	}
+	
+	public static void setOverrideEventsUrl(String eventsUrl){
+		Session session = getInstance();
+		session.setOverrideEventsUrl(eventsUrl);
+	}
 
+	public static void setOverrideMessagingUrl(String messagingUrl){
+		Session session = getInstance();
+		session.setOverrideMessagingUrl(messagingUrl);
+	}
+	
 	public static void start(Context context, long applicationId, String userId) {
 		Session session = getInstance();
 		session.setApplicationId(applicationId);

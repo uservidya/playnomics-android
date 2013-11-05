@@ -113,6 +113,14 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		enablePushNotifications = value;
 	}
 
+	public void setOverrideEventsUrl(String eventsUrl){
+		this.config.setOverrideEventsUrl(eventsUrl);
+	}
+	
+	public void setOverrideMessagingUrl(String messagingUrl){
+		this.config.setOverrideMessagingUrl(messagingUrl);
+	}
+	
 	public Session(IConfig config, Util util,
 			IHttpConnectionFactory connectionFactory, Logger logger,
 			IEventQueue eventQueue, IEventWorker eventWorker,
