@@ -152,8 +152,8 @@ public class Config implements IConfig {
 		return bundle.getString("eventKeys.userInfoInstallDateKey");
 	}
 
-	public String getUserInfoDeviceIdKey() {
-		return bundle.getString("eventKeys.userInfoDeviceIdKey");
+	public String getUserInfoAndroidIdKey() {
+		return bundle.getString("eventKeys.userInfoAndroidIdKey");
 	}
 
 	public String getUserInfoPushTokenKey() {

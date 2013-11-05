@@ -56,7 +56,7 @@ public interface IConfig {
 
 	public String getUserInfoInstallDateKey();
 
-	public String getUserInfoDeviceIdKey();
+	public String getUserInfoAndroidIdKey();
 
 	public String getUserInfoPushTokenKey();
 

@@ -110,7 +110,7 @@ public class PlacementTest {
 
 		when(sessionMock.getApplicationId()).thenReturn(1L);
 		when(sessionMock.getBreadcrumbId()).thenReturn("breadcrumb");
-		when(sessionMock.getDeviceId()).thenReturn("deviceId");
+		when(sessionMock.getAndroidId()).thenReturn("deviceId");
 		when(sessionMock.getUserId()).thenReturn("userId");
 
 		IConfig config = new Config();
