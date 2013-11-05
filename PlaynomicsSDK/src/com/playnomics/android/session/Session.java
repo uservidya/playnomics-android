@@ -318,11 +318,11 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	public void customEvent(CustomEvent.CustomEventType customEventType) {
+	public void customEvent(String customEventName) {
 		try {
 			assertSessionStarted();
 			CustomEvent event = new CustomEvent(config, util, getSessionInfo(),
-					customEventType);
+					customEventName);
 			eventQueue.enqueueEvent(event);
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not send custom event");

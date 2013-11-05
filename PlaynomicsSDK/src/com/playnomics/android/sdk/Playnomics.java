@@ -12,7 +12,6 @@ import com.playnomics.android.client.HttpConnectionFactory;
 import com.playnomics.android.client.IEventQueue;
 import com.playnomics.android.client.IEventWorker;
 import com.playnomics.android.client.PlacementDataClient;
-import com.playnomics.android.events.CustomEvent.CustomEventType;
 import com.playnomics.android.messaging.HtmlAdFactory;
 import com.playnomics.android.messaging.MessagingManager;
 import com.playnomics.android.messaging.ui.PlayViewFactory;
@@ -103,9 +102,9 @@ public class Playnomics {
 		session.transactionInUSD(priceInUSD, quantity);
 	}
 
-	public static void customEvent(CustomEventType customEventType) {
+	public static void customEvent(String customEventName) {
 		Session session = getInstance();
-		session.customEvent(customEventType);
+		session.customEvent(customEventName);
 	}
 
 	public static void attributeInstall(String source, String campaign,

@@ -30,7 +30,6 @@ import com.playnomics.android.events.AppStartEvent;
 import com.playnomics.android.events.CustomEvent;
 import com.playnomics.android.events.TransactionEvent;
 import com.playnomics.android.events.UserInfoEvent;
-import com.playnomics.android.events.CustomEvent.CustomEventType;
 import com.playnomics.android.messaging.MessagingManager;
 import com.playnomics.android.sdk.IPlaynomicsPlacementDelegate;
 import com.playnomics.android.session.IActivityObserver;
@@ -276,18 +275,18 @@ public class SessionTest {
 	}
 
 	@Test
-	public void testMilestone() {
+	public void testCustomEvent() {
 		// start up the session
 		testStartNewDevice();
-		session.customEvent(CustomEventType.CUSTOM_EVENT_1);
+		session.customEvent("my event");
 
 		Object event = eventQueue.queue.remove();
 		assertTrue("Milestone queued", event instanceof CustomEvent);
 	}
 
 	@Test
-	public void testMilestoneNoStart() {
-		session.customEvent(CustomEventType.CUSTOM_EVENT_1);
+	public void testCustomEventNoStart() {
+		session.customEvent("my event");
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 	}
 

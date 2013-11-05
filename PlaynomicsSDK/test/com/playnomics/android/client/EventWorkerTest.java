@@ -20,7 +20,6 @@ import com.playnomics.android.client.EventQueue;
 import com.playnomics.android.client.EventWorker;
 import com.playnomics.android.client.HttpConnectionFactory;
 import com.playnomics.android.events.CustomEvent;
-import com.playnomics.android.events.CustomEvent.CustomEventType;
 import com.playnomics.android.session.GameSessionInfo;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.LargeGeneratedId;
@@ -64,7 +63,7 @@ public class EventWorkerTest {
 		worker = new EventWorker(queue, factoryMock, logger);
 		
 		sessionInfo = new GameSessionInfo(1L, "userId", "breadcrumbId", new LargeGeneratedId(10L));
-		event = new CustomEvent(config, util, sessionInfo, CustomEventType.CUSTOM_EVENT_1);
+		event = new CustomEvent(config, util, sessionInfo, "my event");
 	}
 
 	@After

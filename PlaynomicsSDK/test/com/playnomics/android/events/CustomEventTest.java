@@ -13,7 +13,6 @@ import static org.mockito.Mockito.*;
 import java.util.Map;
 
 import com.playnomics.android.events.CustomEvent;
-import com.playnomics.android.events.CustomEvent.CustomEventType;
 import com.playnomics.android.session.GameSessionInfo;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.IConfig;
@@ -42,16 +41,9 @@ public class CustomEventTest extends PlaynomicsEventTest {
 	}
 
 	@Test
-	public void testCustomEventToString() {
-		CustomEventType milestoneType = CustomEventType.CUSTOM_EVENT_1;
-		assertEquals("MilestoneType has correct string representation",
-				"CUSTOM1", milestoneType.toString());
-	}
-
-	@Test
 	public void testCustomEvent() {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
-		CustomEventType milestone25 = CustomEventType.CUSTOM_EVENT_25;
+		String eventName = "my event";
 
 		long milestoneId = 100L;
 
@@ -60,11 +52,11 @@ public class CustomEventTest extends PlaynomicsEventTest {
 		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 
 		CustomEvent event = new CustomEvent(config, utilMock, sessionInfo,
-				milestone25);
+				eventName);
 		testCommonEventParameters(config, event, sessionInfo);
 
 		Map<String, Object> params = event.getEventParameters();
-		assertEquals("Milestone Name is set", milestone25, params.get("mn"));
+		assertEquals("Milestone Name is set", eventName, params.get("mn"));
 		assertEquals("Milestone ID is set", milestoneId, params.get("mi"));
 		verify(utilMock).generatePositiveRandomLong();
 	}
