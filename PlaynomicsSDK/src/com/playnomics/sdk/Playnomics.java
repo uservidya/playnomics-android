@@ -125,11 +125,23 @@ public class Playnomics {
 	}
 
 	public static void preloadPlacement(String... placementNames) {
-
+		Session session = getInstance();
+		session.preloadPlacements(placementNames);
 	}
 
-	public static void showPlacement(String placementName,
+	public static void showPlacement(String placementName, Activity activity,
 			IPlaynomicsPlacementDelegate delegate) {
-
+		Session session = getInstance();
+		session.showPlacement(placementName, activity, delegate);
+	}
+	
+	public static void showPlacement(String placementName, Activity activity) {
+		Session session = getInstance();
+		session.showPlacement(placementName, activity, null);
+	}
+	
+	public static void hidePlacement(String placementName) {
+		Session session = getInstance();
+		session.hidePlacement(placementName);
 	}
 }

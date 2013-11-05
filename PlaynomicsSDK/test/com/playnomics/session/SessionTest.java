@@ -32,6 +32,7 @@ import com.playnomics.events.CustomEvent.CustomEventType;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
 import com.playnomics.messaging.MessagingManager;
+import com.playnomics.sdk.IPlaynomicsPlacementDelegate;
 import com.playnomics.util.Config;
 import com.playnomics.util.ContextWrapper;
 import com.playnomics.util.EventTime;
@@ -71,6 +72,9 @@ public class SessionTest {
 
 	@Mock
 	private MessagingManager messagingManagerMock;
+	
+	@Mock
+	private IPlaynomicsPlacementDelegate delegateMock;
 
 	private Session session;
 	private StubEventQueue eventQueue;
@@ -376,5 +380,50 @@ public class SessionTest {
 		session.pause();
 		session.resume();
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
+	}
+	
+	@Test 
+	public void testPreloadPlacements(){
+		testStartNewDevice();
+		String [] placementNames = new String[] {"placement1"};
+		session.preloadPlacements(placementNames);
+		verify(messagingManagerMock).preloadPlacements(placementNames);
+	}
+	
+	@Test 
+	public void testPreloadPlacementsNoStart(){
+		String [] placementNames = new String[] {"placement1"};
+		session.preloadPlacements(placementNames);
+		verify(messagingManagerMock, Mockito.never()).preloadPlacements(placementNames);
+	}
+	
+	@Test 
+	public void testShowPlacement(){
+		testStartNewDevice();
+		String placementName = "placement";
+		session.showPlacement(placementName, activityMock, delegateMock);
+		verify(messagingManagerMock).showPlacement(placementName, activityMock, delegateMock);
+	}
+	
+	@Test 
+	public void testShowPlacementNoStart(){
+		String placementName = "placement";
+		session.showPlacement(placementName, activityMock, delegateMock);
+		verify(messagingManagerMock, Mockito.never()).showPlacement(placementName, activityMock, delegateMock);
+	}
+	
+	@Test 
+	public void testHidePlacement(){
+		testStartNewDevice();
+		String placementName = "placement";
+		session.hidePlacement(placementName);
+		verify(messagingManagerMock).hidePlacement(placementName);
+	}
+	
+	@Test 
+	public void testHidePlacementNoStart(){
+		String placementName = "placement";
+		session.hidePlacement(placementName);
+		verify(messagingManagerMock, Mockito.never()).hidePlacement(placementName);
 	}
 }

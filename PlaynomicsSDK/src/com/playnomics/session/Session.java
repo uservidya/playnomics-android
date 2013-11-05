@@ -8,22 +8,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
 
-import com.playnomics.client.EventWorker;
 import com.playnomics.client.IEventQueue;
 import com.playnomics.client.IEventWorker;
 import com.playnomics.client.IHttpConnectionFactory;
-import com.playnomics.messaging.MessagingManager;
-import com.playnomics.util.*;
-import com.playnomics.util.Logger.LogLevel;
 import com.playnomics.events.AppPageEvent;
 import com.playnomics.events.AppPauseEvent;
 import com.playnomics.events.AppResumeEvent;
 import com.playnomics.events.AppRunningEvent;
 import com.playnomics.events.AppStartEvent;
-import com.playnomics.events.ImplicitEvent;
 import com.playnomics.events.CustomEvent;
+import com.playnomics.events.ImplicitEvent;
 import com.playnomics.events.TransactionEvent;
 import com.playnomics.events.UserInfoEvent;
+import com.playnomics.messaging.MessagingManager;
+import com.playnomics.sdk.IPlaynomicsPlacementDelegate;
+import com.playnomics.util.ContextWrapper;
+import com.playnomics.util.EventTime;
+import com.playnomics.util.IConfig;
+import com.playnomics.util.LargeGeneratedId;
+import com.playnomics.util.Logger;
+import com.playnomics.util.Logger.LogLevel;
+import com.playnomics.util.Util;
 
 public class Session implements SessionStateMachine, TouchEventHandler,
 		HeartBeatHandler, ICallbackProcessor {
@@ -347,5 +352,33 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 	public void processUrlCallback(String url) {
 		eventQueue.enqueueEventUrl(url);
+	}
+	
+	/* Messaging */
+	public void preloadPlacements(String[] placementNames){
+		try{
+			assertSessionStarted();
+			messagingManager.preloadPlacements(placementNames);
+		} catch (Exception ex) {
+			logger.log(LogLevel.ERROR, ex, "Could not preload placements");
+		}
+	}
+	
+	public void showPlacement(String placementName, Activity activity, IPlaynomicsPlacementDelegate delegate){
+		try{
+			assertSessionStarted();
+			messagingManager.showPlacement(placementName, activity, delegate);
+		} catch (Exception ex) {
+			logger.log(LogLevel.ERROR, ex, "Could not preload placements");
+		}
+	}
+	
+	public void hidePlacement(String placementName){
+		try{
+			assertSessionStarted();
+			messagingManager.hidePlacement(placementName);
+		} catch (Exception ex) {
+			logger.log(LogLevel.ERROR, ex, "Could not preload placements");
+		}
 	}
 }
