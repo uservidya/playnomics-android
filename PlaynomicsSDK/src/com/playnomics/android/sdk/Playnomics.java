@@ -133,7 +133,7 @@ public class Playnomics {
 		session.attributeInstall(source, null, null);
 	}
 
-	public static void preloadPlacement(String... placementNames) {
+	public static void preloadPlacements(String... placementNames) {
 		Session session = getInstance();
 		session.preloadPlacements(placementNames);
 	}
