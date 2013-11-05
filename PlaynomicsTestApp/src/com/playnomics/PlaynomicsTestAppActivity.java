@@ -1,21 +1,14 @@
 package com.playnomics;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.playnomics.playrm.Frame;
-import com.playnomics.playrm.Messaging;
-import com.playnomics.playrm.PlaynomicsConstants.CurrencyCategory;
-import com.playnomics.playrm.PlaynomicsConstants.CurrencyType;
-import com.playnomics.playrm.PlaynomicsConstants.TransactionType;
-import com.playnomics.playrm.PlaynomicsConstants.UserInfoSex;
-import com.playnomics.playrm.PlaynomicsConstants.UserInfoSource;
-import com.playnomics.playrm.PlaynomicsConstants.UserInfoType;
-import com.playnomics.playrm.PlaynomicsSession;
+import com.playnomics.android.sdk.Playnomics;
 
 public class PlaynomicsTestAppActivity extends Activity {
 	
@@ -26,78 +19,63 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		PlaynomicsSession.setOverrideEventsUrl("https://e.c.playnomics.net/v1/");
-		PlaynomicsSession.setOverrideMessagingUrl("https://ads.c.playnomics.net/v1/ads");
 		
-		Messaging.setup(this);
-		Log.d(logTag, "START: " + PlaynomicsSession.start(this, applicationId).toString());
+		Playnomics.setOverrideEventsUrl("https://e.c.playnomics.net");
+		Playnomics.setOverrideMessagingUrl("https://ads.c.playnomics.net");
+		Playnomics.start(this, applicationId);
+		Playnomics.preloadPlacements("44841d6a2bcec8c9", "a40893b36c6ddb32", "67dbfcad37eccbf9", "5bc049bb66ffc121");
 	}
 	
 	@Override
-	protected void onStart() {
-		Log.d(logTag, "SWITCH ACTIVITY: " + PlaynomicsSession.switchActivity(this));
-		super.onStart();
-	};
+	protected void onResume() {
+		super.onResume();
+		Playnomics.onActivityResumed(this);
+	}
 	
 	@Override
-	protected void onDestroy() {
-		PlaynomicsSession.stop();
-		super.onDestroy();
+	protected void onPause() {
+		super.onPause();
+		Playnomics.onActivityPaused(this);
 	}
 
-	
 	public void onUserInfoClick(View view) {
-		Log.d(logTag, "USER INFO: " +PlaynomicsSession.userInfo(UserInfoType.update, "USA", "test", UserInfoSex.Male, new Date("1/1/1999"),
-				UserInfoSource.Other, "test", new Date()).toString());
+		String source = "source";
+		String campaign = "campaign";
+		GregorianCalendar cal = new GregorianCalendar();
+		Date installDate = cal.getTime();
+		
+		Playnomics.attributeInstall(source, campaign, installDate);
 	}
 	
 	public void onTransactionClick(View view) {
-		String[] currencyTypes = { CurrencyType.USD.toString(), CurrencyType.OFF.toString() };
-		double[] currencyValues = { 1, 2 };
-		CurrencyCategory[] currencyCategories = { CurrencyCategory.Real, CurrencyCategory.Virtual };
-	
-		Log.d(logTag, "TRANSACTION: " +
-				PlaynomicsSession.transaction(1234567890L, "TEST_ITEM_ID", null, TransactionType.BuyItem, "TEST_USER_ID",
-						currencyTypes, currencyValues, currencyCategories).toString());
+		float price = 0.99f;
+		int quantity = 1;
+		Playnomics.transactionInUSD(price, quantity);
 	}
 
 	public void onMilestoneClick(View view) {
-		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(1L, "CUSTOM1").toString());
-		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(2L, "CUSTOM2").toString());
-		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(3L, "CUSTOM3").toString());
-		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(4L, "CUSTOM4").toString());
-		Log.d(logTag, "TEST_MILESTONE: "+ PlaynomicsSession.milestone(5L, "CUSTOM5").toString());
+		String eventName = "my event";
+		Playnomics.customEvent(eventName);
 	}
 
 	public void onHttpClick(View view){
-		setupFrame("44841d6a2bcec8c9");
+		setupPlacement("44841d6a2bcec8c9");
 	}
 	
 	public void onJsonClick(View view){
-		setupFrame("a40893b36c6ddb32");
+		setupPlacement("a40893b36c6ddb32");
 	}
 	
 	public void onNullTargetClick(View view){
-		setupFrame("67dbfcad37eccbf9");
+		setupPlacement("67dbfcad37eccbf9");
 	}
 	
 	public void onNoAdsClick(View view){
-		setupFrame("5bc049bb66ffc121");
+		setupPlacement("5bc049bb66ffc121");
 	}
 	
-	public void onPnxClick(View view){
-		setupFrame("e45c59f627043701");
-	}
-	
-	public void onPnx(){
-		//callback for pnx
-		Log.d(logTag, "PNX Called!");
-	}
-	
-	private void setupFrame (String frameId){
-		RichDataFrameDelegate delegate = new RichDataFrameDelegate(frameId);
-		Frame frame = Messaging.initWithFrameID(frameId, this, delegate);
-		frame.setEnableAdCode(true);
-		frame.start();
+	private void setupPlacement (String placementName){
+		RichDataFrameDelegate delegate = new RichDataFrameDelegate(placementName);
+		Playnomics.showPlacement(placementName, this, delegate);
 	}
 }
