@@ -25,6 +25,8 @@ import com.playnomics.android.client.AssetClient;
 import com.playnomics.android.client.IHttpConnectionFactory;
 import com.playnomics.android.client.AssetClient.AssetResponse;
 import com.playnomics.android.client.AssetClient.ResponseStatus;
+import com.playnomics.android.util.Logger;
+import com.playnomics.android.util.UnitTestLogWriter;
 
 public class AssetClientTest {
 
@@ -46,12 +48,15 @@ public class AssetClientTest {
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
+		
+		Logger logger = new Logger(new UnitTestLogWriter());
+		
 		MockitoAnnotations.initMocks(this);
 		when(
 				httpFactoryMock.buildUrl(any(String.class), any(String.class),
 						any(TreeMap.class))).thenReturn("http://google.com");
 
-		client = new AssetClient(httpFactoryMock);
+		client = new AssetClient(httpFactoryMock, logger);
 	}
 
 	@After

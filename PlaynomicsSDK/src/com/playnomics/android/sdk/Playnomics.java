@@ -54,8 +54,8 @@ public class Playnomics {
 				IActivityObserver activityObserver = new ActivityObserver(util);
 				IHeartBeatProducer heartbeatProducer = new HeartBeatProducer(
 						config.getAppRunningIntervalSeconds());
-				HtmlAdFactory adFactory = new HtmlAdFactory();
-				AssetClient assetClient = new AssetClient(connectionFactory);
+				HtmlAdFactory adFactory = new HtmlAdFactory(logger);
+				AssetClient assetClient = new AssetClient(connectionFactory, logger);
 				PlacementDataClient placementDataClient = new PlacementDataClient(
 						assetClient, config, logger, adFactory, util);
 

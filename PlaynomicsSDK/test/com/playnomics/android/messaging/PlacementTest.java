@@ -143,7 +143,7 @@ public class PlacementTest {
 		when(jsonAssetResponseMock.getStatus()).thenReturn(
 				ResponseStatus.SUCCESS);
 
-		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
+		when(htmlAdFactory.createDataFromBytes(data, "placementName")).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(htmlCloseMock);
 
@@ -170,7 +170,7 @@ public class PlacementTest {
 		when(imageAssetResponseMock.getStatus()).thenReturn(
 				ResponseStatus.SUCCESS);
 
-		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
+		when(htmlAdFactory.createDataFromBytes(data, "placementName")).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 
@@ -196,7 +196,7 @@ public class PlacementTest {
 		when(imageAssetResponseMock.getStatus()).thenReturn(
 				ResponseStatus.FAILURE);
 
-		when(htmlAdFactory.createDataFromBytes(data)).thenReturn(adMock);
+		when(htmlAdFactory.createDataFromBytes(data, "placementName")).thenReturn(adMock);
 
 		when(adMock.getCloseButton()).thenReturn(nativeCloseMock);
 
@@ -229,7 +229,7 @@ public class PlacementTest {
 		when(jsonAssetResponseMock.getStatus()).thenReturn(
 				ResponseStatus.SUCCESS);
 
-		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(
+		when(htmlAdFactory.createDataFromBytes(data, "placementName")).thenThrow(
 				new UnsupportedEncodingException("Failed"));
 
 		placement = new Placement("placementName", processorMock, utilMock,
@@ -248,7 +248,7 @@ public class PlacementTest {
 		when(jsonAssetResponseMock.getStatus()).thenReturn(
 				ResponseStatus.SUCCESS);
 
-		when(htmlAdFactory.createDataFromBytes(data)).thenThrow(
+		when(htmlAdFactory.createDataFromBytes(data, "placementName")).thenThrow(
 				new JSONException("Failed"));
 
 		placement = new Placement("placementName", processorMock, utilMock,

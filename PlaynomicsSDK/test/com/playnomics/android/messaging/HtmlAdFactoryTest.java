@@ -24,6 +24,8 @@ import com.playnomics.android.messaging.Position;
 import com.playnomics.android.messaging.Target;
 import com.playnomics.android.messaging.Position.PositionType;
 import com.playnomics.android.messaging.Target.TargetType;
+import com.playnomics.android.util.Logger;
+import com.playnomics.android.util.UnitTestLogWriter;
 
 public class HtmlAdFactoryTest {
 	private HtmlAdFactory adFactory;
@@ -38,7 +40,8 @@ public class HtmlAdFactoryTest {
 
 	@Before
 	public void setUp() throws Exception {
-		adFactory = new HtmlAdFactory();
+		Logger logger = new Logger(new UnitTestLogWriter());
+		adFactory = new HtmlAdFactory(logger);
 	}
 
 	@After
@@ -49,7 +52,7 @@ public class HtmlAdFactoryTest {
 	public void testDeserializeFullscreenAd_HtmlClose_TargetData()
 			throws IOException, JSONException {
 		byte[] jsonData = getTestJsonResource("sample-internal-ad-all-html-target-data.json");
-		HtmlAd ad = adFactory.createDataFromBytes(jsonData);
+		HtmlAd ad = adFactory.createDataFromBytes(jsonData, "placement");
 
 		assertTrue("HTML content is set",
 				ad.getHtmlContent().equals("<html></html>"));
@@ -85,7 +88,7 @@ public class HtmlAdFactoryTest {
 	public void testDeserializeFullscreenAd_HtmlClose_TargetUrl()
 			throws IOException, JSONException {
 		byte[] jsonData = getTestJsonResource("sample-internal-ad-all-html-target-url.json");
-		HtmlAd ad = adFactory.createDataFromBytes(jsonData);
+		HtmlAd ad = adFactory.createDataFromBytes(jsonData, "placementname");
 
 		assertTrue("HTML content is set",
 				ad.getHtmlContent().equals("<html></html>"));
@@ -121,7 +124,7 @@ public class HtmlAdFactoryTest {
 	public void testDeserializeFullscreenAd_HtmlClose_NullTarget()
 			throws IOException, JSONException {
 		byte[] jsonData = getTestJsonResource("sample-internal-ad-all-html-null-target.json");
-		HtmlAd ad = adFactory.createDataFromBytes(jsonData);
+		HtmlAd ad = adFactory.createDataFromBytes(jsonData, "placementName");
 
 		assertTrue("HTML content is set",
 				ad.getHtmlContent().equals("<html></html>"));
@@ -156,7 +159,7 @@ public class HtmlAdFactoryTest {
 	public void testDeserializeFullscreenAd_ThirdPartyAd() throws IOException,
 			JSONException {
 		byte[] jsonData = getTestJsonResource("sample-third-party-ad.json");
-		HtmlAd ad = adFactory.createDataFromBytes(jsonData);
+		HtmlAd ad = adFactory.createDataFromBytes(jsonData, "placementName");
 
 		assertTrue("HTML content is set",
 				ad.getHtmlContent().equals("<html>Third party ad here </html>"));

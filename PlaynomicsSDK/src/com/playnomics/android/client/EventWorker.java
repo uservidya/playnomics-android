@@ -64,7 +64,7 @@ public class EventWorker implements IEventWorker {
 					successful = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
 				} catch (IOException ex) {
 					logger.log(LogLevel.WARNING, ex,
-							"Event URL Request failed for URL: %s", url);
+							"IO Exception for Event URL: %s", url);
 				} finally {
 					if (connection != null) {
 						connection.disconnect();
@@ -73,6 +73,9 @@ public class EventWorker implements IEventWorker {
 
 				if (!successful) {
 					eventQueue.enqueueEventUrl(url);
+					logger.log(LogLevel.WARNING, "Event URL Request failed %s... retrying", url);
+				} else {
+					logger.log(LogLevel.DEBUG, "Event URL Request succeeded %s", url);
 				}
 			}
 

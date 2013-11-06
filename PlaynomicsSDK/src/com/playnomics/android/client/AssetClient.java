@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.TreeMap;
 
+import com.playnomics.android.util.Logger;
+import com.playnomics.android.util.Logger.LogLevel;
+
 public class AssetClient {
 
 	public enum ResponseStatus {
@@ -57,9 +60,11 @@ public class AssetClient {
 	}
 
 	protected IHttpConnectionFactory connectionFactory;
-
-	public AssetClient(IHttpConnectionFactory connectionFactory) {
+	private Logger logger;
+	
+	public AssetClient(IHttpConnectionFactory connectionFactory, Logger logger) {
 		this.connectionFactory = connectionFactory;
+		this.logger = logger;
 	}
 
 	public AssetResponse requestAsset(String baseUrl, String path,
@@ -73,6 +78,9 @@ public class AssetClient {
 		HttpURLConnection connection = null;
 		BufferedInputStream bufferedIn = null;
 		AssetResponse response;
+		
+		logger.log(LogLevel.DEBUG, "Requesting asset at %s", url);
+		
 		try {
 			connection = connectionFactory.startConnectionForUrl(url);
 			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
@@ -93,6 +101,7 @@ public class AssetClient {
 				response = new AssetResponse(url, data);
 			}
 		} catch (IOException e) {
+			logger.log(LogLevel.WARNING, "Could not retrieve asset at %s", url);
 			response = new AssetResponse(url, e);
 		} finally {
 			if (connection != null) {

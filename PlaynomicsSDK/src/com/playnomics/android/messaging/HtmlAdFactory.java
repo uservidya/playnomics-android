@@ -9,10 +9,19 @@ import org.json.JSONObject;
 
 import com.playnomics.android.messaging.Position.PositionType;
 import com.playnomics.android.messaging.Target.TargetType;
+import com.playnomics.android.util.Logger;
+import com.playnomics.android.util.Logger.LogLevel;
 import com.playnomics.android.util.Util;
 
 public class HtmlAdFactory {
-	public HtmlAd createDataFromBytes(byte[] data)
+	
+	private Logger logger;
+	
+	public HtmlAdFactory(Logger logger){
+		this.logger = logger;
+	}
+	
+	public HtmlAd createDataFromBytes(byte[] data, String placementName)
 			throws UnsupportedEncodingException, JSONException {
 		if (data == null || data.length == 0) {
 			return null;
@@ -20,7 +29,9 @@ public class HtmlAdFactory {
 
 		String jsonData = new String(data, Util.UT8_ENCODING);
 		JSONObject json = new JSONObject(jsonData);
-
+	
+		logger.log(LogLevel.VERBOSE, "Received json for placement: %s\n%s", placementName, jsonData);
+		
 		JSONArray adArray = json.getJSONArray("ads");
 
 		if (adArray == null || adArray.length() == 0) {

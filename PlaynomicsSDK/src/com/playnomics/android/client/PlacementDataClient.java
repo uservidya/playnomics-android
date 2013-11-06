@@ -50,7 +50,7 @@ public class PlacementDataClient {
 						session.getBreadcrumbId());
 				queryParams.put(config.getMessagingAndroidIdKey(),
 						session.getAndroidId());
-				queryParams.put(config.getMessagingLanguageKey(), 
+				queryParams.put(config.getMessagingLanguageKey(),
 						util.getDeviceLanguage());
 				queryParams.put(config.getApplicationIdKey(),
 						session.getApplicationId());
@@ -64,8 +64,9 @@ public class PlacementDataClient {
 
 				if (jsonResponse.getStatus() == ResponseStatus.SUCCESS) {
 					try {
-						HtmlAd htmlAd = adFactory
-								.createDataFromBytes(jsonResponse.getData());
+						HtmlAd htmlAd = adFactory.createDataFromBytes(
+								jsonResponse.getData(),
+								placement.getPlacementName());
 
 						if (htmlAd.getCloseButton() instanceof NativeCloseButton) {
 							NativeCloseButton closeButton = (NativeCloseButton) htmlAd
