@@ -53,8 +53,6 @@ public class CacheFileTest {
 		
 		when(utilMock.getContextCacheFile(contextMock, config.getCacheFileName())).thenReturn(file);
 		
-		
-		
 		cacheFile = new CacheFile(utilMock, config);
 		cacheFile.setContext(contextMock);
 	}
