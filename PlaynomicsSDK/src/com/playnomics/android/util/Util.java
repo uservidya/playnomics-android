@@ -1,6 +1,7 @@
 package com.playnomics.android.util;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,19 +70,19 @@ public class Util implements IRandomGenerator {
 		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		context.startActivity(browserIntent);
 	}
-	
-	public String getDeviceLanguage(){
+
+	public String getDeviceLanguage() {
 		Locale defaultLocale = Locale.getDefault();
-		if(defaultLocale == null){
+		if (defaultLocale == null) {
 			return null;
 		}
 		return defaultLocale.getLanguage();
 	}
 
-	public File getContextCacheFile(Context context, String fileName){
+	public File getContextCacheFile(Context context, String fileName) {
 		return new File(context.getCacheDir(), fileName);
 	}
-	
+
 	public static boolean stringIsNullOrEmpty(String value) {
 		return (value == null || value.isEmpty());
 	}
@@ -137,12 +138,13 @@ public class Util implements IRandomGenerator {
 	}
 
 	public void removeWindowCallback(Activity activity) {
-		WindowCallbackProxy proxy = (WindowCallbackProxy) activity.getWindow()
-				.getCallback();
+		Window.Callback callbackProxy = activity.getWindow().getCallback();
+		WindowCallbackProxy proxy = (WindowCallbackProxy) Proxy
+				.getInvocationHandler(callbackProxy);
 		activity.getWindow().setCallback(proxy.getOriginalCallback());
 	}
-	
-	public void runTaskOnActivityUIThread(Runnable task, Activity activity){
+
+	public void runTaskOnActivityUIThread(Runnable task, Activity activity) {
 		activity.runOnUiThread(task);
 	}
 }
