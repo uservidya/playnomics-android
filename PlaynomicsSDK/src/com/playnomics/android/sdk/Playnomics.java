@@ -27,6 +27,7 @@ import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.IConfig;
 import com.playnomics.android.util.LogWriter;
 import com.playnomics.android.util.Logger;
+import com.playnomics.android.util.Logger.LogLevel;
 import com.playnomics.android.util.Util;
 
 public class Playnomics {
@@ -69,6 +70,11 @@ public class Playnomics {
 			}
 			return instance;
 		}
+	}
+	
+	public static void setLogLevel(LogLevel logLevel){
+		Session session = getInstance();
+		session.setLogLevel(logLevel);
 	}
 	
 	public static void setOverrideEventsUrl(String eventsUrl){

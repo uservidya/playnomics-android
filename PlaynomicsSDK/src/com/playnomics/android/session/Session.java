@@ -124,6 +124,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		this.config.setOverrideMessagingUrl(messagingUrl);
 	}
 	
+	public void setLogLevel(LogLevel logLevel){
+		logger.setLogLevel(logLevel);
+	}
+	
 	public Session(IConfig config, Util util,
 			IHttpConnectionFactory connectionFactory, Logger logger,
 			IEventQueue eventQueue, IEventWorker eventWorker,
