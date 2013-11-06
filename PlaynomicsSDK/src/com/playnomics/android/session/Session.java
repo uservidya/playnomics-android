@@ -1,9 +1,11 @@
 package com.playnomics.android.session;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
@@ -22,13 +24,14 @@ import com.playnomics.android.events.TransactionEvent;
 import com.playnomics.android.events.UserInfoEvent;
 import com.playnomics.android.messaging.MessagingManager;
 import com.playnomics.android.sdk.IPlaynomicsPlacementDelegate;
+import com.playnomics.android.util.CacheFile;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.EventTime;
 import com.playnomics.android.util.IConfig;
 import com.playnomics.android.util.LargeGeneratedId;
 import com.playnomics.android.util.Logger;
-import com.playnomics.android.util.Util;
 import com.playnomics.android.util.Logger.LogLevel;
+import com.playnomics.android.util.Util;
 
 public class Session implements SessionStateMachine, TouchEventHandler,
 		HeartBeatHandler, ICallbackProcessor {
@@ -48,7 +51,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private IActivityObserver observer;
 	private IHeartBeatProducer producer;
 	private MessagingManager messagingManager;
-
+	private CacheFile cacheFile;
 	// session data
 	private Long applicationId;
 
@@ -125,7 +128,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			IHttpConnectionFactory connectionFactory, Logger logger,
 			IEventQueue eventQueue, IEventWorker eventWorker,
 			IActivityObserver activityObserver, IHeartBeatProducer producer,
-			MessagingManager messagingManager) {
+			MessagingManager messagingManager, CacheFile cacheFile) {
 		this.logger = logger;
 		this.sessionState = SessionState.NOT_STARTED;
 		this.util = util;
@@ -138,6 +141,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		// this is done to make Session more testable
 		// we want MessagingManager to be mocked out when we start the session
 		this.messagingManager.setSession(this);
+		this.cacheFile = cacheFile;
 	}
 
 	public void start(ContextWrapper contextWrapper) {
@@ -162,7 +166,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 					.synchronizeDeviceSettings();
 
 			androidId = util.getDeviceIdFromContext(contextWrapper.getContext());
-
+			
 			if (Util.stringIsNullOrEmpty(userId)) {
 				userId = androidId;
 			}
@@ -203,7 +207,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 						instanceId);
 				sessionStartTime = contextWrapper.getLastSessionStartTime();
 			}
-
+			
 			eventQueue.enqueueEvent(implicitEvent);
 			eventWorker.start();
 			producer.start(this);
@@ -212,6 +216,15 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			if (settingsChanged) {
 				onDeviceSettingsUpdated();
 			}
+			
+			cacheFile.setContext(contextWrapper.getContext());
+			Set<String> unprocessedUrls = cacheFile.readSetFromFile();
+			if(unprocessedUrls != null){
+				for(String url : unprocessedUrls){
+					eventQueue.enqueueEventUrl(url);
+				}
+			}
+			
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not start session");
 			sessionState = SessionState.NOT_STARTED;
@@ -232,8 +245,11 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.stop();
 			producer.stop();
 			sessionState = SessionState.PAUSED;
+			
+			Set<String> unprocessUrls = eventWorker.getAllUnprocessedEvents();
+			cacheFile.writeSetToFile(unprocessUrls);
 		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, ex, "Could not pause session");
+			logger.log(LogLevel.ERROR, ex, "Could not pause the session");
 		}
 	}
 
@@ -250,7 +266,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.start();
 			producer.start(this);
 		} catch (Exception ex) {
-			logger.log(LogLevel.ERROR, ex, "Could not pause session");
+			logger.log(LogLevel.ERROR, ex, "Could not resume the session");
 		}
 	}
 

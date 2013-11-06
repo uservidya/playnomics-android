@@ -264,5 +264,9 @@ public class Config implements IConfig {
 	public String getMessagingLanguageKey(){
 		return bundle.getString("messaging.languageKey");
 	}
+
+	public String getCacheFileName() {
+		return bundle.getString("cacheFileName");
+	}
 }
 

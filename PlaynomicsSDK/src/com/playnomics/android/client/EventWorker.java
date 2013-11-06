@@ -2,6 +2,8 @@ package com.playnomics.android.client;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.playnomics.android.util.Logger;
@@ -81,5 +83,13 @@ public class EventWorker implements IEventWorker {
 				return;
 			}
 		}
+	}
+
+	public Set<String> getAllUnprocessedEvents() {
+		HashSet<String> unprocessedEvents = new HashSet<String>();
+		while(!eventQueue.isEmpty()){
+			unprocessedEvents.add(eventQueue.dequeueEventUrl());
+		}
+		return unprocessedEvents;
 	}
 }

@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,6 +38,7 @@ import com.playnomics.android.session.IActivityObserver;
 import com.playnomics.android.session.IHeartBeatProducer;
 import com.playnomics.android.session.Session;
 import com.playnomics.android.session.SessionStateMachine;
+import com.playnomics.android.util.CacheFile;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.EventTime;
@@ -79,6 +82,9 @@ public class SessionTest {
 	@Mock
 	private IPlaynomicsPlacementDelegate delegateMock;
 
+	@Mock
+	private CacheFile cacheFileMock;
+	
 	private Session session;
 	private StubEventQueue eventQueue;
 
@@ -105,7 +111,9 @@ public class SessionTest {
 		Logger logger = new Logger(new UnitTestLogWriter());
 		session = new Session(config, utilMock, factoryMock, logger,
 				eventQueue, eventWorker, observerMock, producerMock,
-				messagingManagerMock);
+				messagingManagerMock, cacheFileMock);
+		
+		
 	}
 
 	@After
@@ -133,7 +141,12 @@ public class SessionTest {
 
 	public void testNewDevice(String userId) {
 		long newSessionId = 1;
-
+	
+		String urlPreviousEvent = "urlPreviousEvent";
+		HashSet<String> unprocessEvents = new HashSet<String>();
+		unprocessEvents.add(urlPreviousEvent);
+		when(cacheFileMock.readSetFromFile()).thenReturn(unprocessEvents);
+		
 		when(utilMock.generatePositiveRandomLong()).thenReturn(newSessionId);
 
 		when(contextWrapperMock.getLastEventTime()).thenReturn(null);
@@ -167,8 +180,11 @@ public class SessionTest {
 
 		Object nextEvent = eventQueue.queue.remove();
 		assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
-		// 2 events are queued
-		assertTrue("2 events are queued", eventQueue.isEmpty());
+		
+		String previousEvent = (String) eventQueue.queue.remove();
+		assertEquals(urlPreviousEvent, previousEvent);
+		// 3 events are queued
+		assertTrue("3 events are queued", eventQueue.isEmpty());
 
 		// verify that contextWrapper is called
 		verify(contextWrapperMock).setLastSessionStartTime(startTime);
@@ -203,6 +219,11 @@ public class SessionTest {
 		long nextId = 2;
 		when(utilMock.generatePositiveRandomLong()).thenReturn(nextId);
 
+		String urlPreviousEvent = "urlPreviousEvent";
+		HashSet<String> unprocessEvents = new HashSet<String>();
+		unprocessEvents.add(urlPreviousEvent);
+		when(cacheFileMock.readSetFromFile()).thenReturn(unprocessEvents);
+		
 		LargeGeneratedId oldSessionId = new LargeGeneratedId(1);
 
 		GregorianCalendar startTime = new GregorianCalendar();
@@ -263,15 +284,21 @@ public class SessionTest {
 			Object nextEvent = eventQueue.queue.remove();
 			assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
 			// 2 events are queued
-			assertTrue("2 events are queued", eventQueue.isEmpty());
+			String previousEvent = (String) eventQueue.queue.remove();
+			assertEquals(urlPreviousEvent, previousEvent);
+			// 3 events are queued
+			assertTrue("3 events are queued", eventQueue.isEmpty());
 		} else {
-			// 1 events are queued
-			assertTrue("1 event is queued", eventQueue.isEmpty());
+			String previousEvent = (String) eventQueue.queue.remove();
+			assertEquals(urlPreviousEvent, previousEvent);
+			
+			assertTrue("2 event is queued", eventQueue.isEmpty());
 		}
 
 		verify(producerMock).start(session);
 		verify(observerMock).setStateMachine(session);
 		verify(eventWorker).start();
+		verify(cacheFileMock).readSetFromFile();
 	}
 
 	@Test
@@ -364,9 +391,13 @@ public class SessionTest {
 	public void testPauseResume() {
 		testStartNewDevice();
 
+		Set<String> set = new HashSet<String>();
+		when(eventWorker.getAllUnprocessedEvents()).thenReturn(set);
+		
 		session.pause();
 		verify(producerMock).stop();
 		verify(eventWorker).stop();
+		verify(cacheFileMock).writeSetToFile(set);
 
 		session.resume();
 		verify(producerMock, Mockito.atMost(2)).start(session);

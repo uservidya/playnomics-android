@@ -1,5 +1,6 @@
 package com.playnomics.android.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,6 +78,10 @@ public class Util implements IRandomGenerator {
 		return defaultLocale.getLanguage();
 	}
 
+	public File getContextCacheFile(Context context, String fileName){
+		return new File(context.getCacheDir(), fileName);
+	}
+	
 	public static boolean stringIsNullOrEmpty(String value) {
 		return (value == null || value.isEmpty());
 	}

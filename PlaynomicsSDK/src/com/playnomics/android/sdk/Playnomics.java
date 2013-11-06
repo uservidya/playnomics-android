@@ -21,6 +21,7 @@ import com.playnomics.android.session.IActivityObserver;
 import com.playnomics.android.session.IHeartBeatProducer;
 import com.playnomics.android.session.Session;
 import com.playnomics.android.util.AndroidLogger;
+import com.playnomics.android.util.CacheFile;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.IConfig;
@@ -60,9 +61,11 @@ public class Playnomics {
 				PlayViewFactory viewFactory = new PlayViewFactory();
 				MessagingManager messagingManager = new MessagingManager(
 						config, placementDataClient, util, logger, viewFactory);
+				
+				CacheFile cacheFile = new CacheFile(util, config);
 				instance = new Session(config, util, connectionFactory, logger,
 						eventQueue, eventWorker, activityObserver,
-						heartbeatProducer, messagingManager);
+						heartbeatProducer, messagingManager, cacheFile);
 			}
 			return instance;
 		}

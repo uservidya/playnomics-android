@@ -111,4 +111,6 @@ public interface IConfig {
 	public String getMessagingAndroidIdKey();
 	
 	public String getMessagingLanguageKey();
+	
+	public String getCacheFileName();
 }

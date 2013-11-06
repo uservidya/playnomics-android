@@ -1,5 +1,6 @@
 package com.playnomics.android.client;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.playnomics.android.events.PlaynomicsEvent;
@@ -16,7 +17,7 @@ public class EventQueue implements IEventQueue {
 		eventUrlQueue = new ConcurrentLinkedQueue<String>();
 		this.factory = builder;
 	}
-
+	
 	public void enqueueEvent(PlaynomicsEvent event) {
 		String eventUrl = factory.buildUrl(config.getEventsUrl(),
 				event.getUrlPath(), event.getEventParameters());
