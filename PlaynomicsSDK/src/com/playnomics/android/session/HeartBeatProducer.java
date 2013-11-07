@@ -14,7 +14,6 @@ public class HeartBeatProducer implements IHeartBeatProducer {
 
 	public HeartBeatProducer(long heartbeatIntervalSeconds) {
 		this.started = new AtomicBoolean(false);
-		this.hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
 		this.heartbeatIntervalSeconds = heartbeatIntervalSeconds;
 	}
 
@@ -22,7 +21,7 @@ public class HeartBeatProducer implements IHeartBeatProducer {
 		if (started.getAndSet(true)) {
 			return;
 		}
-
+		hearbeatSchedule = new ScheduledThreadPoolExecutor(1);
 		hearbeatSchedule
 				.scheduleAtFixedRate(new Runnable() {
 					public void run() {
