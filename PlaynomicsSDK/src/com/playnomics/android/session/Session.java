@@ -155,12 +155,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			}
 
 			// session start code here
-			if (sessionState == SessionState.STARTED) {
-				return;
-			}
-
-			if (sessionState == SessionState.PAUSED) {
-				resume();
+			if (sessionState == SessionState.STARTED || sessionState == SessionState.PAUSED) {
 				return;
 			}
 
@@ -221,14 +216,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 				onDeviceSettingsUpdated();
 			}
 			
-			cacheFile.setContext(contextWrapper.getContext());
-			Set<String> unprocessedUrls = cacheFile.readSetFromFile();
-			if(unprocessedUrls != null){
-				for(String url : unprocessedUrls){
-					eventQueue.enqueueEventUrl(url);
-				}
-			}
-			
+			cacheFile.setContext(contextWrapper.getContext());			
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not start session");
 			sessionState = SessionState.NOT_STARTED;
@@ -237,7 +225,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 	public void pause() {
 		try {
-			if (sessionState != SessionState.STARTED) {
+			if (sessionState != SessionState.STARTED || applicationId == null) {
 				return;
 			}
 			sessionPauseTime = new EventTime();
@@ -259,7 +247,7 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 	public void resume() {
 		try {
-			if (sessionState != SessionState.PAUSED) {
+			if (sessionState != SessionState.PAUSED || applicationId == null) {
 				return;
 			}
 
@@ -269,6 +257,15 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventQueue.enqueueEvent(event);
 			eventWorker.start();
 			producer.start(this);
+			
+			Set<String> unprocessedUrls = cacheFile.readSetFromFile();
+			if(unprocessedUrls != null){
+				for(String url : unprocessedUrls){
+					eventQueue.enqueueEventUrl(url);
+				}
+			}
+			
+			sessionState = SessionState.STARTED;
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not resume the session");
 		}
