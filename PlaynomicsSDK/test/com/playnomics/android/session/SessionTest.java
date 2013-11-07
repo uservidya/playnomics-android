@@ -7,6 +7,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -36,6 +38,7 @@ import com.playnomics.android.session.IActivityObserver;
 import com.playnomics.android.session.IHeartBeatProducer;
 import com.playnomics.android.session.Session;
 import com.playnomics.android.session.SessionStateMachine;
+import com.playnomics.android.util.CacheFile;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.EventTime;
@@ -78,7 +81,10 @@ public class SessionTest {
 	
 	@Mock
 	private IPlaynomicsPlacementDelegate delegateMock;
-
+	
+	@Mock
+	private CacheFile cacheFileMock;
+	
 	private Session session;
 	private StubEventQueue eventQueue;
 
@@ -105,7 +111,7 @@ public class SessionTest {
 		Logger logger = new Logger(new UnitTestLogWriter());
 		session = new Session(config, utilMock, factoryMock, logger,
 				eventQueue, eventWorker, observerMock, producerMock,
-				messagingManagerMock);
+				messagingManagerMock, cacheFileMock);
 	}
 
 	@After
@@ -363,26 +369,48 @@ public class SessionTest {
 	@Test
 	public void testPauseResume() {
 		testStartNewDevice();
-
+		
+		String url = "url";
+		Set<String> unprocessedUrls = new HashSet<String>();
+		unprocessedUrls.add(url);
+		
+		when(eventWorker.getAllUnprocessedEvents()).thenReturn(unprocessedUrls);
+		
 		session.pause();
 		verify(producerMock).stop();
 		verify(eventWorker).stop();
+		verify(cacheFileMock).writeSetToFile(unprocessedUrls);
 
+		
+		when(cacheFileMock.readSetFromFile()).thenReturn(unprocessedUrls);
 		session.resume();
 		verify(producerMock, Mockito.atMost(2)).start(session);
 		verify(eventWorker, Mockito.atMost(2)).start();
-
+		
+		
+		
 		Object pauseEvent = eventQueue.queue.remove();
 		assertTrue("Pause event queued", pauseEvent instanceof AppPauseEvent);
 		Object resumeEvent = eventQueue.queue.remove();
 		assertTrue("Resume event queued", resumeEvent instanceof AppResumeEvent);
+		String previousEvent = (String) eventQueue.queue.remove();
+		assertEquals("Previous event queued", url, previousEvent);
 	}
 
 	@Test
 	public void testPauseResumeNoStart() {
+		String url = "url";
+		Set<String> unprocessedUrls = new HashSet<String>();
+		unprocessedUrls.add(url);
+		
+		when(eventWorker.getAllUnprocessedEvents()).thenReturn(unprocessedUrls);
+		
 		session.pause();
 		session.resume();
+		
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
+		verify(cacheFileMock, Mockito.never()).writeSetToFile(unprocessedUrls);
+		verify(cacheFileMock, Mockito.never()).readSetFromFile();
 	}
 	
 	@Test 
