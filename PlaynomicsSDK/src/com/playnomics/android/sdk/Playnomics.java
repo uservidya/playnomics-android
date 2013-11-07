@@ -72,6 +72,11 @@ public class Playnomics {
 		}
 	}
 	
+	public static void setTestMode(boolean testMode){
+		Session session = getInstance();
+		session.setTestMode(testMode);
+	}
+	
 	public static void setLogLevel(LogLevel logLevel){
 		Session session = getInstance();
 		session.setLogLevel(logLevel);

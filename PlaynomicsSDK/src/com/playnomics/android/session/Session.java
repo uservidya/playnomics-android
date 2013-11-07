@@ -117,15 +117,19 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	}
 
 	public void setOverrideEventsUrl(String eventsUrl){
-		this.config.setOverrideEventsUrl(eventsUrl);
+		config.setOverrideEventsUrl(eventsUrl);
 	}
 	
 	public void setOverrideMessagingUrl(String messagingUrl){
-		this.config.setOverrideMessagingUrl(messagingUrl);
+		config.setOverrideMessagingUrl(messagingUrl);
 	}
 	
 	public void setLogLevel(LogLevel logLevel){
 		logger.setLogLevel(logLevel);
+	}
+	
+	public void setTestMode(boolean testMode){
+		config.setTestMode(testMode);
 	}
 	
 	public Session(IConfig config, Util util,
