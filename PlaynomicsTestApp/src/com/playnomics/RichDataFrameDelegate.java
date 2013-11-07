@@ -19,19 +19,26 @@ public class RichDataFrameDelegate implements IPlaynomicsPlacementDelegate {
 	@Override
 	public void onShow(Map<String, Object> jsonData) {
 		Log.d(TAG, "onShow data for this placement: "+ placementName);
-		Log.d(TAG, jsonData.toString());
+		if(jsonData !=  null){
+			Log.d(TAG, jsonData.toString());
+		}
+		
 	}
 
 	@Override
 	public void onTouch(Map<String, Object> jsonData) {
 		Log.d(TAG, "onTouch data for this placement: "+ placementName);
-		Log.d(TAG, jsonData.toString());
+		if(jsonData !=  null){
+			Log.d(TAG, jsonData.toString());
+		}
 	}
 
 	@Override
 	public void onClose(Map<String, Object> jsonData) {
 		Log.d(TAG, "onClose data for this placement: "+ placementName);
-		Log.d(TAG, jsonData.toString());
+		if(jsonData !=  null){
+			Log.d(TAG, jsonData.toString());
+		}
 	}
 
 	@Override

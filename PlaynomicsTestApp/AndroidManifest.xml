@@ -21,8 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.playnomics.PlaynomicsTestAppActivity2" >
-        </activity>
     </application>
 
 </manifest>

@@ -8,7 +8,7 @@
         android:id="@+id/userInfoButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="UserInfo"
+        android:text="Install Attribution"
         android:onClick="onUserInfoClick" />
     <Button
         android:id="@+id/transactionButton"
@@ -43,12 +43,6 @@
         android:layout_height="wrap_content"
         android:text="Messaging No Ads"
         android:onClick="onNoAdsClick" />
-     <Button
-        android:id="@+id/messagingPnxButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Messaging PNX"
-        android:onClick="onPnxClick" />
     
       <Button
         android:id="@+id/messagingNullTargetButton"

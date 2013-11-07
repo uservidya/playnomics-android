@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.playnomics.android.sdk.Playnomics;
+import com.playnomics.android.util.Logger.LogLevel;
 
 public class PlaynomicsTestAppActivity extends Activity {
 	
@@ -16,26 +17,26 @@ public class PlaynomicsTestAppActivity extends Activity {
 	private final long applicationId = 2143315484923938870L;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		Playnomics.setOverrideEventsUrl("https://e.c.playnomics.net");
-		Playnomics.setOverrideMessagingUrl("https://ads.c.playnomics.net");
+		Playnomics.setLogLevel(LogLevel.VERBOSE);
+		Playnomics.setOverrideEventsUrl("https://e.c.playnomics.net/v1/");
+		Playnomics.setOverrideMessagingUrl("https://ads.c.playnomics.net/v3/");
 		Playnomics.start(this, applicationId);
 		Playnomics.preloadPlacements("44841d6a2bcec8c9", "a40893b36c6ddb32", "67dbfcad37eccbf9", "5bc049bb66ffc121");
 	}
 	
 	@Override
 	protected void onResume() {
-		super.onResume();
 		Playnomics.onActivityResumed(this);
+		super.onResume();
 	}
 	
 	@Override
 	protected void onPause() {
-		super.onPause();
 		Playnomics.onActivityPaused(this);
+		super.onPause();
 	}
 
 	public void onUserInfoClick(View view) {
