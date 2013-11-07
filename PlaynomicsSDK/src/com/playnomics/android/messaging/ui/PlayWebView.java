@@ -22,7 +22,7 @@ public class PlayWebView extends WebView {
 		void onUrlLoading(String url);
 	}
 
-	public PlayWebView(Context context, String htmlContent, String baseUrl,
+	public PlayWebView(Context context, String htmlContent,
 			final IPlayWebViewHandler handler, final Logger logger)
 			throws Exception {
 		super(context);
@@ -84,6 +84,6 @@ public class PlayWebView extends WebView {
 		});
 
 		// load this data in the background
-		loadDataWithBaseURL(baseUrl, htmlContent, Util.CONTENT_TYPE_HTML, Util.UT8_ENCODING, null);
+		loadDataWithBaseURL(null, htmlContent, Util.CONTENT_TYPE_HTML, Util.UT8_ENCODING, null);
 	}
 }

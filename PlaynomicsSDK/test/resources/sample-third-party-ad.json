@@ -6,7 +6,6 @@
          "closeUrl":"http://closeUrl",
          "clickUrl":"http://clickUrl",
          "clickLink": null,
-         "contentBaseUrl":"http://a.applovin.com",
          "target" : {
             "targetType" : "external"
          },

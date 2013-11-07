@@ -37,7 +37,7 @@ public class RenderTaskFactory {
 				try {
 					PlayWebView webView = viewFactory.createPlayWebView(
 							activity, htmlAd.getHtmlContent(),
-							htmlAd.getContentBaseUrl(), handler, logger);
+							 handler, logger);
 					
 					PlayDialog dialog;
 					if (htmlAd.getCloseButton() instanceof NativeCloseButton) {

@@ -23,10 +23,9 @@ public class PlayViewFactory implements IPlayViewFactory {
 		return new PlayDialog(context, webView, observer, activity, nativeCloseButton);
 	}
 
-	public PlayWebView createPlayWebView(Context context, String htmlContent,
-			String baseUrl, final IPlayWebViewHandler handler,
+	public PlayWebView createPlayWebView(Context context, String htmlContent, final IPlayWebViewHandler handler,
 			final Logger logger) throws Exception {
-		return new PlayWebView(context, htmlContent, baseUrl, handler, logger);
+		return new PlayWebView(context, htmlContent, handler, logger);
 	}
 
 	public ImageView createImageView(Context context, final IImageViewHandler imageViewHandler) {

@@ -15,7 +15,7 @@ public interface IPlayViewFactory {
 	
 	public PlayDialog createPlayDialog(Context context, PlayWebView webView, IPlacementStateObserver observer, Activity activity, ImageView nativeCloseButton);
 	
-	public PlayWebView createPlayWebView(Context context, String htmlContent, String baseUrl,
+	public PlayWebView createPlayWebView(Context context, String htmlContent,
 			final IPlayWebViewHandler handler, final Logger logger) throws Exception;
 	
 	public ImageView createImageView(Context context, final IImageViewHandler imageViewHandler);

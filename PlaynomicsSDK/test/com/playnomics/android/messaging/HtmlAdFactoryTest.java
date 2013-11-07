@@ -63,8 +63,6 @@ public class HtmlAdFactoryTest {
 				ad.getCloseUrl().equals("http://closeUrl"));
 		assertTrue("Impression URL is set",
 				ad.getImpressionUrl().equals("http://impressionUrl"));
-		assertTrue("Content Base URL is set",
-				ad.getContentBaseUrl().equals("https://ads.a.playnomics.net"));
 
 		Target target = ad.getTarget();
 		assertNotNull("Target is set", target);
@@ -99,9 +97,7 @@ public class HtmlAdFactoryTest {
 				ad.getCloseUrl().equals("http://closeUrl"));
 		assertTrue("Impression URL is set",
 				ad.getImpressionUrl().equals("http://impressionUrl"));
-		assertTrue("Content Base URL is set",
-				ad.getContentBaseUrl().equals("https://ads.a.playnomics.net"));
-
+		
 		Target target = ad.getTarget();
 		assertNotNull("Target is set", target);
 		assertEquals("Target type is url", TargetType.URL,
@@ -135,9 +131,7 @@ public class HtmlAdFactoryTest {
 				ad.getCloseUrl().equals("http://closeUrl"));
 		assertTrue("Impression URL is set",
 				ad.getImpressionUrl().equals("http://impressionUrl"));
-		assertTrue("Content Base URL is set",
-				ad.getContentBaseUrl().equals("https://ads.a.playnomics.net"));
-
+		
 		Target target = ad.getTarget();
 		assertNotNull("Target is set", target);
 		assertEquals("Target type is url", TargetType.URL,
@@ -170,9 +164,7 @@ public class HtmlAdFactoryTest {
 				ad.getCloseUrl().equals("http://closeUrl"));
 		assertTrue("Impression URL is set",
 				ad.getImpressionUrl().equals("http://impressionUrl"));
-		assertTrue("Content Base URL is set",
-				ad.getContentBaseUrl().equals("http://a.applovin.com"));
-
+		
 		Target target = ad.getTarget();
 		assertNotNull("Target is set", target);
 		assertEquals("Target type is external", TargetType.EXTERNAL,

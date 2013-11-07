@@ -126,9 +126,8 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 			Runnable hideTask = renderTaskFactory
 					.createHidePlacementTask(dialog);
 			util.runTaskOnActivityUIThread(hideTask, activity);
+			dialog = null;
 		}
-		this.dialog = null;
-		this.activity = null;
 	}
 
 	public void onLoadFailure(int errorCode) {

@@ -49,11 +49,8 @@ public class HtmlAdFactory {
 				false);
 		String closeUrl = cleanJSONString(firstAdData, "closeUrl", false);
 		String htmlContent = cleanJSONString(firstAdData, "htmlContent", false);
-		String contentBaseUrl = cleanJSONString(firstAdData, "contentBaseUrl",
-				false);
-
 		return new HtmlAd(position, closeButton, target, clickLink, clickUrl,
-				impressionUrl, closeUrl, contentBaseUrl, htmlContent);
+				impressionUrl, closeUrl, htmlContent);
 	}
 
 	private Position getPositionFromResponse(JSONObject response)

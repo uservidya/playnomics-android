@@ -6,7 +6,6 @@
          "closeUrl":"http://closeUrl",
          "clickUrl":"http://clickUrl",
          "clickLink":"pn://click",
-         "contentBaseUrl":"https://ads.a.playnomics.net",
          "target" : {
             "targetType" : "data",
             "targetData" : "{\"key\":\"value\"}"

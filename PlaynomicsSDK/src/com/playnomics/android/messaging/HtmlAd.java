@@ -46,13 +46,7 @@ public class HtmlAd {
 	public String getCloseUrl() {
 		return closeUrl;
 	}
-
-	private String contentBaseUrl;
-
-	public String getContentBaseUrl() {
-		return contentBaseUrl;
-	}
-
+	
 	private String htmlContent;
 
 	public String getHtmlContent() {
@@ -61,14 +55,13 @@ public class HtmlAd {
 
 	public HtmlAd(Position position, CloseButton closeButton, Target target,
 			String clickLink, String clickUrl, String impressionUrl,
-			String closeUrl, String contentBaseUrl, String htmlContent) {
+			String closeUrl, String htmlContent) {
 		this.position = position;
 		this.target = target;
 		this.clickLink = clickLink;
 		this.clickUrl = clickUrl;
 		this.impressionUrl = impressionUrl;
 		this.closeUrl = closeUrl;
-		this.contentBaseUrl = contentBaseUrl;
 		this.htmlContent = htmlContent;
 		this.closeButton = closeButton;
 	}
