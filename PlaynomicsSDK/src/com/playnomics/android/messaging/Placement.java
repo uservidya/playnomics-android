@@ -127,6 +127,8 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 					.createHidePlacementTask(dialog);
 			util.runTaskOnActivityUIThread(hideTask, activity);
 		}
+		this.dialog = null;
+		this.activity = null;
 	}
 
 	public void onLoadFailure(int errorCode) {
@@ -205,12 +207,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void detachActivity() {
-		if (dialog != null) {
-			Runnable hideTask = renderTaskFactory
-					.createHidePlacementTask(dialog);
-			util.runTaskOnActivityUIThread(hideTask, activity);
-		}
-		this.activity = null;
+		hide();
 	}
 
 	public void onTouch() {

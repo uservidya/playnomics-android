@@ -1,9 +1,11 @@
 package com.playnomics.android.messaging.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import com.playnomics.android.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.android.messaging.ui.PlayWebView.IPlayWebViewHandler;
 import com.playnomics.android.util.Logger;
 
@@ -13,8 +15,12 @@ public class PlayViewFactory implements IPlayViewFactory {
 		void onTouch();
 	}
 	
-	public PlayDialog createPlayDialog(Context context, PlayWebView webView) {
-		return new PlayDialog(context, webView);
+	public PlayDialog createPlayDialog(Context context, PlayWebView webView, IPlacementStateObserver observer, Activity activity) {
+		return new PlayDialog(context, webView, observer, activity);
+	}
+	
+	public PlayDialog createPlayDialog(Context context, PlayWebView webView, IPlacementStateObserver observer, Activity activity, ImageView nativeCloseButton) {
+		return new PlayDialog(context, webView, observer, activity, nativeCloseButton);
 	}
 
 	public PlayWebView createPlayWebView(Context context, String htmlContent,

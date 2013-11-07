@@ -25,8 +25,6 @@ public class RenderTaskFactory {
 		this.viewFactory = viewFactory;
 		this.logger = logger;
 	}
-	
-
 
 	public Runnable createLayoutPlacementTask(final Placement placement,
 			final HtmlAd htmlAd, final Activity activity,
@@ -40,15 +38,8 @@ public class RenderTaskFactory {
 					PlayWebView webView = viewFactory.createPlayWebView(
 							activity, htmlAd.getHtmlContent(),
 							htmlAd.getContentBaseUrl(), handler, logger);
-					PlayDialog dialog = viewFactory.createPlayDialog(activity,
-							webView);
-
-					placement.setDialog(dialog);
-
-					RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, 
-							LayoutParams.FILL_PARENT);
-					dialog.addContentView(webView, layoutParams);
 					
+					PlayDialog dialog;
 					if (htmlAd.getCloseButton() instanceof NativeCloseButton) {
 						NativeCloseButton closeButton = (NativeCloseButton) htmlAd
 								.getCloseButton();
@@ -60,13 +51,15 @@ public class RenderTaskFactory {
 						Bitmap bitmap = BitmapFactory.decodeByteArray(
 								imageData, 0, imageData.length);
 						closeButtonView.setImageBitmap(bitmap);
-						
-						RelativeLayout.LayoutParams params = new LayoutParams(closeButton.getWidth(), closeButton.getHeight());
-						params.addRule(RelativeLayout.ALIGN_PARENT_TOP | RelativeLayout.ALIGN_PARENT_RIGHT);
-						dialog.addContentView(closeButtonView, params);
+						dialog = viewFactory.createPlayDialog(activity,
+								webView, observer, activity, closeButtonView);
+					} else {
+						dialog = viewFactory.createPlayDialog(activity,
+								webView, observer, activity);
 					}
-					observer.onPlacementShown(activity, placement);
-				} catch (Exception ex) {
+					
+					placement.setDialog(dialog);
+ 				} catch (Exception ex) {
 					logger.log(LogLevel.WARNING,
 							"The placement %s cannot be rendered",
 							placement.getPlacementName());
