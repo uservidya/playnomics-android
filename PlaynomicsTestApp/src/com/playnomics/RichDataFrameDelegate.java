@@ -2,47 +2,43 @@ package com.playnomics;
 
 import java.util.Map;
 
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.playnomics.android.sdk.IPlaynomicsPlacementDelegate;
 
 public class RichDataFrameDelegate implements IPlaynomicsPlacementDelegate {
-
-	private final String TAG = RichDataFrameDelegate.class.getSimpleName();
-	
 	private final String placementName;
-	
-	public RichDataFrameDelegate(String placementName){
+	private Context context;
+	public RichDataFrameDelegate(String placementName, Context context){
 		this.placementName = placementName;
+		this.context = context;
 	}
 
 	@Override
 	public void onShow(Map<String, Object> jsonData) {
-		Log.d(TAG, "onShow data for this placement: "+ placementName);
-		if(jsonData !=  null){
-			Log.d(TAG, jsonData.toString());
-		}
-		
+		postToastMessage(String.format("onShow:\n %s", jsonData == null ? "No data" : jsonData.toString()));
 	}
 
 	@Override
 	public void onTouch(Map<String, Object> jsonData) {
-		Log.d(TAG, "onTouch data for this placement: "+ placementName);
-		if(jsonData !=  null){
-			Log.d(TAG, jsonData.toString());
-		}
+		postToastMessage(String.format("onTouch:\n %s", jsonData == null ? "No data" : jsonData.toString()));
 	}
 
 	@Override
 	public void onClose(Map<String, Object> jsonData) {
-		Log.d(TAG, "onClose data for this placement: "+ placementName);
-		if(jsonData !=  null){
-			Log.d(TAG, jsonData.toString());
-		}
+		postToastMessage(String.format("onClose:\n %s", jsonData == null ? "No data" : jsonData.toString()));
 	}
 
 	@Override
 	public void onRenderFailed() {
-		Log.d(TAG, "Placement could not be rendered: "+ placementName);
+		postToastMessage(String.format("Placement could not be rendered: %s", placementName));
+	}
+	
+	private void postToastMessage(String message){
+		int duration = Toast.LENGTH_LONG;
+		Toast toast = Toast.makeText(context, message, duration);
+		toast.show();
 	}
 }

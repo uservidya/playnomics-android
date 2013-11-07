@@ -76,7 +76,7 @@ public class PlaynomicsTestAppActivity extends Activity {
 	}
 	
 	private void setupPlacement (String placementName){
-		RichDataFrameDelegate delegate = new RichDataFrameDelegate(placementName);
+		RichDataFrameDelegate delegate = new RichDataFrameDelegate(placementName, getApplicationContext());
 		Playnomics.showPlacement(placementName, this, delegate);
 	}
 }
