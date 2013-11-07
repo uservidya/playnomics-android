@@ -129,6 +129,11 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 			dialog = null;
 		}
 	}
+	
+	private void dispose(){
+		hide();
+		observer.onPlacementDisposed(activity);
+	}
 
 	public void onLoadFailure(int errorCode) {
 		onLoadFailure();
@@ -158,7 +163,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void onUrlLoading(String url) {
-		hide();
+		dispose();
 		if (!Util.stringIsNullOrEmpty(url)) {
 			if (!hasNativeCloseButton()) {
 				HtmlCloseButton htmlClose = (HtmlCloseButton) htmlAd
@@ -191,7 +196,6 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	private void onAdClosed(boolean closedByUser) {
-		observer.onPlacementDisposed(activity);
 		if (closedByUser) {
 			callbackProcessor.processUrlCallback(htmlAd.getCloseUrl());
 		}
@@ -210,7 +214,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void onTouch() {
-		hide();
+		dispose();
 		onAdClosed(true);
 	}
 }

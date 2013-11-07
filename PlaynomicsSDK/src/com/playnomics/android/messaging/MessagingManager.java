@@ -77,7 +77,7 @@ public class MessagingManager implements IPlacementStateObserver {
 	}
 
 	public void onPlacementDisposed(Activity activity) {
-		placementsByActivityName.remove(activity);
+		placementsByActivityName.remove(getKeyForActivity(activity));
 	}
 
 	public void onActivityResumed(Activity activity) {

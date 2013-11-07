@@ -5,6 +5,7 @@ import android.content.Context;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import com.playnomics.android.messaging.Placement;
 import com.playnomics.android.messaging.Placement.IPlacementStateObserver;
 import com.playnomics.android.messaging.ui.PlayWebView.IPlayWebViewHandler;
 import com.playnomics.android.util.Logger;
@@ -15,12 +16,12 @@ public class PlayViewFactory implements IPlayViewFactory {
 		void onTouch();
 	}
 	
-	public PlayDialog createPlayDialog(Context context, PlayWebView webView, IPlacementStateObserver observer, Activity activity) {
-		return new PlayDialog(context, webView, observer, activity);
+	public PlayDialog createPlayDialog( Activity activity, PlayWebView webView, IPlacementStateObserver observer, Placement placement) {
+		return new PlayDialog(activity, webView, observer, placement);
 	}
 	
-	public PlayDialog createPlayDialog(Context context, PlayWebView webView, IPlacementStateObserver observer, Activity activity, ImageView nativeCloseButton) {
-		return new PlayDialog(context, webView, observer, activity, nativeCloseButton);
+	public PlayDialog createPlayDialog( Activity activity, PlayWebView webView, IPlacementStateObserver observer, ImageView nativeCloseButton, Placement placement) {
+		return new PlayDialog(activity, webView, observer, nativeCloseButton, placement);
 	}
 
 	public PlayWebView createPlayWebView(Context context, String htmlContent, final IPlayWebViewHandler handler,

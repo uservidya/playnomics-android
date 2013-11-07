@@ -52,10 +52,10 @@ public class RenderTaskFactory {
 								imageData, 0, imageData.length);
 						closeButtonView.setImageBitmap(bitmap);
 						dialog = viewFactory.createPlayDialog(activity,
-								webView, observer, activity, closeButtonView);
+								webView, observer, closeButtonView, placement);
 					} else {
 						dialog = viewFactory.createPlayDialog(activity,
-								webView, observer, activity);
+								webView, observer, placement);
 					}
 					
 					placement.setDialog(dialog);

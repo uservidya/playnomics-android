@@ -1,4 +1,5 @@
 package com.playnomics.android.messaging.ui;
+import com.playnomics.android.messaging.Placement;
 import com.playnomics.android.messaging.Placement.IPlacementStateObserver;
 
 import android.app.Activity;
@@ -18,17 +19,18 @@ public class PlayDialog extends Dialog {
 	private ImageView nativeCloseButton;
 	private Activity activity;
 	private IPlacementStateObserver observer;
+	private Placement placement;
 	
-	public PlayDialog(Context context, PlayWebView webView, final IPlacementStateObserver observer, Activity activity) {
-		super(context);
-		
+	public PlayDialog(Activity activity, PlayWebView webView, final IPlacementStateObserver observer, Placement placement) {
+		super(activity);
+		this.placement = placement;
 		this.webView = webView;
 		this.activity = activity;
 		this.observer = observer;
 	}
 	
-	public PlayDialog(Context context, PlayWebView webView, final IPlacementStateObserver observer, Activity activity, ImageView nativeCloseButton) {
-		this(context, webView, observer, activity);
+	public PlayDialog(Activity activity, PlayWebView webView, final IPlacementStateObserver observer, ImageView nativeCloseButton, Placement placement) {
+		this(activity, webView, observer, placement);
 		this.nativeCloseButton = nativeCloseButton;
 	}
 	
@@ -53,5 +55,7 @@ public class PlayDialog extends Dialog {
 			params.addRule(RelativeLayout.ALIGN_PARENT_TOP | RelativeLayout.ALIGN_PARENT_RIGHT);
 			addContentView(nativeCloseButton, params);
 		}
+		
+		observer.onPlacementShown(activity, placement);
 	}
 }
