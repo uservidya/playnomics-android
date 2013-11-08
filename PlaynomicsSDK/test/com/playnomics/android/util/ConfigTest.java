@@ -59,14 +59,14 @@ public class ConfigTest {
 	@Test
 	public void testProductionMessagingUrl() {
 		assertEquals("Production Messaging URL",
-				"https://ads.a.playnomics.net/v2/", config.getMessagingUrl());
+				"https://ads.a.playnomics.net/v3/", config.getMessagingUrl());
 	}
 
 	@Test
 	public void testTestMessagingUrl() {
 		config.setTestMode(true);
 		assertEquals("Production Messaging URL",
-				"https://ads.b.playnomics.net/v2/", config.getMessagingUrl());
+				"https://ads.b.playnomics.net/v3/", config.getMessagingUrl());
 	}
 
 	@Test
