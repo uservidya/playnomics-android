@@ -45,11 +45,7 @@ public class CustomEventTest extends PlaynomicsEventTest {
 		GameSessionInfo sessionInfo = getGameSessionInfo();
 		String eventName = "my event";
 
-		long milestoneId = 100L;
-
 		IConfig config = new Config();
-
-		when(utilMock.generatePositiveRandomLong()).thenReturn(milestoneId);
 
 		CustomEvent event = new CustomEvent(config, utilMock, sessionInfo,
 				eventName);
@@ -57,7 +53,5 @@ public class CustomEventTest extends PlaynomicsEventTest {
 
 		Map<String, Object> params = event.getEventParameters();
 		assertEquals("Milestone Name is set", eventName, params.get("mn"));
-		assertEquals("Milestone ID is set", milestoneId, params.get("mi"));
-		verify(utilMock).generatePositiveRandomLong();
 	}
 }

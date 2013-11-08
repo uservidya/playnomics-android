@@ -74,8 +74,6 @@ public interface IConfig {
 
 	public String getTransactionCurrencyCategoryFormatKey();
 
-	public String getMilestoneIdKey();
-
 	public String getMilestoneNameKey();
 
 	public int getAppRunningIntervalSeconds();
