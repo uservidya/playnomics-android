@@ -1,11 +1,13 @@
 package com.playnomics.android.client;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.After;
@@ -16,9 +18,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.playnomics.android.client.EventQueue;
-import com.playnomics.android.client.EventWorker;
-import com.playnomics.android.client.HttpConnectionFactory;
 import com.playnomics.android.events.CustomEvent;
 import com.playnomics.android.session.GameSessionInfo;
 import com.playnomics.android.util.Config;
@@ -26,6 +25,7 @@ import com.playnomics.android.util.LargeGeneratedId;
 import com.playnomics.android.util.Logger;
 import com.playnomics.android.util.UnitTestLogWriter;
 import com.playnomics.android.util.Util;
+
 
 public class EventWorkerTest {
 	
@@ -77,7 +77,8 @@ public class EventWorkerTest {
 		worker.start();
 		Thread.sleep(1500);
 		worker.stop();
-		assertTrue("Queue is empty", queue.isEmpty());
+		Set<String> unprocessed = worker.getAllUnprocessedEvents();
+		assertTrue("Unprocessed is empty", unprocessed.isEmpty());
 	}
 	
 	@Test
@@ -87,6 +88,20 @@ public class EventWorkerTest {
 		worker.start();
 		Thread.sleep(1500);
 		worker.stop();
-		assertFalse("Queue is not empty", queue.isEmpty());
+		
+		Set<String> unprocessed = worker.getAllUnprocessedEvents();
+		assertFalse("Unprocessed is not empty", unprocessed.isEmpty());
+	}
+	
+	@Test()
+	public void testRequestThrowsException() throws InterruptedException, IOException{
+		when(connectionMock.getResponseCode()).thenThrow(new IOException());
+		queue.enqueueEvent(event);
+		worker.start();
+		Thread.sleep(1500);
+		
+		assertFalse("Worker has been stopped", worker.isRunning());
+		Set<String> unprocessed = worker.getAllUnprocessedEvents();
+		assertFalse("Unprocessed is not empty", unprocessed.isEmpty());
 	}
 }
