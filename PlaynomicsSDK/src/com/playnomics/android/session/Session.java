@@ -284,7 +284,6 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventQueue.enqueueEvent(event);
 			// reset the touch events
 			touchEvents.set(0);
-			allTouchEvents.set(0);
 
 		} catch (UnsupportedEncodingException exception) {
 			logger.log(LogLevel.ERROR, exception, "Could not log appRunning");

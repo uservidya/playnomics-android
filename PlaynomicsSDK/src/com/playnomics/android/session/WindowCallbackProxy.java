@@ -39,7 +39,7 @@ public class WindowCallbackProxy implements InvocationHandler {
 			throws Throwable {
 
 		Object result;
-		if (method.getName() == "dispatchTouchEvent") {
+		if (method.getName().equals("dispatchTouchEvent")) {
 			if (args != null && args.length > 0) {
 				Object event = args[0];
 
