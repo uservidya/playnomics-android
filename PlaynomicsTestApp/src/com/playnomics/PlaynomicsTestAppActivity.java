@@ -12,17 +12,14 @@ import com.playnomics.android.sdk.Playnomics;
 import com.playnomics.android.util.Logger.LogLevel;
 
 public class PlaynomicsTestAppActivity extends Activity {
-	
-	private String logTag = PlaynomicsTestAppActivity.class.getSimpleName();
-	private final long applicationId = 2143315484923938870L;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		final long applicationId = 2143315484923938870L;
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
 		Playnomics.setLogLevel(LogLevel.VERBOSE);
-		Playnomics.setOverrideEventsUrl("https://e.c.playnomics.net/v1/");
-		Playnomics.setOverrideMessagingUrl("https://ads.c.playnomics.net/v3/");
+		Playnomics.setTestMode(true);
 		Playnomics.start(this, applicationId);
 		Playnomics.preloadPlacements("44841d6a2bcec8c9", "a40893b36c6ddb32", "67dbfcad37eccbf9", "5bc049bb66ffc121");
 	}
