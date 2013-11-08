@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.playnomics.android.util.Logger;
@@ -17,6 +21,7 @@ public class EventWorker implements IEventWorker {
 	private AtomicBoolean running;
 
 	private Thread thread;
+	private ScheduledThreadPoolExecutor scheduler;
 
 	public EventWorker(IEventQueue eventQueue, IHttpConnectionFactory factory,
 			Logger logger) {
@@ -26,6 +31,10 @@ public class EventWorker implements IEventWorker {
 		this.logger = logger;
 	}
 
+	public boolean isRunning(){
+		return running.get();
+	}
+	
 	public void start() {
 		if (running.getAndSet(true)) {
 			// return if we were already running
@@ -41,6 +50,10 @@ public class EventWorker implements IEventWorker {
 	}
 
 	public void stop() {
+		if(scheduler != null){
+			scheduler.shutdown();
+		}
+		
 		if (!running.getAndSet(false)) {
 			return;
 		}
@@ -52,6 +65,20 @@ public class EventWorker implements IEventWorker {
 		}
 	}
 
+	private void stopWithRestart(){
+		if (!running.getAndSet(false)) {
+			return;
+		}
+		
+		scheduler = new ScheduledThreadPoolExecutor(1);
+		Runnable restartTask = new Runnable() {
+			public void run() {
+				start();
+			}
+		};
+		scheduler.schedule(restartTask, 2, TimeUnit.MINUTES);
+	}
+	
 	private void doWork() {
 		while (running.get()) {
 			while (!eventQueue.isEmpty() && running.get()) {
@@ -64,7 +91,9 @@ public class EventWorker implements IEventWorker {
 					successful = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
 				} catch (IOException ex) {
 					logger.log(LogLevel.WARNING, ex,
-							"IO Exception for Event URL: %s", url);
+							"Could not connext to the event API. Shutting down the queue for 2 minutes ...", url);
+					eventQueue.enqueueEventUrl(url);
+					stopWithRestart();
 				} finally {
 					if (connection != null) {
 						connection.disconnect();
@@ -79,6 +108,10 @@ public class EventWorker implements IEventWorker {
 				}
 			}
 
+			if(!running.get()){
+				return;
+			}
+			
 			try {
 				// put this thread to sleep
 				Thread.sleep(1000);

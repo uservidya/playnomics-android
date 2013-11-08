@@ -4,6 +4,8 @@ import java.util.Set;
 
 public interface IEventWorker {
 
+	public boolean isRunning();
+	
 	public void start();
 
 	public void stop();
