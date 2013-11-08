@@ -177,8 +177,6 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			sequence = new AtomicInteger(1);
 			touchEvents = new AtomicInteger(0);
 			allTouchEvents = new AtomicInteger(0);
-			sequence = new AtomicInteger(0);
-
 			// start the background UI service
 
 			// send appRunning or appPage
