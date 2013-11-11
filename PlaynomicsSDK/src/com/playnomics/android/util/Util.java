@@ -147,4 +147,10 @@ public class Util implements IRandomGenerator {
 	public void runTaskOnActivityUIThread(Runnable task, Activity activity) {
 		activity.runOnUiThread(task);
 	}
+	
+	public Thread startTaskOnBackgroundThread(Runnable task){
+		Thread thread = new Thread(task);
+		thread.start();
+		return thread;
+	}
 }

@@ -25,6 +25,7 @@ import com.playnomics.android.events.UserInfoEvent;
 import com.playnomics.android.messaging.MessagingManager;
 import com.playnomics.android.sdk.IPlaynomicsPlacementDelegate;
 import com.playnomics.android.util.CacheFile;
+import com.playnomics.android.util.CacheFile.ICacheFileHandler;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.EventTime;
 import com.playnomics.android.util.IConfig;
@@ -238,10 +239,12 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventQueue.enqueueEvent(event);
 			eventWorker.stop();
 			producer.stop();
-			sessionState = SessionState.PAUSED;
 			
 			Set<String> unprocessUrls = eventWorker.getAllUnprocessedEvents();
-			cacheFile.writeSetToFile(unprocessUrls);
+			Runnable writeTask = cacheFile.writeSetToFile(unprocessUrls);
+			util.startTaskOnBackgroundThread(writeTask);
+			
+			sessionState = SessionState.PAUSED;
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not pause the session");
 		}
@@ -260,13 +263,19 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			eventWorker.start();
 			producer.start(this);
 			
-			Set<String> unprocessedUrls = cacheFile.readSetFromFile();
-			if(unprocessedUrls != null){
-				for(String url : unprocessedUrls){
-					eventQueue.enqueueEventUrl(url);
+			ICacheFileHandler handler = new ICacheFileHandler() {
+				public void onReadSetComplete(Set<String> data) {
+					if(data != null){
+						for(String url : data){
+							eventQueue.enqueueEventUrl(url);
+						}
+					}
 				}
-			}
+			};
 			
+			Runnable readTask = cacheFile.readSetFromFile(handler);
+			util.startTaskOnBackgroundThread(readTask);
+
 			sessionState = SessionState.STARTED;
 		} catch (Exception ex) {
 			logger.log(LogLevel.ERROR, ex, "Could not resume the session");

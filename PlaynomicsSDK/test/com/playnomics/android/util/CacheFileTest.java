@@ -20,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.playnomics.android.util.CacheFile.ICacheFileHandler;
+
 import android.content.Context;
 
 public class CacheFileTest {
@@ -64,15 +66,31 @@ public class CacheFileTest {
 	}
 
 	@Test
-	public void testReadsWritesFile() {
+	public void testReadsWritesFile() throws InterruptedException {
 		Set<String> urls = new HashSet<String>();
 		urls.add("url1");
 		urls.add("url2");
 		urls.add("url3");
 		
-		cacheFile.writeSetToFile(urls);
+		Thread thread;
 		
-		Set<String> result = cacheFile.readSetFromFile();
+		Runnable writeTask = cacheFile.writeSetToFile(urls);
+		thread = new Thread(writeTask);
+		thread.start();
+		thread.join();
+		
+		final Set<String> result = new HashSet<String>();
+		ICacheFileHandler handler = new ICacheFileHandler(){
+			public void onReadSetComplete(Set<String> data) {
+				result.addAll(data);
+			}
+		};
+		
+		Runnable readTask =cacheFile.readSetFromFile(handler);
+		thread = new Thread(readTask);
+		thread.start();
+		thread.join();
+		
 		assertArrayEquals(urls.toArray(), result.toArray());
 	}
 

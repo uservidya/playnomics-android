@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -39,6 +40,7 @@ import com.playnomics.android.session.IHeartBeatProducer;
 import com.playnomics.android.session.Session;
 import com.playnomics.android.session.SessionStateMachine;
 import com.playnomics.android.util.CacheFile;
+import com.playnomics.android.util.CacheFile.ICacheFileHandler;
 import com.playnomics.android.util.Config;
 import com.playnomics.android.util.ContextWrapper;
 import com.playnomics.android.util.EventTime;
@@ -84,6 +86,13 @@ public class SessionTest {
 	
 	@Mock
 	private CacheFile cacheFileMock;
+	
+	@Mock
+	private Runnable readTaskMock;
+	
+	@Mock
+	private Runnable writeTaskMock;
+	
 	
 	private Session session;
 	private StubEventQueue eventQueue;
@@ -381,20 +390,17 @@ public class SessionTest {
 		verify(eventWorker).stop();
 		verify(cacheFileMock).writeSetToFile(unprocessedUrls);
 
+		when(cacheFileMock.readSetFromFile(any(ICacheFileHandler.class))).thenReturn(readTaskMock);
 		
-		when(cacheFileMock.readSetFromFile()).thenReturn(unprocessedUrls);
 		session.resume();
 		verify(producerMock, Mockito.atMost(2)).start(session);
 		verify(eventWorker, Mockito.atMost(2)).start();
-		
-		
+		verify(utilMock).startTaskOnBackgroundThread(readTaskMock);
 		
 		Object pauseEvent = eventQueue.queue.remove();
 		assertTrue("Pause event queued", pauseEvent instanceof AppPauseEvent);
 		Object resumeEvent = eventQueue.queue.remove();
 		assertTrue("Resume event queued", resumeEvent instanceof AppResumeEvent);
-		String previousEvent = (String) eventQueue.queue.remove();
-		assertEquals("Previous event queued", url, previousEvent);
 	}
 
 	@Test
@@ -410,7 +416,7 @@ public class SessionTest {
 		
 		assertTrue("No events were queued", eventQueue.queue.isEmpty());
 		verify(cacheFileMock, Mockito.never()).writeSetToFile(unprocessedUrls);
-		verify(cacheFileMock, Mockito.never()).readSetFromFile();
+		verify(cacheFileMock, Mockito.never()).readSetFromFile(any(ICacheFileHandler.class));
 	}
 	
 	@Test 
