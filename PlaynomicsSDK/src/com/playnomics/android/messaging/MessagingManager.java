@@ -6,6 +6,7 @@ import android.app.Activity;
 
 import com.playnomics.android.client.PlacementDataClient;
 import com.playnomics.android.messaging.Placement.IPlacementStateObserver;
+import com.playnomics.android.messaging.Placement.PlacementState;
 import com.playnomics.android.messaging.ui.IPlayViewFactory;
 import com.playnomics.android.messaging.ui.RenderTaskFactory;
 import com.playnomics.android.sdk.IPlaynomicsPlacementDelegate;
@@ -49,6 +50,11 @@ public class MessagingManager implements IPlacementStateObserver {
 	public void showPlacement(String placementName, Activity activity,
 			IPlaynomicsPlacementDelegate delegate) {
 		Placement placement = getOrAddPlacement(placementName);
+	
+		if(placement.getState() == PlacementState.NOT_LOADED || placement.getState() == PlacementState.LOAD_FAILED){
+			placementDataClient.loadPlacementInBackground(placement);
+		}
+		
 		placement.show(activity, delegate);
 	}
 
