@@ -44,10 +44,17 @@
         android:text="Messaging No Ads"
         android:onClick="onNoAdsClick" />
     
-      <Button
-        android:id="@+id/messagingNullTargetButton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Messaging Null Target"
-        android:onClick="onNullTargetClick" />
+     <Button
+       android:id="@+id/messagingNullTargetButton"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:text="Messaging Null Target"
+       android:onClick="onNullTargetClick" />
+     
+     <Button
+       android:id="@+id/messagingThirdPartyAds"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:text="Messaging Third Party Ad"
+       android:onClick="onThirdPartyAdClick" />
 </LinearLayout>

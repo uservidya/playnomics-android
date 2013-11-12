@@ -12,6 +12,9 @@ import com.playnomics.android.sdk.Playnomics;
 import com.playnomics.android.util.Logger.LogLevel;
 
 public class PlaynomicsTestAppActivity extends Activity {
+	
+	private static boolean preloaded = false;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		final long applicationId = 2143315484923938870L;
@@ -19,9 +22,14 @@ public class PlaynomicsTestAppActivity extends Activity {
 		setContentView(R.layout.main);
 		
 		Playnomics.setLogLevel(LogLevel.VERBOSE);
-		Playnomics.setTestMode(true);
+		//Playnomics.setTestMode(false);
 		Playnomics.start(this, applicationId);
-		Playnomics.preloadPlacements("44841d6a2bcec8c9", "a40893b36c6ddb32", "67dbfcad37eccbf9", "5bc049bb66ffc121");
+		
+		if(!preloaded){
+			//only preload once
+			Playnomics.preloadPlacements("44841d6a2bcec8c9", "a40893b36c6ddb32", "67dbfcad37eccbf9", "5bc049bb66ffc121", "e45c59f627043701");
+			preloaded = true;
+		}
 	}
 	
 	@Override
@@ -70,6 +78,10 @@ public class PlaynomicsTestAppActivity extends Activity {
 	
 	public void onNoAdsClick(View view){
 		setupPlacement("5bc049bb66ffc121");
+	}
+	
+	public void onThirdPartyAdClick(View view){
+ 		setupPlacement("e45c59f627043701");
 	}
 	
 	private void setupPlacement (String placementName){
