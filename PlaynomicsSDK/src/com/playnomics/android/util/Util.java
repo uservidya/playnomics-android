@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.provider.Settings;
 import android.view.Window;
@@ -66,9 +67,24 @@ public class Util implements IRandomGenerator {
 		}
 	}
 
-	public void openUrlInPhoneBrowser(String url, Context context) {
-		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-		context.startActivity(browserIntent);
+	public void startUriIntent(String uri, Context context) {
+		
+		try{
+			Intent uriIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+			
+			PackageManager packageManager = context.getPackageManager();
+			List<ResolveInfo> activities = packageManager.queryIntentActivities(uriIntent, 0);
+			boolean isIntentSafe = activities.size() > 0;
+			
+			if(isIntentSafe){
+				context.startActivity(uriIntent);
+			} else {
+				logger.log(LogLevel.WARNING, "Failed to navigate to URI %s. There is nothing to repond to this URI.", uri);
+			}
+		} catch(Exception ex){
+			logger.log(LogLevel.WARNING, "Failed to navigate to URI %s", uri);
+			logger.log(LogLevel.WARNING, ex);
+		}
 	}
 
 	public String getDeviceLanguage() {

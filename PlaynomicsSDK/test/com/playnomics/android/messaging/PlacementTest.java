@@ -351,7 +351,7 @@ public class PlacementTest {
 		placement.onUrlLoading(clickLink);
 
 		verify(processorMock).processUrlCallback(clickUrl);
-		verify(utilMock).openUrlInPhoneBrowser(targetUrl, activityMock);
+		verify(utilMock).startUriIntent(targetUrl, activityMock);
 	}
 	
 	@Test
@@ -372,7 +372,7 @@ public class PlacementTest {
 		placement.onUrlLoading(clickLink);
 		
 		verify(processorMock).processUrlCallback(clickUrl);
-		verify(utilMock, Mockito.never()).openUrlInPhoneBrowser(targetUrl,
+		verify(utilMock, Mockito.never()).startUriIntent(targetUrl,
 				activityMock);
 	}
 	

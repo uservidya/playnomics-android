@@ -176,7 +176,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 
 			onAdTouched();
 			if (!url.equals(htmlAd.getClickLink())) {
-				util.openUrlInPhoneBrowser(url, activity);
+				util.startUriIntent(url, activity);
 			}
 		}
 	}
@@ -187,7 +187,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 
 		if (target.getTargetType() == TargetType.URL
 				&& !Util.stringIsNullOrEmpty(target.getTargetUrl())) {
-			util.openUrlInPhoneBrowser(target.getTargetUrl(), activity);
+			util.startUriIntent(target.getTargetUrl(), activity);
 		}
 
 		if (delegate != null) {
