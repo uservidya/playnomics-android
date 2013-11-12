@@ -33,9 +33,7 @@ public class PlayDialog extends Dialog {
 		this(activity, webView, observer, placement);
 		this.nativeCloseButton = nativeCloseButton;
 	}
-	
-	final int PADDING = 10;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,6 +55,8 @@ public class PlayDialog extends Dialog {
 		//make the dialog window fullscreen
 		window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT);
 		setCanceledOnTouchOutside(false);
+		//can't be close by the back button
+		setCancelable(false);
 		
 		observer.onPlacementShown(activity, placement);
 	}
