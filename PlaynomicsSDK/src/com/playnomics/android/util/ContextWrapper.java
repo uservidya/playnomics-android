@@ -89,7 +89,7 @@ public class ContextWrapper {
 		return util.getApplicationVersionFromContext(context);
 	}
 
-	public boolean synchronizeDeviceSettings() {
+	public boolean pushSettingsOutdated() {
 		int cachedVersion = getApplicationVersion();
 		int currentVersion = getCurrentAppVersion();
 		if (cachedVersion != currentVersion) {

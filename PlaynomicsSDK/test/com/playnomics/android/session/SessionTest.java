@@ -154,7 +154,7 @@ public class SessionTest {
 		when(contextWrapperMock.getLastEventTime()).thenReturn(null);
 		when(contextWrapperMock.getLastSessionStartTime()).thenReturn(null);
 		when(contextWrapperMock.getPreviousSessionId()).thenReturn(null);
-		when(contextWrapperMock.synchronizeDeviceSettings()).thenReturn(true);
+		when(contextWrapperMock.pushSettingsOutdated()).thenReturn(true);
 
 		session.setApplicationId(appId);
 		session.setUserId(userId);
@@ -238,7 +238,7 @@ public class SessionTest {
 				startEventTime);
 		when(contextWrapperMock.getPreviousSessionId())
 				.thenReturn(oldSessionId);
-		when(contextWrapperMock.synchronizeDeviceSettings()).thenReturn(
+		when(contextWrapperMock.pushSettingsOutdated()).thenReturn(
 				deviceDataChanged);
 
 		session.setApplicationId(appId);
@@ -274,15 +274,12 @@ public class SessionTest {
 					.getId());
 		}
 
-		if (deviceDataChanged) {
-			Object nextEvent = eventQueue.queue.remove();
-			assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
-			// 2 events are queued
-			assertTrue("2 events are queued", eventQueue.isEmpty());
-		} else {
-			// 1 events are queued
-			assertTrue("1 event is queued", eventQueue.isEmpty());
-		}
+
+		Object nextEvent = eventQueue.queue.remove();
+		assertTrue("UserInfo queued", nextEvent instanceof UserInfoEvent);
+		// 2 events are queued
+
+		assertTrue("2 events are queued", eventQueue.isEmpty());
 
 		verify(producerMock).start(session);
 		verify(observerMock).setStateMachine(session);

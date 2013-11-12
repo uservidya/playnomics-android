@@ -111,11 +111,12 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 	private AtomicInteger sequence;
 	private AtomicInteger touchEvents;
 	private AtomicInteger allTouchEvents;
-	private boolean enablePushNotifications;
+	//TODO: push notifications
+	//private boolean enablePushNotifications;
 
-	public void setEnabledPushNotifications(boolean value) {
-		enablePushNotifications = value;
-	}
+//	public void setEnabledPushNotifications(boolean value) {
+//		enablePushNotifications = value;
+//	}
 
 	public void setOverrideEventsUrl(String eventsUrl){
 		config.setOverrideEventsUrl(eventsUrl);
@@ -166,8 +167,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 			sessionState = SessionState.STARTED;
 			this.contextWrapper = contextWrapper;
-			boolean settingsChanged = contextWrapper
-					.synchronizeDeviceSettings();
+			
+//TODO: 	refactor for push settings
+//			boolean settingsChanged = contextWrapper
+//					.pushSettingsOutdated();
 
 			androidId = util.getDeviceIdFromContext(contextWrapper.getContext());
 			
@@ -215,9 +218,15 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 			producer.start(this);
 			observer.setStateMachine(this);
 
-			if (settingsChanged) {
-				onDeviceSettingsUpdated();
-			}
+			//TODO: Refactor for push
+			
+//			if (enablePushNotifications && settingsChanged) {
+//				registerForPushNotifcations();
+//			} else {
+			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
+					null, util.getDeviceIdFromContext(contextWrapper.getContext()));
+			eventQueue.enqueueEvent(event);
+			//}
 			
 			cacheFile.setContext(contextWrapper.getContext());			
 		} catch (Exception ex) {
@@ -312,21 +321,10 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		}
 	}
 
-	private void onDeviceSettingsUpdated() throws UnsupportedEncodingException {
-		if (enablePushNotifications
-				&& contextWrapper.getPushRegistrationId() == null) {
-			registerForPushNotifcations();
-		} else {
-			UserInfoEvent event = new UserInfoEvent(config, getSessionInfo(),
-					contextWrapper.getPushRegistrationId(),
-					util.getDeviceIdFromContext(contextWrapper.getContext()));
-			eventQueue.enqueueEvent(event);
-		}
-	}
-
-	void registerForPushNotifcations() {
-
-	}
+	//TODO: bring back for push
+//	void registerForPushNotifcations() {
+//		
+//	}
 
 	// explicit events
 	public void transactionInUSD(float priceInUSD, int quantity) {
