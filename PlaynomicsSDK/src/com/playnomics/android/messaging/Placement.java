@@ -25,7 +25,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	public interface IPlacementStateObserver {
 		void onPlacementShown(Activity activity, Placement placement);
 
-		void onPlacementDisposed(Activity activity);
+		void onPlacementDisposed(Activity activity, Placement placement);
 	}
 
 	public enum PlacementState {
@@ -51,14 +51,19 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 		return placementName;
 	}
 
+	private Object sycnLock = new Object();
 	private PlacementState state;
 
 	public PlacementState getState() {
-		return state;
+		synchronized(sycnLock){
+			return state;
+		}
 	}
 
 	public void setState(PlacementState state) {
-		this.state = state;
+		synchronized(sycnLock){
+			this.state = state;
+		}
 	}
 
 	public void setDialog(PlayDialog dialog) {
@@ -122,17 +127,19 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void hide() {
+		removeFromView();
+		state = PlacementState.NOT_LOADED;
+		shouldRender = false;
+		observer.onPlacementDisposed(activity, this);
+	}
+	
+	private void removeFromView(){
 		if (dialog != null) {
 			Runnable hideTask = renderTaskFactory
 					.createHidePlacementTask(dialog);
 			util.runTaskOnActivityUIThread(hideTask, activity);
 			dialog = null;
 		}
-	}
-	
-	private void dispose(){
-		hide();
-		observer.onPlacementDisposed(activity);
 	}
 
 	public void onLoadFailure(int errorCode) {
@@ -163,7 +170,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void onUrlLoading(String url) {
-		dispose();
+		hide();
 		if (!Util.stringIsNullOrEmpty(url)) {
 			if (!hasNativeCloseButton()) {
 				HtmlCloseButton htmlClose = (HtmlCloseButton) htmlAd
@@ -210,11 +217,11 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	public void detachActivity() {
-		hide();
+		removeFromView();
 	}
 
 	public void onTouch() {
-		dispose();
+		hide();
 		onAdClosed(true);
 	}
 }
