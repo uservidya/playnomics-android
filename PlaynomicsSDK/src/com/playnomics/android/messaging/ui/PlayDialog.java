@@ -40,11 +40,6 @@ public class PlayDialog extends Dialog {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		Window window = getWindow();
-		window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-		//make the dialog window fullscreen
-		window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT);
-		setCanceledOnTouchOutside(false);
 		
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, 
 				LayoutParams.FILL_PARENT);
@@ -55,6 +50,13 @@ public class PlayDialog extends Dialog {
 			params.addRule(RelativeLayout.ALIGN_PARENT_TOP | RelativeLayout.ALIGN_PARENT_RIGHT);
 			addContentView(nativeCloseButton, params);
 		}
+		
+		//do this after we add the content so the content fills the entire screen
+		Window window = getWindow();
+		window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+		//make the dialog window fullscreen
+		window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT);
+		setCanceledOnTouchOutside(false);
 		
 		observer.onPlacementShown(activity, placement);
 	}
