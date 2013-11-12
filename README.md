@@ -17,7 +17,7 @@ You can also forking this [repo](https://github.com/playnomics/playnomics-androi
 
 * Add the PlaynomicsAndroidSDK.jar file or the project to your Android application's build path.
 
-* Add the following permissions to your Android application manifest file if they don't already exist:
+* Add the following permissions to your Android application's manifest file if they don't already exist:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -26,7 +26,7 @@ You can also forking this [repo](https://github.com/playnomics/playnomics-androi
 
 ## Starting a PlayRM Session
 
-To start logging automatically tracking player engagement data, you need to first start a session. **No other SDK calls will work until you do this.**
+To start logging automatically tracking user engagement data, you need to first start a session. **No other SDK calls will work until you do this.**
 
 In the root `Activity` of your application, start the PlayRM Session in the `onCreateMethod`:
 
@@ -35,44 +35,44 @@ In the root `Activity` of your application, start the PlayRM Session in the `onC
 import com.playnomics.android.sdk.Playnomics;
 
 class YourActivity extends Activity {
-    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         final long applicationId = <APPID>L;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
+
         //optionally set the log level for the SDK, default is ERROR
         Playnomics.setLogLevel(LogLevel.VERBOSE);
         //Enable test mode to view your events in the Validator. Remove this line of code before releasing your game to the app store.
         Playnomics.setTestMode(true);
-        
+
         Playnomics.start(this, applicationId);
     }
 }
 ```
 
-You can either provide a dynamic `<USER-ID>` to identify each player:
+You can either provide a dynamic `<USER-ID>` to identify each user:
 
 ```objectivec
 public static void start(Context context, long applicationId, String userId);
 ```
 
-or have PlayRM, generate a *best-effort* unique-identifier for the player:
+or have PlayRM, generate a *best-effort* unique-identifier for the user:
 
 ```objectivec
 public static void start(Context context, long applicationId);
 ```
 
-If you do choose to provide a `<USER-ID>`, this value should be persistent, anonymized, and unique to each player. This is typically discerned dynamically when a player starts the game. Some potential implementations:
+If you do choose to provide a `<USER-ID>`, this value should be persistent, anonymized, and unique to each user. This is typically discerned dynamically when a user starts the game. Some potential implementations:
 
 * An internal ID (such as a database auto-generated number).
 * A hash of the user's email address.
 
 **You cannot use the user's Facebook ID or any personally identifiable information (plain-text email, name, etc) for the `<USER-ID>`.**
 
+** IMPORTANT **
 
-In every `Activity`, you will need to also notify the SDK of when your application is pausing and resuming:
+In every `Activity`, you will need to also notify the SDK when your application is pausing and resuming:
 
 ```java
 @Override
@@ -94,11 +94,11 @@ This guide assumes you're already familiar with the concept of placements and me
 
 If you are new to PlayRM's messaging feature, please refer to <a href="http://integration.playnomics.com" target="_blank">integration documentation</a>.
 
-Once you have all of your placements created with their associated `<PLAYRM-FRAME-ID>`s, you can start the integration process.
+Once you have all of your placements created with their associated `<PLACEMENT-ID>`s, you can start the integration process.
 
 ## SDK Integration
 
-We recommend that you preload all of your placements when your application loads, so that you can quickly show a frame when necessary:
+We recommend that you preload all of your placements when your application loads, so that you can quickly show a placement when necessary:
 
 ```java
 public static void preloadPlacements(String... placementNames);
@@ -113,7 +113,7 @@ public void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-Then when you're ready, you can show the frame:
+Then when you're ready, you can show the placement:
 
 ```java
 public static void showPlacement(String placementName, Activity activity);
@@ -141,7 +141,7 @@ public static void showPlacement(String placementName, Activity activity);
     </tbody>
 </table>
 
-Optionally, associate an implementation of the `IPlaynomicsFrameDelegate` interface, to process rich data callbacks. See [Using Rich Data Callbacks](#using-rich-data-callbacks) for more information.
+Optionally, associate an implementation of the `IPlaynomicsPlacementDelegate` interface, to process rich data callbacks. See [Using Rich Data Callbacks](#using-rich-data-callbacks) for more information.
 
 
 ```java
@@ -183,7 +183,7 @@ Using an implementation of `IPlaynomicsPlacementDelegate` your game can receive 
 
 * Is shown in the screen.
 * Receives a touch event on the creative.
-* Is dismissed by the player, when they press the close button.
+* Is dismissed by the user, when they press the close button.
 * Can't be rendered in the view because of connectivity or other issues.
 
 ```java
@@ -298,7 +298,7 @@ Playnomics.transactionInUSD(priceInUSD, quantity);
 
 ## Install Attribution
 
-PlayRM allows you track and segment based on the source of install attribution. You can track this at the level of a source like *AdMob* or *MoPub*, and optionally include a campaign and an install date. By default, PlayRM tracks the install date by the first day we started seeing engagement date for your player.
+PlayRM allows you track and segment based on the source of install attribution. You can track this at the level of a source like *AdMob* or *MoPub*, and optionally include a campaign and an install date. By default, PlayRM tracks the install date by the first day we started seeing engagement date for your user.
 
 ```java
 public static void attributeInstall(String source);
@@ -333,7 +333,7 @@ public static void attributeInstall(String source, String campaign,
             <td><code>installDate</code></td>
             <td>Date</td>
             <td>
-               The date this player installed your app.
+               The date this user installed your app.
             </td>
         </tr>
     </tbody>
@@ -351,9 +351,9 @@ Playnomics.attributeInstall(source, campaign, installDate);
 
 ## Custom Event Tracking
 
-Custom events may be defined in a number of ways.  They may be defined at certain key gameplay points like, finishing a tutorial, or may they refer to other important milestones in a player's lifecycle. PlayRM, by default, supports up to 25 custom milestones.  Players can be segmented based on when and how many times they have achieved a particular milestone.
+Custom events may be defined in a number of ways.  They may be defined at certain key gameplay points like, finishing a tutorial, or may they refer to other important events in a user's lifecycle. Users can be segmented based on when and how many times they have achieved a particular event.
 
-Each time a player reaches a milestone, track it with this call:
+Each time a user reaches a event, track it with this call:
 
 ```java
 void customEvent(String customEventName);
@@ -377,10 +377,10 @@ void customEvent(String customEventName);
     </tbody>
 </table>
 
-Example client-side calls for a player reaching a milestone, with generated IDs:
+Example client-side calls for a user reaching a event, with generated IDs:
 
 ```objectivec
-String eventName = "levelComplete";
+String eventName = "level 1 complete";
 Playnomics.customEvent(eventName);
 ```
 
@@ -391,15 +391,15 @@ Push Notifications
 Example Use-Cases for Rich Data
 ===============================
 
-Here are three common use cases for frames and a messaging campaigns:
+Here are three common use cases for placements and a messaging campaigns:
 
-* [Game Start Frame](#game-start-frame)
-* [Event Driven Frame - Open the Store](#event-driven-frame-open-the-store) for instance, when the player is running low on premium currency
-* [Event Driven Frame - Level Completion](#event-driven-drame-level-completion)
+* [Game Start Placement](#game-start-placement)
+* [Event Driven Placement - Open the Store](#event-driven-placement-open-the-store) for instance, when the user is running low on premium currency
+* [Event Driven Placement - Level Completion](#event-driven-drame-level-completion)
 
-### Game Start Frame
+### Game Start Placement
 
-In this use-case, we want to configure a frame that is always shown to players when they start playing a new game. The message shown to the player may change based on the desired segments:
+In this use-case, we want to configure a placement that is always shown to users when they start playing a new game. The message shown to the user may change based on the desired segments:
 
 <table>
     <thead>
@@ -425,7 +425,7 @@ In this use-case, we want to configure a frame that is always shown to players w
             </td>
             <td>1st</td>
             <td>
-                In this case, we're worried once-active players are now in danger of leaving the game. We might offer them <strong>50 MonsterBucks</strong> to bring them back.
+                In this case, we're worried once-active users are now in danger of leaving the game. We might offer them <strong>50 MonsterBucks</strong> to bring them back.
             </td>
             <td>
                 <img src="http://playnomics.com/integration-dev/img/messaging/50-free-monster-bucks.png"/>
@@ -437,7 +437,7 @@ In this use-case, we want to configure a frame that is always shown to players w
             </td>
             <td>2nd</td>
             <td>
-                In this case, we want to thank the player for coming back and incentivize these lapsed players to continue doing so. We might offer them <strong>10 MonsterBucks</strong> to increase their engagement and loyalty.
+                In this case, we want to thank the user for coming back and incentivize these lapsed users to continue doing so. We might offer them <strong>10 MonsterBucks</strong> to increase their engagement and loyalty.
             </td>
             <td> 
                 <img src="http://playnomics.com/integration-dev/img/messaging/10-free-monster-bucks.png"/>
@@ -445,7 +445,7 @@ In this use-case, we want to configure a frame that is always shown to players w
         </tr>
         <tr>
             <td>
-                Default - players who don't fall into either segment.
+                Default - users who don't fall into either segment.
             </td>
             <td>3rd</td>
             <td>
@@ -458,7 +458,7 @@ In this use-case, we want to configure a frame that is always shown to players w
     </tbody>
 </table>
 
-We want our game to process messages for awarding items to players. We process this data with an implementation of the `IPlaynomicsPlacementDelegate` interface.
+We want our game to process messages for awarding items to users. We process this data with an implementation of the `IPlaynomicsPlacementDelegate` interface.
 
 
 ```java
@@ -493,7 +493,7 @@ public class GameActivity extends Activity {
     protected void onCreate(){
         String placementName = "placementName";
 
-        IPlaynomicsPlacementDelegate frameDelegate = new AwardDelegate();
+        IPlaynomicsPlacementDelegate delegate = new AwardDelegate();
         Playnomics.showPlacement(placementName, this, delegate)
     }
 }
@@ -538,9 +538,9 @@ Grant Bazooka
 
 ### Event Driven Placement - Open the Store
 
-An advantage of placements is that they can be triggered by in-game events. For each in-game event you would configure a separate placement. While segmentation may be helpful in deciding what message you show, it may be sufficient to show the same message to all players.
+An advantage of placements is that they can be triggered by in-game events. For each in-game event you would configure a separate placement. While segmentation may be helpful in deciding what message you show, it may be sufficient to show the same message to all users.
 
-In particular one event, for examle, a player may deplete their premium currency and you want to remind them that they can re-up through your store. In this context, we display the same message to all players.
+In particular one event, for examle, a user may deplete their premium currency and you want to remind them that they can re-up through your store. In this context, we display the same message to all users.
 
 <table>
     <thead>
@@ -562,11 +562,11 @@ In particular one event, for examle, a player may deplete their premium currency
     <tbody>
         <tr>
             <td>
-                Default - all players, because this message is intended for anyone playing the game.
+                Default - all users, because this message is intended for anyone playing the game.
             </td>
             <td>1st</td>
             <td>
-                You notice that the player's in-game, premium currency drops below a certain threshold, now you can prompt them to re-up with this <strong>message</strong>.
+                You notice that the user's in-game, premium currency drops below a certain threshold, now you can prompt them to re-up with this <strong>message</strong>.
             </td>
             <td>
                 <img src="http://playnomics.com/integration-dev/img/messaging/running-out-of-monster-bucks.png"/>
@@ -604,7 +604,7 @@ The Default message would be configured in the Control Panel to use this callbac
 
 ### Event Driven Placement - Level Completion
 
-In the following example, we wish to generate third-party revenue from players unlikely to monetize by showing them a segmented message after completing a level or challenge: 
+In the following example, we wish to generate third-party revenue from users unlikely to monetize by showing them a segmented message after completing a level or challenge: 
 
 <table>
     <thead>
@@ -649,7 +649,7 @@ In the following example, we wish to generate third-party revenue from players u
     </tbody>
 </table>
 
-This another continuation on the `AwardFrameDelegate`, with some different data. The related messages would be configured in the Control Panel:
+This another continuation on the `AwardDelegate`, with some different data. The related messages would be configured in the Control Panel:
 
 * **Non-monetizers, in their 5th day of game play**, a Target URL: `HTTP URL for Third Party Ad`
 * **Default**, Target Data:
@@ -674,7 +674,8 @@ Change Log
 
 #### Version 1.0.0
 * Support for 3rd party html-based advertisements
-* Support for simplified, fullscreen frames and internal messaging creatives
+* Support for simplified, fullscreen placements and internal messaging creatives
+* Support for custom events
 * A greatly simplified interface and API
 * More robust error and exception handling
 * Performance improvements, including background event queueing and better support for offline-mode
