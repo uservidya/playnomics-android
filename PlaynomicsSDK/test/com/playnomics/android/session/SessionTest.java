@@ -129,7 +129,7 @@ public class SessionTest {
 
 	@Test
 	public void testStartNoApplicationId() {
-		session.start(contextWrapperMock);
+		session.start(contextWrapperMock, null, null);
 		assertEquals("Session state is not started",
 				SessionStateMachine.SessionState.NOT_STARTED,
 				session.getSessionState());
@@ -156,9 +156,7 @@ public class SessionTest {
 		when(contextWrapperMock.getPreviousSessionId()).thenReturn(null);
 		when(contextWrapperMock.pushSettingsOutdated()).thenReturn(true);
 
-		session.setApplicationId(appId);
-		session.setUserId(userId);
-		session.start(contextWrapperMock);
+		session.start(contextWrapperMock, appId, userId);
 
 		assertEquals("Application ID is set", appId, session.getApplicationId());
 		assertEquals("User ID is set", userId == null ? deviceId : userId,
@@ -241,9 +239,7 @@ public class SessionTest {
 		when(contextWrapperMock.pushSettingsOutdated()).thenReturn(
 				deviceDataChanged);
 
-		session.setApplicationId(appId);
-		session.setUserId(userId);
-		session.start(contextWrapperMock);
+		session.start(contextWrapperMock, appId, userId);
 
 		assertEquals("Application ID is set", appId, session.getApplicationId());
 		assertEquals("User ID is set", userId, session.getUserId());

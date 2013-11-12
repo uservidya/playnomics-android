@@ -94,21 +94,17 @@ public class Playnomics {
 	
 	public static void start(Context context, long applicationId, String userId) {
 		Session session = getInstance();
-		session.setApplicationId(applicationId);
-		session.setUserId(userId);
 		ContextWrapper contextWrapper = new ContextWrapper(context, logger,
 				util);
-		session.start(contextWrapper);
+		session.start(contextWrapper, applicationId, userId);
 	}
 
 	public static void start(Context context, long applicationId) {
 		Session session = getInstance();
-		session.setApplicationId(applicationId);
-		session.setUserId(null);
 
 		ContextWrapper contextWrapper = new ContextWrapper(context, logger,
 				util);
-		session.start(contextWrapper);
+		session.start(contextWrapper, applicationId, null);
 	}
 
 	public static void onActivityResumed(Activity activity) {

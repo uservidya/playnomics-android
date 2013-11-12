@@ -60,20 +60,12 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		return applicationId;
 	}
 
-	public void setApplicationId(long applicationId) {
-		this.applicationId = applicationId;
-	}
-
 	private String userId;
 
-	public String getUserId() {
+	public String getUserId(){
 		return userId;
 	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
+	
 	public String getBreadcrumbId() {
 		return androidId;
 	}
@@ -154,16 +146,18 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 		this.cacheFile = cacheFile;
 	}
 
-	public void start(ContextWrapper contextWrapper) {
+	public void start(ContextWrapper contextWrapper, Long applicationId, String userId) {
 		try {
-			if (applicationId == null) {
-				throw new NullPointerException("Application ID must be set");
-			}
-
-			// session start code here
 			if (sessionState == SessionState.STARTED || sessionState == SessionState.PAUSED) {
 				return;
 			}
+			
+			this.applicationId = applicationId;
+			if (this.applicationId == null) {
+				throw new NullPointerException("Application ID must be set");
+			}
+			
+			this.userId = userId;
 
 			sessionState = SessionState.STARTED;
 			this.contextWrapper = contextWrapper;
@@ -174,8 +168,8 @@ public class Session implements SessionStateMachine, TouchEventHandler,
 
 			androidId = util.getDeviceIdFromContext(contextWrapper.getContext());
 			
-			if (Util.stringIsNullOrEmpty(userId)) {
-				userId = androidId;
+			if (Util.stringIsNullOrEmpty(this.userId)) {
+				this.userId = androidId;
 			}
 
 			sequence = new AtomicInteger(1);
