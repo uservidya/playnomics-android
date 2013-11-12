@@ -356,7 +356,7 @@ Custom events may be defined in a number of ways.  They may be defined at certai
 Each time a user reaches a event, track it with this call:
 
 ```java
-void customEvent(String customEventName);
+public static void customEvent(String customEventName);
 ```
 <table>
     <thead>
