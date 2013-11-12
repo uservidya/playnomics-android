@@ -52,6 +52,7 @@ public class MessagingManager implements IPlacementStateObserver {
 		Placement placement = getOrAddPlacement(placementName);
 	
 		if(placement.getState() == PlacementState.NOT_LOADED || placement.getState() == PlacementState.LOAD_FAILED){
+			placement.setState(PlacementState.LOAD_STARTED);
 			placementDataClient.loadPlacementInBackground(placement);
 		}
 		
@@ -63,6 +64,7 @@ public class MessagingManager implements IPlacementStateObserver {
 		if (!placementsByName.containsKey(placementName)) {
 			placement = new Placement(placementName, callbackProcessor, util,
 					logger, this, renderTaskFactory);
+			placement.setState(PlacementState.LOAD_STARTED);
 			placementDataClient.loadPlacementInBackground(placement);
 			placementsByName.put(placementName, placement);
 		} else {

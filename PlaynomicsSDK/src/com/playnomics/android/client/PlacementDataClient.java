@@ -38,7 +38,6 @@ public class PlacementDataClient {
 	public Thread loadPlacementInBackground(final Placement placement) {
 		Runnable task = new Runnable() {
 			public void run() {
-				placement.setState(PlacementState.LOAD_STARTED);
 				String messagingApiUrl = config.getMessagingUrl();
 
 				String adsPath = config.getMessagingPathAds();
