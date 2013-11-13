@@ -3,4 +3,6 @@
     email:
       - engineering@playnomics.com
   language: java
+  jdk:
+    - openjdk6
   script: cd PlaynomicsSDK && mvn test
