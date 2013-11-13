@@ -92,7 +92,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 
 	public void updatePlacementData(HtmlAd htmlAd) {
 		this.htmlAd = htmlAd;
-		state = PlacementState.LOAD_COMPLETE;
+		setState(PlacementState.LOAD_COMPLETE);
 		impressionLogged = false;
 		if (shouldRender) {
 			loadWebView();
@@ -106,9 +106,9 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 
 		shouldRender = true;
 
-		if (state == PlacementState.LOAD_COMPLETE) {
+		if (getState() == PlacementState.LOAD_COMPLETE) {
 			loadWebView();
-		} else if (state == PlacementState.LOAD_FAILED) {
+		} else if (getState() == PlacementState.LOAD_FAILED) {
 			if (delegate != null) {
 				delegate.onRenderFailed();
 			}
@@ -116,7 +116,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	private void loadWebView() {
-		if (!(shouldRender && state == PlacementState.LOAD_COMPLETE)) {
+		if (!(shouldRender && getState() == PlacementState.LOAD_COMPLETE)) {
 			return;
 		}
 
@@ -128,7 +128,7 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 
 	public void hide() {
 		removeFromView();
-		state = PlacementState.NOT_LOADED;
+		setState(PlacementState.NOT_LOADED);
 		shouldRender = false;
 		observer.onPlacementDisposed(activity, this);
 	}
@@ -147,14 +147,14 @@ public class Placement implements PlayWebView.IPlayWebViewHandler, IImageViewHan
 	}
 
 	private void onLoadFailure() {
-		state = PlacementState.LOAD_FAILED;
+		setState(PlacementState.LOAD_FAILED);
 		if (delegate != null) {
 			delegate.onRenderFailed();
 		}
 	}
 
 	public void onLoadComplete() {
-		state = PlacementState.LOAD_COMPLETE;
+		setState(PlacementState.LOAD_COMPLETE);
 		
 		Runnable showTask = renderTaskFactory.createShowPlacementTask(dialog);
 		util.runTaskOnActivityUIThread(showTask, activity);
