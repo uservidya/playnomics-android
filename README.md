@@ -386,7 +386,7 @@ Playnomics.customEvent(eventName);
 
 Push Notifications
 ==================
-
+Coming soon.
 
 Example Use-Cases for Rich Data
 ===============================
