@@ -70,7 +70,7 @@ If you do choose to provide a `<USER-ID>`, this value should be persistent, anon
 
 **You cannot use the user's Facebook ID or any personally identifiable information (plain-text email, name, etc) for the `<USER-ID>`.**
 
-**IMPORTANT**
+### IMPORTANT
 
 In every `Activity`, you will need to also notify the SDK when your application is pausing and resuming:
 
