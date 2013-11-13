@@ -90,7 +90,7 @@ protected void onPause() {
 
 Messaging Integration
 =====================
-This guide assumes you're already familiar with the concept of placements and messaging, and that you have all of the relevant `palcements` setup for your application.
+This guide assumes you're already familiar with the concept of placements and messaging, and that you have all of the relevant `placements` setup for your application.
 
 If you are new to PlayRM's messaging feature, please refer to <a href="http://integration.playnomics.com" target="_blank">integration documentation</a>.
 
