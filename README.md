@@ -1,6 +1,8 @@
 Playnomics PlayRM Android SDK Integration Guide
 =============================================
 
+[![Build Status](https://api.travis-ci.org/playnomics/playnomics-android.png)](https://travis-ci.org/playnomics/playnomics-android)
+
 ## Considerations for Cross-Platform Applications
 
 If you want to deploy your application to multiple platforms (eg: iOS, Android, etc), you'll need to create a separate Playnomics Applications in the control panel. Each application must incorporate a separate `<APPID>` particular to that application. In addition, message frames and their respective creative uploads will be particular to that app in order to ensure that they are sized appropriately - proportionate to your application screen size.
