@@ -1,9 +1,9 @@
 Playnomics PlayRM Android SDK Integration Guide
 =============================================
 
-## Considerations for Cross-Platform Games
+## Considerations for Cross-Platform Applications
 
-If you want to deploy your game to multiple platforms (eg: iOS, Android, etc), you'll need to create a separate Playnomics Applications in the control panel. Each application must incorporate a separate `<APPID>` particular to that application. In addition, message frames and their respective creative uploads will be particular to that app in order to ensure that they are sized appropriately - proportionate to your game screen size.
+If you want to deploy your application to multiple platforms (eg: iOS, Android, etc), you'll need to create a separate Playnomics Applications in the control panel. Each application must incorporate a separate `<APPID>` particular to that application. In addition, message frames and their respective creative uploads will be particular to that app in order to ensure that they are sized appropriately - proportionate to your application screen size.
 
 
 Getting Started
@@ -43,7 +43,7 @@ class YourActivity extends Activity {
 
         //optionally set the log level for the SDK, default is ERROR
         Playnomics.setLogLevel(LogLevel.VERBOSE);
-        //Enable test mode to view your events in the Validator. Remove this line of code before releasing your game to the app store.
+        //Enable test mode to view your events in the Validator. Remove this line of code before releasing your application to the app store.
         Playnomics.setTestMode(true);
 
         Playnomics.start(this, applicationId);
@@ -63,14 +63,14 @@ or have PlayRM, generate a *best-effort* unique-identifier for the user:
 public static void start(Context context, long applicationId);
 ```
 
-If you do choose to provide a `<USER-ID>`, this value should be persistent, anonymized, and unique to each user. This is typically discerned dynamically when a user starts the game. Some potential implementations:
+If you do choose to provide a `<USER-ID>`, this value should be persistent, anonymized, and unique to each user. This is typically discerned dynamically when a user starts the application. Some potential implementations:
 
 * An internal ID (such as a database auto-generated number).
 * A hash of the user's email address.
 
 **You cannot use the user's Facebook ID or any personally identifiable information (plain-text email, name, etc) for the `<USER-ID>`.**
 
-** IMPORTANT **
+**IMPORTANT**
 
 In every `Activity`, you will need to also notify the SDK when your application is pausing and resuming:
 
@@ -179,7 +179,7 @@ public static void showPlacement(String placementName, Activity activity,
 
 ## Using Rich Data Callbacks
 
-Using an implementation of `IPlaynomicsPlacementDelegate` your game can receive notifications when a placement is:
+Using an implementation of `IPlaynomicsPlacementDelegate` your application can receive notifications when a placement is:
 
 * Is shown in the screen.
 * Receives a touch event on the creative.
@@ -200,7 +200,7 @@ public interface IPlaynomicsPlacementDelegate {
 
 For each of these events, your delegate may also receive Rich Data that has been tied with this creative. Rich Data is a JSON message that you can associate with your message creative. In all cases, the `jsonData` value can be `null`.
 
-The actual contents of your JSON message can be delayed until the time of the messaging campaign configuration. However, the structure of your message needs to be decided before you can process it in your game. See [example use-cases for rich data](#example-use-cases-for-rich-data) below.
+The actual contents of your JSON message can be delayed until the time of the messaging campaign configuration. However, the structure of your message needs to be decided before you can process it in your application. See [example use-cases for rich data](#example-use-cases-for-rich-data) below.
 
 ## Validate Integration
 After you've finished the installation, you should verify your that application is correctly integrated by checkout the integration verification section of your application page.
@@ -399,7 +399,7 @@ Here are three common use cases for placements and a messaging campaigns:
 
 ### Game Start Placement
 
-In this use-case, we want to configure a placement that is always shown to users when they start playing a new game. The message shown to the user may change based on the desired segments:
+In this use-case, we want to configure a placement that is always shown to users when they start playing a new session. The message shown to the user may change based on the desired segments:
 
 <table>
     <thead>
@@ -425,7 +425,7 @@ In this use-case, we want to configure a placement that is always shown to users
             </td>
             <td>1st</td>
             <td>
-                In this case, we're worried once-active users are now in danger of leaving the game. We might offer them <strong>50 MonsterBucks</strong> to bring them back.
+                In this case, we're worried once-active users are now in danger of leaving the session. We might offer them <strong>50 MonsterBucks</strong> to bring them back.
             </td>
             <td>
                 <img src="http://playnomics.com/integration-dev/img/messaging/50-free-monster-bucks.png"/>
