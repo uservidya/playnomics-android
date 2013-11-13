@@ -5,12 +5,19 @@
 	<artifactId>PlaynomicsSDK</artifactId>
 	<version>1.0.0</version>
 	<build>
+		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
 				<directory>src/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<testSourceDirectory>test</testSourceDirectory>
+		<testResources>
+		    <testResource>
+		    	<directory>test/resources</directory>
+		    </testResource>
+	    </testResources>
 	</build>
 	<dependencies>
 		<dependency>

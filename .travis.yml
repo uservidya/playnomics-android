@@ -1,0 +1,6 @@
+---
+  notifications:
+    email:
+      - engineering@playnomics.com
+  language: java
+  script: cd src && mvn test
