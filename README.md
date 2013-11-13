@@ -252,7 +252,7 @@ Full Integration
             <a href="#support-issues">Support Issues</a>
         </li>
         <li>
-            <a href="#change-log>">Change Log</a>
+            <a href="#change-log">Change Log</a>
         </li>
     </ul>
 </div>
@@ -695,4 +695,4 @@ Change Log
 #### Version 2
 * First release
 
-View version tags <a href="https://github.com/playnomics/android-sdk/tags">here</a>
+View version <a href="https://github.com/playnomics/android-sdk/tags">tags</a>. View [releases](https://github.com/playnomics/playnomics-android/releases).
